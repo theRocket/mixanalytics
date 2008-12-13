@@ -1,7 +1,7 @@
 class SugarAccounts < SourceAdapter
 
   def initialize(source)
-    super
+    super(source)
   end
 
   def login

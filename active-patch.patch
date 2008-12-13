@@ -1,6 +1,0 @@
---- ./activesalesforce_adapter.rb	2008-05-05 16:29:08.000000000-0700
-+++ ./activesalesforce_adapter.rb	2008-05-05 16:29:08.000000000
--0700
-@@ -705 +705 @@
--                klass.belongs_to referenceName.to_sym, :class_name => referenced_klass.name, :foreign_key => foreign_key, :dependent => :nullify
-+                klass.belongs_to referenceName.to_sym, :class_name => referenced_klass.name, :foreign_key => foreign_key

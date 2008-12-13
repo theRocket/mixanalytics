@@ -1,0 +1,61 @@
+--- &id001 !ruby/object:Source 
+attributes: 
+  name: SugarAccounts
+  refreshtime: 
+  prolog: |
+    u = @source.login
+    p = Digest::MD5.hexdigest(@source.password)
+    ua = {'user_name' => u,'password' => p}
+    ss = @@client.login(ua,nil)
+    if ss.error.number.to_i != 0
+      p 'failed to login - #{ss.error.description}'
+      return
+    else
+      @session_id = ss['id']
+      uid = @client.get_user_id(@session_id)
+    end
+
+  updated_at: 2008-12-12 18:04:00.015564 Z
+  deletecall: name_value_list.push({'name'=>'deleted','value'=>'1'}); result=@client.set_entry(@session_id,'Accounts',name_value_list)
+  adapter: SugarAccounts
+  createcall: result=@@client.set_entry(@session_id,'Accounts',name_value_list)
+  type: 
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  sync: |
+    result.entry_list.each do |x|
+      x.name_value_list.each do |y|
+        o=ObjectValue.new
+        o.source_id=@source.id
+        o.object=x['id']
+        o.attrib=y.name
+        o.value=y.value
+        o.save
+      end
+    end
+
+  method: 
+  id: "1"
+  updatecall: result=@@client.set_entry(@session_id,'Accounts',name_value_list)
+  call: |
+    module_name = 'Accounts'
+    query = '' # gets all the acounts, you can also use SQL like 'accounts.name like '%company%''
+    order_by = '' # in default order. you can also use SQL like 'accounts.name'
+    offset = 0
+    select_fields = ['name','industry'] # this can't be an empty array
+    max_results = '10000' # if set to 0 or '', this doesn't return all the results
+    deleted = 0 # whether you want to retrieve deleted records, too
+    result = @@client.get_entry_list(@session_id,module_name,query,order_by,offset,select_fields,max_results,deleted);
+
+  password: testuser
+  login: testuser
+  epilog: "@@client.logout(@session_id)"
+  created_at: 2008-12-11 17:57:05
+attributes_cache: {}
+
+changed_attributes: {}
+
+errors: !ruby/object:ActiveRecord::Errors 
+  base: *id001
+  errors: {}
+
+new_record_before_save: 

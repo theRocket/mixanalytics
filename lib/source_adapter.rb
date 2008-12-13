@@ -1,6 +1,7 @@
 class SourceAdapter
   attr_accessor :client
   def initialize(source)
+    @source = source
   end
 
   def login

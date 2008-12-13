@@ -1,0 +1,23 @@
+<p>
+  <b>Name:</b>
+  <%=h @app.name %>
+</p>
+
+<p>
+  <b>Password:</b>
+  <%=h @app.password %>
+</p>
+
+<p>
+  <b>Admin:</b>
+  <%=h @app.admin %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%=h @app.description %>
+</p>
+
+
+<%= link_to 'Edit', edit_app_path(@app) %> |
+<%= link_to 'Back', apps_path %>
