@@ -31,14 +31,30 @@ such as Funambol.
 
 === PREREQUISITES
 
-    * Ruby on Rails Version 2.1
+    * Ruby on Rails Version 2.2.2
     * mySQL, SQLite or other database that plays nicely with Rails
 
-=== ADMINISTRATION
+=== INSTALLATION & ADMINISTRATION
 
-    * install the Rails application files (generally by unzipping)
-    * set up the database, generally by running “rake db:migrate”
+  sudo gem install rspec rspec-rails
+  git clone git://github.com/rhomobile/rhosync.git
+  cd rhosync
 
+Then run the db:bootstrap rake task provided, creating the database and associated tables that RhoSync needs. It will also load the source adapters that we ship with.
+
+  rake db:bootstrap
+
+Install any required gems
+
+  sudo rake gems:install
+
+Then use your Rails server of choice to run the application. For example:
+
+  mongrel_rails start
+
+Then you can view the Sources from your web browser:
+
+  http://localhost:3000
 
 === SET UP A BACKEND DATA SOURCE
 

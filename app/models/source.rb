@@ -12,7 +12,7 @@ class Source < ActiveRecord::Base
     if self.adapter and self.adapter.size>0
       @source_adapter=(Object.const_get(self.adapter)).new(self)
     else # if source_adapter is nil it will
-      @source_adapter=SourceAdapter.new
+      @source_adapter=nil
     end
   end
 

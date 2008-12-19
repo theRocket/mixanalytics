@@ -225,4 +225,13 @@ describe SourcesController do
     end
     
   end
+  
+  describe "responding to GET clientcreate" do
+
+    it "should return the created client" do
+      get :clientcreate, :format => 'json'
+      response.body.should =~ /(^[^\r\n]+?)([A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}(?:@[^\s]*)?|@[^\s]*|\s*$)/
+    end
+    
+  end
 end

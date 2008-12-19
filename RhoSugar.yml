@@ -1,11 +1,9 @@
 --- &id001 !ruby/object:Source 
 attributes: 
   name: RhoSugar
-  refreshtime: 2008-12-10 00:29:08
-  prolog: |
-    
-
-  updated_at: 2008-12-10 00:29:37.997433 Z
+  refreshtime: 2008-12-10 00:29:46
+  prolog: ""
+  updated_at: 2008-12-16 22:21:28.323843 Z
   deletecall: ""
   adapter: SugarAccounts
   createcall: ""

@@ -16,7 +16,10 @@
 <%if x.object!=prevobj%>
 <%=link_to x.object,{:action=>"editobject",:id=>@source.id,:object=>x.object,:attrib=>x.attrib}%>
 <%end%>
-</td><td><%=x.attrib%></td><td><%=x.value%></td>
+</td><td>
+<%=link_to x.attrib,{:action=>"editobject",:id=>@source.id,:object=>x.object,:attrib=>x.attrib} %>
+
+</td><td><%=x.value%></td>
   <td><%=link_to "X",{:action=>"deleteobjects",:id=>@source.id,:attrvals=>[{"object"=>x.object}]}%></td>
   </tr>
 <%

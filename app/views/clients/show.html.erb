@@ -1,0 +1,13 @@
+<p>
+  <b>Client:</b>
+  <%=h @client.client_id %>
+</p>
+
+<p>
+  <b>Session:</b>
+  <%=h @client.session %>
+</p>
+
+
+<%= link_to 'Edit', edit_client_path(@client) %> |
+<%= link_to 'Back', clients_path %>

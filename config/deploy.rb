@@ -22,6 +22,7 @@ set :ssh_options, { :forward_agent => true }
 namespace :deploy do
   desc "Restarting mod_rails with restart.txt"
   task :restart, :roles => :app, :except => { :no_release => true } do
+    
     run "touch #{current_path}/tmp/restart.txt"
   end
 
@@ -30,3 +31,11 @@ namespace :deploy do
     task t, :roles => :app do ; end
   end
 end 
+
+namespace :rake do
+  desc "Load the sample data remotely"
+  task :samples do
+    run("cd #{deploy_to}/current; /usr/bin/rake db:fixtures:samples")
+  end
+end
+

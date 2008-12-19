@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :apps
+  map.resources :clients
 
   map.resources :apps
 
@@ -7,13 +7,13 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :accounts
 
-
   map.connect 'sources/index/:app/:pwd',:controller=>'sources',:action=>'index'
+  map.connect 'sources/:id/clientcreate', :controller => 'sources', :action => 'clientcreate'
   
   # build in CRUD
-  map.connect 'sources/:id/create/:app/:pwd', :controller => 'sources', :action => 'create'
-  map.connect 'sources/:id/update/:app/:pwd', :controller => 'sources', :action => 'update'
-  map.connect 'sources/:id/delete/:app/:pwd', :controller => 'sources', :action => 'delete'
+  map.connect 'sources/:id/create', :controller => 'sources', :action => 'create'
+  map.connect 'sources/:id/update', :controller => 'sources', :action => 'update'
+  map.connect 'sources/:id/delete', :controller => 'sources', :action => 'delete'
 
   map.connect 'sources/:id/attributes', :controller => 'sources', :action => 'attributes'
   map.connect 'sources/:id/attributes.:format', :controller => 'sources', :action => 'attributes'

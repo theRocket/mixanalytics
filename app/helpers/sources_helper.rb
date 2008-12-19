@@ -19,7 +19,8 @@ module SourcesHelper
     @source=Source.find id
     @source.initadapter
     # not all endpoints require WSDL! dont do this if you dont see WSDL in the URL (a bit of a hack)
-    @source.source_adapter.client = SOAP::WSDLDriverFactory.new(@source.url).create_rpc_driver if @source.url and @source.url.size>0 and @source.url=~/wsdl/
+    client = SOAP::WSDLDriverFactory.new(@source.url).create_rpc_driver if @source.url and @source.url.size>0 and @source.url=~/wsdl/
+    @source.source_adapter.client=client if @source.source_adapter
     # make sure to use @client and @session_id variables
     # in your code that is edited into each source!
     if @source.source_adapter
