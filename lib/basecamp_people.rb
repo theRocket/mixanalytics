@@ -53,9 +53,7 @@ class BasecampPeople
   def get_all_people(people)
     people.each do |person|
       id = person['id'][0]['content']
-      
-      puts person
-    
+          
       %w(first-name last-name email-address).each do |key|
           add_triple(@source.id, id, key.gsub('-','_'), person[key][0])      
       end
