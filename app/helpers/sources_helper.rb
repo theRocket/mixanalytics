@@ -47,7 +47,8 @@ module SourcesHelper
         #  need a clean way to pass the attrvalues hash to any source adapter cleanly
         nvlist=make_name_value_list(attrvalues)
         if @source.source_adapter
-          @source.source_adapter.create(nvlist)
+          name_value_list=eval(nvlist)
+          @source.source_adapter.create(name_value_list)
         else
           raise ArgumentError,"Need some create code to execute" if @source.createcall.nil?
           callbinding=eval("name_value_list="+nvlist+";"+@source.createcall+";binding",callbinding)
@@ -70,7 +71,8 @@ module SourcesHelper
       # now attrvalues has the attribute values needed for the createcall
       nvlist=make_name_value_list(attrvalues)
       if @source.source_adapter
-        @source.source_adapter.update(nvlist)
+        name_value_list=eval(nvlist)
+        @source.source_adapter.update(name_value_list)
       else
         raise ArgumentError,"Need some update code to execute" if @source.updatecall.nil?
         callbinding=eval("name_value_list="+nvlist+";"+@source.updatecall+";binding",callbinding)
@@ -87,7 +89,8 @@ module SourcesHelper
       attrvalues["id"]=x
       nvlist=make_name_value_list(attrvalues)
       if @source.source_adapter
-        @source.source_adapter.delete(nvlist)
+        name_value_list=eval(nvlist)
+        @source.source_adapter.delete(name_value_list)
       else
         raise ArgumentError,"Need some delete code to execute" if @source.deletecall.nil?
         callbinding=eval("name_value_list="+nvlist+";"+@source.deletecall+";binding",callbinding)
