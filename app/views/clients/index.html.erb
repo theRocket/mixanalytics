@@ -10,7 +10,7 @@
   <tr>
     <td><%=h client.client_id %></td>
     <td><%=h client.session %></td>
-    <td><%= link_to 'Show', client.client_id %></td>
+    <td><%= link_to 'Show', client_path(client.client_id) %></td>
     <td><%= link_to 'Edit', edit_client_path(client) %></td>
     <td><%= link_to 'Destroy', client, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>

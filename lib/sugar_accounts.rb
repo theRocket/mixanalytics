@@ -8,13 +8,13 @@ class SugarAccounts < SourceAdapter
     u = @source.login
     p = Digest::MD5.hexdigest(@source.password)
     ua = {'user_name' => u,'password' => p}
-    ss = @client.login(ua,nil)
+    ss = client.login(ua,nil)
     if ss.error.number.to_i != 0
       p 'failed to login - #{ss.error.description}'
       return
     else
       @session_id = ss['id']
-      uid = @client.get_user_id(@session_id)
+      uid = client.get_user_id(@session_id)
     end
   end
 
@@ -43,19 +43,19 @@ class SugarAccounts < SourceAdapter
   end
 
   def create(name_value_list)
-    result=@client.set_entry(@session_id,'Accounts',name_value_list)
+    result=client.set_entry(@session_id,'Accounts',name_value_list)
   end
 
   def update(name_value_list)
-    result=@client.set_entry(@session_id,'Accounts',name_value_list)
+    result=client.set_entry(@session_id,'Accounts',name_value_list)
   end
 
   def delete(name_value_list)
     name_value_list.push({'name'=>'deleted','value'=>'1'});
-    result=@client.set_entry(@session_id,'Accounts',name_value_list)
+    result=client.set_entry(@session_id,'Accounts',name_value_list)
   end
 
   def logoff
-    @client.logout(@session_id)
+    client.logout(@session_id)
   end
 end

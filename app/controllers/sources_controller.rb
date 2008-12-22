@@ -27,14 +27,19 @@ class SourcesController < ApplicationController
     else
       p "No pending updates"
     end
+    
+    # if client_id is provided, return only relevant objects
+    # for that client
+    if params[:client_id]
+      @object_values=process_objects_for_client(params[:client_id])
+      
     # if we have a last_update parameter then only do the update
     # if the last update time is before the most recent refresh then bring back values
-    if !last_update_time or (@source.refreshtime and (last_update_time<=>@source.refreshtime)<0)
+    elsif !last_update_time or (@source.refreshtime and (last_update_time<=>@source.refreshtime)<0)
       @object_values=ObjectValue.find_all_by_update_type_and_source_id "query",params[:id]
     else  # no need to bring back values because we're still waiting for a refresh on the server!
       @object_values=nil
     end
-
 
     respond_to do |format|
       format.html

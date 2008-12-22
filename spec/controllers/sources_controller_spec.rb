@@ -25,6 +25,10 @@ describe SourcesController do
     @mock_source ||= mock_model(Source, stubs)
   end
   
+  def mock_records(stubs={})
+    @mock_records ||= mock_model(ObjectValue, stubs)
+  end
+  
   describe "responding to GET index" do
 
     it "should expose all sources as @sources" do
@@ -231,6 +235,23 @@ describe SourcesController do
     it "should return the created client" do
       get :clientcreate, :format => 'json'
       response.body.should =~ /(^[^\r\n]+?)([A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}(?:@[^\s]*)?|@[^\s]*|\s*$)/
+    end
+    
+  end
+  
+  describe "responding to GET show with client_id" do
+    
+    it "should return full list on first sync" do
+      records = mock_records(:attrib => 'some-attrib', 
+                             :object => 'some-object', 
+                             :value => 'some-value',
+                             :updated_at => nil,
+                             :created_at => nil,
+                             :id => -359898525,
+                             :source_id => 37)
+      Source.should_receive(:find).with('37').and_return(records)
+      get :show, :id => "37", :format => "json", :client_id => "some-client"
+      assigns[:source].should == records
     end
     
   end

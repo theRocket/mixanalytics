@@ -1,5 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
   map.resources :clients
+  
+  map.connect 'client/:client_id/show', :controller => 'clients', :action => 'show'
 
   map.resources :apps
 

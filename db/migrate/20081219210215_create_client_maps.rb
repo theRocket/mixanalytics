@@ -1,9 +1,8 @@
 class CreateClientMaps < ActiveRecord::Migration
   def self.up
-    create_table :client_maps do |t|
-      t.string :client_id
-      t.string :obj_key
-      t.string :update_type
+    create_table :client_maps, :id => false do |t|
+      t.string :client_id, :limit => 36
+      t.string :object_value_id
 
       t.timestamps
     end

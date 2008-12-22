@@ -4,8 +4,7 @@ describe ClientMap do
   before(:each) do
     @valid_attributes = {
       :client_id => "value for client_id",
-      :obj_key => "value for obj_key",
-      :update_type => "value for update_type"
+      :object_value_id => "value for object_values_object"
     }
   end
 
