@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(:version => 20081222175338) do
   create_table "client_maps", :id => false, :force => true do |t|
     t.string   "client_id",       :limit => 36
     t.string   "object_value_id"
+    t.string   "db_operation"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

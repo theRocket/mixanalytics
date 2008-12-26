@@ -31,7 +31,7 @@ class SourcesController < ApplicationController
     # if client_id is provided, return only relevant objects
     # for that client
     if params[:client_id]
-      @object_values=process_objects_for_client(params[:client_id])
+      @object_values=process_objects_for_client(params[:client_id], params[:id])
       
     # if we have a last_update parameter then only do the update
     # if the last update time is before the most recent refresh then bring back values
@@ -44,7 +44,7 @@ class SourcesController < ApplicationController
     respond_to do |format|
       format.html
       format.xml  { render :xml => @object_values}
-      format.json { render :json => @object_values}
+      format.json
     end
   end
 

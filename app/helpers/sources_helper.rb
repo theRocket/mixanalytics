@@ -125,8 +125,27 @@ module SourcesHelper
   # creates an object_value list for a given client
   # based on that client's client_map records
   # and the current state of the object_values table
-  def process_objects_for_client(client_id)
-    @object_values = ObjectValue.find :all
-    @object_values
+  def process_objects_for_client(client_id, source_id)
+    
+    # look for changes in the current object_values list
+    @object_values = ObjectValue.find_all_by_source_id(source_id)
+    objs_to_return = []
+    if @object_values
+      # find the new records
+      @object_values.each do |ov|
+        map = ClientMap.find_or_initialize_by_client_id_and_object_value_id({:client_id => client_id, 
+                                                                             :object_value_id => ov.id,
+                                                                             :db_operation => 'insert'})
+        if map and map.new_record?
+          map.save
+          map.object_value.db_operation = map.db_operation
+          objs_to_return << map.object_value
+        end
+      end
+      
+      # delete records that don't exist in the cache table anymore
+      
+    end
+    objs_to_return
   end
 end

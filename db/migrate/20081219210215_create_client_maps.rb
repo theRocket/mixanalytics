@@ -3,7 +3,8 @@ class CreateClientMaps < ActiveRecord::Migration
     create_table :client_maps, :id => false do |t|
       t.string :client_id, :limit => 36
       t.string :object_value_id
-
+      t.string :db_operation
+      
       t.timestamps
     end
   end
