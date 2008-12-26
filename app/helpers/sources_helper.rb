@@ -1,6 +1,4 @@
 module SourcesHelper
-<<<<<<< HEAD:app/helpers/sources_helper.rb
-=======
 
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
@@ -14,7 +12,6 @@ module SourcesHelper
     p "User: " + @current_user.login + " permitted access."
   end
 
->>>>>>> da455cd89f6a008acaf5c216e18e8f53627fe1ec:app/helpers/sources_helper.rb
   # helper function to come up with the string used for the name_value_list
   # name_value_list =  [ { "name" => "name", "value" => "rhomobile" },
   #                     { "name" => "industry", "value" => "software" } ]
