@@ -1,6 +1,6 @@
 <h1><%= h(@source.name) %></h1>
 
-<%=link_to 'Edit source',{:action=>'edit',:id=>@source.id}%><br>
+<%=link_to 'Edit source',{:action=>'edit',:id=>@source.id,:app_id=>@app.id}%><br>
 <%=link_to 'Refresh object-value records',{:action=>'refresh',:id=>@source.id}%><br>
 <%=link_to 'Create object-value record',{:action=>'newobject',:id=>@source.id}%><br>
 <%prevobj=""%>
@@ -28,4 +28,4 @@ end%>
 <%  end%>
 </table>
 
-<%= link_to "Sources", sources_url %>
+<%= link_to "Sources",app_sources_url(:app_id=>@source.app.id) %>

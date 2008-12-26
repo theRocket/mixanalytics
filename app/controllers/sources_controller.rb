@@ -9,13 +9,19 @@ require 'soap/mapping'
 
 class SourcesController < ApplicationController
 
+  before_filter :login_required
+  
   include SourcesHelper
   # shows all object values in XML structure given a supplied source
   # if a :last_update parameter is supplied then only show data that has been
   # refreshed (retrieved from the backend) since then
   protect_from_forgery :only => [:create, :delete, :update]
+  
 
+  # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
+    @app=App.find params[:app_id]
+    check_access(@app)
     last_update_time=Time.parse(params[:last_update]) if params[:last_update]
     @source=Source.find params[:id]
 
@@ -44,8 +50,10 @@ class SourcesController < ApplicationController
   end
 
   # return the metadata for the specified source
+  # ONLY FOR SUBSCRIBERS/ADIN
   def attributes
     @source=Source.find params[:id]
+    check_access(@source.app)
     # get the distinct list of attributes that is available
     @attributes=ObjectValue.find_by_sql "select distinct(attrib) from object_values where source_id="+params[:id]
 
@@ -91,6 +99,7 @@ class SourcesController < ApplicationController
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def createobjects
     @source=Source.find params[:id]
+    check_access(@source.app)
     objects={}
     params[:attrvals].each do |x| # for each hash in the array
        # note that there should NOT be an object value for new records
@@ -132,6 +141,7 @@ class SourcesController < ApplicationController
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def updateobjects
     @source=Source.find params[:id]
+    check_access(@source.app)
     objects={}
     params[:attrvals].each do |x|  # for each hash in the array
        o=ObjectValue.new
@@ -163,6 +173,7 @@ class SourcesController < ApplicationController
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def deleteobjects
     @source=Source.find params[:id]
+    check_access(@source.app)
     objects={}
     params[:attrvals].each do |x|
        o=ObjectValue.new
@@ -231,29 +242,34 @@ class SourcesController < ApplicationController
 
 
   # this connects to the web service of the given source backend and:
-  # - does a prolog (generally logging in)
+  # - does a login
   # - does creating, updating, deleting of records as required
   # - reads (queries) records from the backend
-  # - does an epilog (logs off)
+  # - logs off
   #
-  # it should be invoked on a scheduled basis by some admin process,
-  # generally using CURL.  it should also be done with a separate instance
+  # It should be invoked on a scheduled basis by some admin process,
+  # for example by using CURL.  It should also be done with a separate instance
   # than the one used to service create, update and delete calls from the client
-  # device
+  # device.
   def refresh
+    source=Source.find params[:id]
+    check_access(source.app)
     do_refresh(params[:id])
 
     redirect_to :action=>"show",:id=>@source.id
   end
-
-
+  
   # GET /sources
   # GET /sources.xml
-  # the password is actually more of a token than it is a password as we use it now
   # this returns all sources that are associated with a given "app" as determine by the token
   def index
-    #@sources = Source.find_all_by_password(params[:password])
-    @sources = Source.find :all
+    check_access
+    if params[:app_id].nil?
+      @app=App.find_by_admin request.headers['login']
+    else
+      @app=App.find params[:app_id] 
+      @sources=@app.sources if @app
+    end
         
     respond_to do |format|
       format.html # index.html.erb
@@ -261,12 +277,11 @@ class SourcesController < ApplicationController
     end
   end
 
-
   # GET /sources/new
   # GET /sources/new.xml
   def new
     @source = Source.new
-
+    @apps=App.find_all_by_admin(@current_user.login)
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @source }
@@ -275,7 +290,14 @@ class SourcesController < ApplicationController
 
   # GET /sources/1/edit
   def edit
+    if @current_user.nil?
+      redirect_to :controller=>:sessions,:action=>:new 
+    else
+      p "Current user: " + @current_user.login
+    end
     @source = Source.find(params[:id])
+    @app=App.find(params[:app_id])
+    @apps=App.find_all_by_admin(@current_user.login) 
     render :action=>"edit"
   end
 
@@ -300,13 +322,14 @@ class SourcesController < ApplicationController
   # PUT /sources/1.xml
   def update
     @source = Source.find(params[:id])
+    @app=App.find params["source"]["app_id"]
 
     respond_to do |format|
       begin
         if @source.update_attributes(params[:source])
           @source.save_to_yaml
           flash[:notice] = 'Source was successfully updated.'
-          format.html { redirect_to(@source) }
+          format.html { redirect_to(:action=>:index,:app_id=>@app.id) }
           format.xml  { head :ok }
         else
           begin  # call underlying save! so we can get some exceptions back to report
