@@ -8,6 +8,18 @@
     <%= f.text_field :name %>
   </p>
 
+  <p>
+    <%= f.label "Application" %> 
+    <select id="source_app_id" name="source[app_id]">
+      <%@apps.each do |a| %>
+        <option value="<%=a.id%>"
+<%if params[:app_id]==a.id%>
+ selected
+<%end%>
+><%=a.name%></option>
+      <%end%>
+    </select>
+  </p>
     <p>
     <%= f.label :url %><br />
     <%= f.text_field :url %>

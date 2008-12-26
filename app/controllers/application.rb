@@ -2,6 +2,13 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  include AuthenticatedSystem
+
+
+  # You can move this into a different controller, if you wish.  This module gives you the require_role helpers, and others.
+  # You can move this into a different controller, if you wish.  This module gives you the require_role helpers, and others.
+
+  
   helper :all # include all helpers, all the time
 
   # See ActionController::RequestForgeryProtection for details

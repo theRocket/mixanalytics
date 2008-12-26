@@ -1,0 +1,8 @@
+development: 
+  domain: mail.rhomobile.com
+  sender: admin@rhomobile.com
+  name: Admin
+  
+staging:
+
+production:

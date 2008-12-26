@@ -1,4 +1,20 @@
 module SourcesHelper
+<<<<<<< HEAD:app/helpers/sources_helper.rb
+=======
+
+  # determines if the logged in users is a subscriber of the current app or 
+  # admin of the current app
+  def check_access(app)
+    matches_login=app.users.select{ |u| u.login==@current_user.login}
+    matches_login << app.admin if app.admin==@current_user.login  # let the administrator of the app in as well
+    if matches_login.nil? or matches_login.size == 0
+      p "User: " + @current_user.login + " not allowed access."
+      response.redirect  :action=>"noaccess",:login=>@current_user.login
+    end
+    p "User: " + @current_user.login + " permitted access."
+  end
+
+>>>>>>> da455cd89f6a008acaf5c216e18e8f53627fe1ec:app/helpers/sources_helper.rb
   # helper function to come up with the string used for the name_value_list
   # name_value_list =  [ { "name" => "name", "value" => "rhomobile" },
   #                     { "name" => "industry", "value" => "software" } ]
