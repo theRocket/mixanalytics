@@ -71,7 +71,7 @@ class AppsController < ApplicationController
     respond_to do |format|
       if @app.save
         flash[:notice] = 'App was successfully created.'
-        format.html { redirect_to(:index) }
+        format.html { redirect_to(apps_url) }
         format.xml  { render :xml => @app, :status => :created, :location => @app }
       else
         format.html { render :action => "new" }

@@ -138,16 +138,20 @@ module SourcesHelper
   # creates an object_value list for a given client
   # based on that client's client_map records
   # and the current state of the object_values table
+  # since we do a delete_all in rhosync refresh, 
+  # only delete and insert are required
   def process_objects_for_client(client_id, source_id)
     
     # look for changes in the current object_values list
     @object_values = ObjectValue.find_all_by_source_id(source_id)
     objs_to_return = []
     if @object_values
+      
       # find the new records
       @object_values.each do |ov|
         map = ClientMap.find_or_initialize_by_client_id_and_object_value_id({:client_id => client_id, 
                                                                              :object_value_id => ov.id,
+                                                                             :object_value_object => ov.object,
                                                                              :db_operation => 'insert'})
         if map and map.new_record?
           map.save
@@ -155,9 +159,21 @@ module SourcesHelper
           objs_to_return << map.object_value
         end
       end
-      
-      # delete records that don't exist in the cache table anymore
-      
+    end
+    
+    # delete records that don't exist in the cache table anymore
+    maps_to_delete = ClientMap.find_by_client_id(client_id)
+    maps_to_delete.each do |map|
+      obj = map.object_value
+      if obj.nil?
+        temp_obj = ObjectValue.new
+        temp_obj.object = map.object_value_object
+        temp_obj.db_operation = 'delete'
+        puts "removing object: #{temp_obj.inspect} from map table and client"
+        objs_to_return << temp_obj
+        # remove from map table
+        map.destroy
+      end
     end
     objs_to_return
   end

@@ -15,7 +15,7 @@ attributes:
       uid = client.get_user_id(@session_id)
     end
 
-  updated_at: 2008-12-17 01:06:32.812011 Z
+  updated_at: 2008-12-26 21:28:45.456422 Z
   deletecall: name_value_list.push({'name'=>'deleted','value'=>'1'}); result=client.set_entry(@session_id,'Accounts',name_value_list)
   adapter: SugarAccounts
   createcall: result=client.set_entry(@session_id,'Accounts',name_value_list)
@@ -35,6 +35,7 @@ attributes:
 
   method: 
   id: "1"
+  app_id: "2"
   updatecall: result=client.set_entry(@session_id,'Accounts',name_value_list)
   call: |
     module_name = 'Accounts'
@@ -49,7 +50,7 @@ attributes:
   password: testuser
   login: testuser
   epilog: client.logout(@session_id)
-  created_at: 2008-12-17 01:05:49
+  created_at: 2008-12-26 21:28:02
 attributes_cache: {}
 
 changed_attributes: {}
