@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe SourcesController do
+  fixtures :sources
   
   def mock_source(stubs={})
     time = Time.now.to_s
@@ -51,12 +52,12 @@ describe SourcesController do
 
     it "should expose the requested source as @source" do
       Source.should_receive(:find).with("37").and_return(mock_source)
+      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("anton:password")
       get :show, :id => "37"
       assigns[:source].should equal(mock_source)
     end
     
     describe "with mime type of xml" do
-
       it "should render the requested source as xml" do
         expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nil-classes type=\"array\"/>\n"
         request.env["HTTP_ACCEPT"] = "application/xml"
@@ -64,11 +65,9 @@ describe SourcesController do
         get :show, :id => "37", :format => "xml"
         response.body.should == expected
       end
-
     end
-    
   end
-
+  
   describe "responding to GET new" do
   
     it "should expose a new source as @source" do

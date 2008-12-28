@@ -14,9 +14,6 @@ describe UsersController do
     end.should change(User, :count).by(1)
   end
 
-  
-
-
   it 'requires login on signup' do
     lambda do
       create_user(:login => nil)
