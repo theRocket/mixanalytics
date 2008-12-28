@@ -1,7 +1,7 @@
-adam:
+quentin:
   id:                        1
-  login:                     adam
-  email:                     adam@rhomobile.comr
+  login:                     quentin
+  email:                     quentin@rhomobile.com
   salt:                      356a192b7913b04c54574d18c28d46e6395428ab # SHA1('0')
   crypted_password:          314b5d13ac6f9fe0e55e8a50ad2d372a8b41f39e # 'monkey'
   created_at:                <%= 5.days.ago.to_s :db  %>
