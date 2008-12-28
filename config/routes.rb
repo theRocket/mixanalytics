@@ -13,6 +13,8 @@ ActionController::Routing::Routes.draw do |map|
   map.resource :session
 
   map.resources :clients
+  
+  map.connect 'client/:client_id/show', :controller => 'clients', :action => 'show'
 
   map.resources :apps do |app|
     app.resources :sources

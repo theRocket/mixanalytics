@@ -2,10 +2,8 @@
 
 one:
   client_id: MyString
-  obj_key: MyString
-  update_type: MyString
+  object_values_object: MyString
 
 two:
   client_id: MyString
-  obj_key: MyString
-  update_type: MyString
+  object_values_object: MyString

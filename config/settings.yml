@@ -3,16 +3,16 @@ development:
   sender: admin@rhomobile.com
   name: Admin
 
-test:
-      domain: mail.rhomobile.com
-      sender: admin@rhomobile.com
-      name: Admin
-  
 staging:
     domain: mail.rhomobile.com
     sender: admin@rhomobile.com
     name: Admin
-    
+
+test:
+  domain: mail.rhomobile.com
+  sender: admin@rhomobile.com
+  name: Admin
+
 production:
     domain: mail.rhomobile.com
     sender: admin@rhomobile.com

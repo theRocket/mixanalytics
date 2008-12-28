@@ -9,27 +9,28 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20081225004842) do
+ActiveRecord::Schema.define(:version => 20081226213425) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
-    t.string   "password"
+    t.string   "token"
     t.string   "admin"
     t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  create_table "client_maps", :force => true do |t|
-    t.string   "client_id"
-    t.string   "obj_key"
-    t.string   "update_type"
+  create_table "client_maps", :id => false, :force => true do |t|
+    t.string   "client_id",           :limit => 36
+    t.string   "object_value_id"
+    t.string   "db_operation"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "object_value_object"
   end
 
-  create_table "clients", :force => true do |t|
-    t.string   "client_id"
+  create_table "clients", :id => false, :force => true do |t|
+    t.string   "client_id",  :limit => 36
     t.string   "session"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -40,9 +41,9 @@ ActiveRecord::Schema.define(:version => 20081225004842) do
     t.string   "attrib"
     t.string   "object"
     t.string   "value"
+    t.string   "update_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "update_type"
   end
 
   create_table "sources", :force => true do |t|
@@ -64,6 +65,12 @@ ActiveRecord::Schema.define(:version => 20081225004842) do
     t.datetime "refreshtime"
     t.string   "adapter"
     t.integer  "app_id"
+  end
+
+  create_table "subscribers", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "subscriptions", :id => false, :force => true do |t|
