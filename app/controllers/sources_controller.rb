@@ -261,7 +261,7 @@ class SourcesController < ApplicationController
     check_access(source.app)
     do_refresh(params[:id])
 
-    redirect_to :action=>"show",:id=>@source.id
+    redirect_to :action=>"show",:id=>@source.id, :app_id=>@source.app.id
   end
   
   # GET /sources
