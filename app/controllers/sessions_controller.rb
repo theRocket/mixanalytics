@@ -1,6 +1,10 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
 
+  # disable forgery protection for login
+  # TODO: Only do this for json requests!
+  protect_from_forgery :except => :create
+
   # render new.rhtml
   def new
   end
