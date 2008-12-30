@@ -122,7 +122,7 @@ class SourcesController < ApplicationController
     respond_to do |format|
       format.html { 
         flash[:notice]="Created objects"
-        redirect_to :action=>"show",:id=>@source.id
+        redirect_to :action=>"show",:id=>@source.id,:app_id=>@source.app.id
       }
       format.xml  { render :xml => objects }
       format.json  { render :json => objects }
@@ -163,7 +163,7 @@ class SourcesController < ApplicationController
     respond_to do |format|
       format.html { 
         flash[:notice]="Updated objects"
-        redirect_to :action=>"show",:id=>@source.id
+        redirect_to :action=>"show",:id=>@source.id,:app_id=>@source.app.id
       }
       format.xml  { render :xml => objects }
       format.json  { render :json => objects }
@@ -268,7 +268,6 @@ class SourcesController < ApplicationController
   # GET /sources.xml
   # this returns all sources that are associated with a given "app" as determine by the token
   def index
-    check_access
     if params[:app_id].nil?
       @app=App.find_by_admin request.headers['login']
     else

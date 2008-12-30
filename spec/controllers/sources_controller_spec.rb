@@ -44,6 +44,7 @@ describe SourcesController do
         request.env["HTTP_ACCEPT"] = "application/xml"
         Source.should_receive(:find).with(:all).and_return(sources = mock("Array of Sources"))
         sources.should_receive(:to_xml).and_return("generated XML")
+        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
         get :index
         response.body.should == "generated XML"
       end
@@ -56,7 +57,7 @@ describe SourcesController do
 
     it "should expose the requested source as @source" do
       Source.should_receive(:find).with("37").and_return(mock_source)
-      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("anton:password")
+      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
       get :show, :id => "37"
       assigns[:source].should equal(mock_source)
     end
@@ -66,6 +67,7 @@ describe SourcesController do
         expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nil-classes type=\"array\"/>\n"
         request.env["HTTP_ACCEPT"] = "application/xml"
         Source.should_receive(:find).with("37").and_return(mock_source)
+        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
         get :show, :id => "37", :format => "xml"
         response.body.should == expected
       end
@@ -249,6 +251,7 @@ describe SourcesController do
                              :id => -359898525,
                              :source_id => 37)
       Source.should_receive(:find).with('37').and_return(records)
+      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
       get :show, :id => "37", :format => "json", :client_id => "some-client"
       assigns[:source].should == records
     end

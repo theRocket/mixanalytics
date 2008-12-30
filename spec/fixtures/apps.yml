@@ -1,0 +1,28 @@
+sugar:
+  id:       1
+  name:     Sugar
+  admin:    adam 
+  description: sample app for SugarCRM cases, employees, accounts               
+      
+siebel:
+  id:       2
+  name:     Siebel
+  admin:    adam
+  description: sample for Siebel Field Service tickets
+
+lighthouse:
+  id:       3
+  name:     Lighthouse
+  admin:    vidal
+  description: Lighthouse bugs
+  
+basecamp:
+  id:       4
+  name:     Basecamp
+  admin:    vidal
+  description: Basecamp projects and tasks
+
+
+  
+ 
+

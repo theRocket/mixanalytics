@@ -4,7 +4,7 @@
 
 Name <%=@source.name%>
   <%= f.submit "Update source adapter code" %>
-<%=link_to 'Show records',{:action=>'show',:id=>@source.id}%>&nbsp;
+<%=link_to 'Show records',{:action=>'show',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
 <%= link_to 'Back to sources list', app_sources_path(@source.app) %>&nbsp;
   <p>
     <%= f.label "Source Name" %> <%=f.text_field :name,:size=>20 %>
