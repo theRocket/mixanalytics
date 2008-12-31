@@ -162,7 +162,7 @@ module SourcesHelper
     end
     
     # delete records that don't exist in the cache table anymore
-    maps_to_delete = ClientMap.find_by_client_id(client_id)
+    maps_to_delete = ClientMap.find_all_by_client_id(client_id)
     maps_to_delete.each do |map|
       obj = map.object_value
       if obj.nil?
