@@ -20,10 +20,10 @@ class SourcesController < ApplicationController
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
-    @app=App.find params[:app_id]
-    check_access(@app)
     last_update_time=Time.parse(params[:last_update]) if params[:last_update]
     @source=Source.find params[:id]
+    @app=@source.app
+    check_access(@app)
 
     # if there are any pending updates then we need a refresh, so go invoke it!
     update_values=ObjectValue.find_by_sql "select * from object_values where update_type!='query' and source_id="+params[:id]
@@ -300,7 +300,7 @@ class SourcesController < ApplicationController
       p "Current user: " + @current_user.login
     end
     @source = Source.find(params[:id])
-    @app=App.find(params[:app_id])
+    @app=App.find(@source.app)
     @apps=App.find_all_by_admin(@current_user.login) 
     render :action=>"edit"
   end
