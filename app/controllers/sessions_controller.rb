@@ -5,8 +5,6 @@ class SessionsController < ApplicationController
   # TODO: Only do this for json requests!
   protect_from_forgery :except => :client_login
   
-  before_filter :login_required, :except => [:client_login, :create]
-
   # render new.rhtml
   def new
   end
