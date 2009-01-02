@@ -37,6 +37,7 @@ such as Funambol.
 === INSTALLATION & ADMINISTRATION
 
   sudo gem install rspec rspec-rails
+  sudo gem install rubyist-aasm -s http://gems.github.com
   git clone git://github.com/rhomobile/rhosync.git
   cd rhosync
 
