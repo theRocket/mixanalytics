@@ -2,8 +2,9 @@ class CreateObjectValues < ActiveRecord::Migration
   def self.up
     create_table :object_values do |t|
       t.integer :source_id
-      t.string :attrib
+      t.integer :id
       t.string :object
+      t.string :attrib
       t.string :value
       t.timestamps
     end

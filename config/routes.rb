@@ -1,14 +1,31 @@
 ActionController::Routing::Routes.draw do |map|
-  map.resources :clients
+  map.logout '/logout', :controller => 'sessions', :action => 'destroy'
+  map.login '/login', :controller => 'sessions', :action => 'new'
+  map.register '/register', :controller => 'users', :action => 'create'
+  map.signup '/signup', :controller => 'users', :action => 'new'
+  
+  # more for routes
+  map.forgot_password '/forgot_password', :controller => 'users', :action => 'forgot_password'
+  map.reset_password '/reset_password', :controller => 'users', :action => 'reset_password'
+  
+  map.resources :users
 
-  map.resources :apps
+  map.resource :session
+
+  map.resources :clients
+  
+  map.connect 'client/:client_id/show', :controller => 'clients', :action => 'show'
+
+  map.resources :apps do |app|
+    app.resources :sources
+  end
 
   map.resources :applications
 
   map.resources :accounts
 
-  map.connect 'sources/index/:app/:pwd',:controller=>'sources',:action=>'index'
   map.connect 'sources/:id/clientcreate', :controller => 'sources', :action => 'clientcreate'
+  map.connect 'sources/:id/client_login', :controller => 'sessions', :action => 'client_login'
   
   # build in CRUD
   map.connect 'sources/:id/create', :controller => 'sources', :action => 'create'
@@ -32,9 +49,8 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'sources/:id/save',:controller=>'sources',:action => 'save'
 
   map.resources :object_values
-  map.resources :sources
   map.resources :stores
-
+  map.resources :sources
 
   # The priority is based upon order of creation: first created -> highest priority.
 
@@ -67,7 +83,7 @@ ActionController::Routing::Routes.draw do |map|
   #   end
 
   # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
-  map.root :controller => "sources"
+  map.root :controller => "apps"
 
   # See how all your routes lay out with "rake routes"
 

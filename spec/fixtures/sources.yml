@@ -1,0 +1,26 @@
+SugarAccounts:
+  id:       1
+  name:     SugarAccounts
+  url:      http://rhomobile.com/sugar/soap.php?wsdl
+  adapter:  SugarAccounts
+  app_id:   1            
+      
+SugarCases:
+  id:       2
+  name:     SugarCases
+  url:      http://rhomobile.com/sugar/soap.php?wsdl
+  adapter:  SugarCases
+  app_id:   1
+
+SugarEmployees:
+  id:       3
+  name:     SugarEmployees
+  url:      http://rhomobile.com/sugar/soap.php?wsdl
+  adapter:  SugarEmployees
+  app_id:   1
+  
+SiebelServiceRequests:
+  id:       4
+  name:     SiebelServiceRequests
+  url:      secure-ausomxbha.crmondemand.com
+  adapter:  SiebelServiceRequests

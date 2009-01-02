@@ -1,6 +1,6 @@
 class Source < ActiveRecord::Base
   has_many :object_values
-  belongs_to :application
+  belongs_to :app
   attr_accessor :source_adapter
 
   def before_validate

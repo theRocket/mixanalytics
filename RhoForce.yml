@@ -1,37 +1,39 @@
---- !ruby/object:Source 
+--- &id001 !ruby/object:Source 
 attributes: 
   name: RhoForce
+  refreshtime: 
   prolog: |
     class Account < ActiveRecord::Base
-      establish_connection(:url=>"https://www.salesforce.com",
+      establish_connection(:url=>'https://www.salesforce.com',
         :adapter => 'activesalesforce',
         :username => @source.login,
         :password => @source.password)
     end
 
-  updated_at: 
-  deletecall: 
-  createcall: 
+  updated_at: 2008-12-18 18:58:30
+  deletecall: ""
+  adapter: ""
+  createcall: ""
   type: 
   url: http://localhost:3000/sf.wsdl
-  sync: p "Syncing" accounts.each do |x| name_value_list.each do |y| o=ObjectValue.new o.source_id=@source.id o.object=x.id o.attrib=y.name o.value=y.value o.update_type="query" o.save end end
+  sync: accounts.each do |x| name_value_list.each do |y| o=ObjectValue.new o.source_id=@source.id o.object=x['id'] o.attrib=y.name o.value=y.value o.update_type='query' o.save end end
   method: 
-  updatecall: 
+  id: "4"
+  app_id: "5"
+  updatecall: ""
   call: |
     accounts=Account.find :all
 
   password: ac
   login: adam@rhomobile.com
-  epilog: 
-  created_at: 
+  epilog: ""
+  created_at: 2008-11-20 23:04:24
 attributes_cache: {}
 
-changed_attributes: 
-  name: 
-  prolog: 
-  url: 
-  sync: 
-  call: 
-  password: 
-  login: 
-new_record: true
+changed_attributes: {}
+
+errors: !ruby/object:ActiveRecord::Errors 
+  base: *id001
+  errors: {}
+
+new_record_before_save: 

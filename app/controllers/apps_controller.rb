@@ -1,8 +1,15 @@
 class AppsController < ApplicationController
+  
+  before_filter :login_required
+  
   # GET /apps
   # GET /apps.xml
   def index
-    @apps = App.find(:all)
+    login=@current_user.login.downcase
+    @apps = App.find_all_by_admin login
+    if @apps.nil?
+      flash[:notice]="You have no existing apps"
+    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -14,7 +21,9 @@ class AppsController < ApplicationController
   # GET /apps/1.xml
   def show
     @app = App.find(params[:id])
-
+    @sources=@app.sources
+    @users=User.find :all
+    
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @app }
@@ -25,7 +34,7 @@ class AppsController < ApplicationController
   # GET /apps/new.xml
   def new
     @app = App.new
-
+    
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @app }
@@ -35,6 +44,23 @@ class AppsController < ApplicationController
   # GET /apps/1/edit
   def edit
     @app = App.find(params[:id])
+    @users = User.find :all
+  end
+  
+  # subscribe specified subscriber to specified app ID
+  def subscribe
+    user=User.find_by_login params[:subscriber]
+    @app=App.find(params[:id])
+    @app.users << user
+    redirect_to :action=>:edit
+  end
+
+  # unsubscribe subscriber to specified app ID 
+  def unsubscribe
+    @app=App.find params[:id]
+    @user=User.find_by_login params[:subscriber]    
+    @app.users.delete @user
+    redirect_to :action=>:edit
   end
 
   # POST /apps
@@ -45,7 +71,7 @@ class AppsController < ApplicationController
     respond_to do |format|
       if @app.save
         flash[:notice] = 'App was successfully created.'
-        format.html { redirect_to(@app) }
+        format.html { redirect_to(apps_url) }
         format.xml  { render :xml => @app, :status => :created, :location => @app }
       else
         format.html { render :action => "new" }

@@ -1,26 +1,31 @@
-<h1>Listing apps</h1>
-
+<h3>Your Apps</h3>
+<%= @current_user.login%>
+<%if @apps and @apps.size>0%>, below are your RhoSync applications.
 <table>
   <tr>
     <th>Name</th>
-    <th>Token</th>
     <th>Admin</th>
     <th>Description</th>
   </tr>
-
-<% for app in @apps %>
+  <% for app in @apps %>
   <tr>
-    <td><%=h app.name %></td>
-    <td><%=h app.password %></td>
+    <td><%=link_to app.name, edit_app_path(app) %></td>
     <td><%=h app.admin %></td>
     <td><%=h app.description %></td>
-    <td><%= link_to 'Show', app %></td>
-    <td><%= link_to 'Edit', edit_app_path(app) %></td>
-    <td><%= link_to 'Destroy', app, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'X', app, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>
 <% end %>
 </table>
+<%else%>
+, you have no apps.
+<%end%>
 
-<br />
+<p/>
 
-<%= link_to 'New app', new_app_path %>
+<%= link_to 'New app', new_app_path %><p/>
+<% if @current_user.nil? %><br/>
+<%= link_to 'Login',{:controller=>'sessions',:action=>'new'}%><br/>
+<%= link_to 'Register',{:controller=>'users',:action=>'new'}%><br/>
+<%else%>
+<%= link_to 'Logout',{:controller=>'sessions',:action=>'destroy'}%><br/>
+<%end%>

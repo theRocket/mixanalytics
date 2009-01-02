@@ -1,0 +1,18 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+sugar_adam:
+  app_id: 1
+  user_id: 1
+
+sugar_anton:
+  app_id: 1
+  user_id: 2
+  
+sugar_evgeny:
+  app_id: 1
+  user_id: 3
+
+siebel_lars:
+  app_id: 2
+  user_id: 4
+  

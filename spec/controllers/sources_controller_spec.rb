@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe SourcesController do
+  fixtures :sources
   
   def mock_source(stubs={})
     time = Time.now.to_s
@@ -25,6 +26,10 @@ describe SourcesController do
     @mock_source ||= mock_model(Source, stubs)
   end
   
+  def mock_records(stubs={})
+    @mock_records ||= mock_model(ObjectValue, stubs)
+  end
+  
   describe "responding to GET index" do
 
     it "should expose all sources as @sources" do
@@ -39,6 +44,7 @@ describe SourcesController do
         request.env["HTTP_ACCEPT"] = "application/xml"
         Source.should_receive(:find).with(:all).and_return(sources = mock("Array of Sources"))
         sources.should_receive(:to_xml).and_return("generated XML")
+        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
         get :index
         response.body.should == "generated XML"
       end
@@ -51,24 +57,23 @@ describe SourcesController do
 
     it "should expose the requested source as @source" do
       Source.should_receive(:find).with("37").and_return(mock_source)
+      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
       get :show, :id => "37"
       assigns[:source].should equal(mock_source)
     end
     
     describe "with mime type of xml" do
-
       it "should render the requested source as xml" do
         expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nil-classes type=\"array\"/>\n"
         request.env["HTTP_ACCEPT"] = "application/xml"
         Source.should_receive(:find).with("37").and_return(mock_source)
+        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
         get :show, :id => "37", :format => "xml"
         response.body.should == expected
       end
-
     end
-    
   end
-
+  
   describe "responding to GET new" do
   
     it "should expose a new source as @source" do
@@ -231,6 +236,24 @@ describe SourcesController do
     it "should return the created client" do
       get :clientcreate, :format => 'json'
       response.body.should =~ /(^[^\r\n]+?)([A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}(?:@[^\s]*)?|@[^\s]*|\s*$)/
+    end
+    
+  end
+  
+  describe "responding to GET show with client_id" do
+    
+    it "should return full list on first sync" do
+      records = mock_records(:attrib => 'some-attrib', 
+                             :object => 'some-object', 
+                             :value => 'some-value',
+                             :updated_at => nil,
+                             :created_at => nil,
+                             :id => -359898525,
+                             :source_id => 37)
+      Source.should_receive(:find).with('37').and_return(records)
+      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
+      get :show, :id => "37", :format => "json", :client_id => "some-client"
+      assigns[:source].should == records
     end
     
   end

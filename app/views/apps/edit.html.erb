@@ -1,4 +1,4 @@
-<h1>Editing app</h1>
+<h3>Editing Application</h3>
 
 <% form_for(@app) do |f| %>
   <%= f.error_messages %>
@@ -6,11 +6,6 @@
   <p>
     <%= f.label :name %><br />
     <%= f.text_field :name %>
-  </p>
-  <p>
-    Enter the token used to retrieve the app<br/>
-    <%= f.label :token %><br />
-    <%= f.text_field :password %>
   </p>
   <p>
     <%= f.label :admin %><br />
@@ -25,5 +20,32 @@
   </p>
 <% end %>
 
-<%= link_to 'Show', @app %> |
-<%= link_to 'Back', apps_path %>
+<h4>Sources</h4>
+<table>
+<% @app.sources.each do |source| %>
+<tr><td><%= link_to  source.name,edit_source_path(source,:app_id=>@app.id)%></td></tr>
+<%end %>
+</table>
+<p>
+<%=link_to 'Add Source',:controller=>"sources",:action=>"new",:app=>@app.id %>
+</p>
+
+<h4>Existing Subscribers</h4>
+<table>
+<% @app.users.each do |sub| %>
+<tr><td><%= link_to sub.login + "(unsubscribe)",{:action=>:unsubscribe,:id=>@app.id,:subscriber=>sub.login}%></td></tr>
+<%end %>
+</table>
+<p>
+<%form_for(:subscribe, @app,:url=>{:controller=>"apps",:action=>"subscribe",:id=>@app.id})  do |f|%>
+<select name="subscriber">
+<%@users.each do |user|%>
+<option value="<%=user.login%>"><%=user.login%></option>
+<%end%>
+</select>
+<%= f.submit "Subscribe User" %>
+<%end%>
+</p>
+<p>
+<%= link_to 'Back to applications list', apps_path %>
+</p>

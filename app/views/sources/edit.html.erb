@@ -1,17 +1,29 @@
 <h2>Editing Source Adapter </h2>
 
-<% form_for(@source) do |f| %>
+<% form_for(@source,:url=>{:action=>:update}) do |f| %>
 
-  <%= f.error_messages %>
+Name <%=@source.name%>
   <%= f.submit "Update source adapter code" %>
-<%=link_to 'Show records',{:action=>'show',:id=>@source.id}%>&nbsp;
-<%= link_to 'Back to sources list', sources_path %>&nbsp;
+<%=link_to 'Show records',{:action=>'show',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
+<%= link_to 'Back to sources list', app_sources_path(@source.app) %>&nbsp;
   <p>
     <%= f.label "Source Name" %> <%=f.text_field :name,:size=>20 %>
   </p>
   <p>
+    <%= f.label "Application" %> 
+    <select id="source_app_id" name="source[app_id]">
+      <%@apps.each do |a| %>
+        <option value="<%=a.id%>"
+<%if @source.app_id==a.id%>
+ selected
+<%end%>
+><%=a.name%></option>
+      <%end%>
+    </select>
+  </p>
+  <p>
     <%= f.label :url %>
-    <%= f.text_field :url, :size=>50%> &nbsp;
+    <%= f.text_field "url", :size=>50%> &nbsp;
     <%= f.label :login %><%= f.text_field :login, :size=>10%> &nbsp;
     <%= f.label :password %><%= f.text_field :password, :size=>20 %>
   </p>

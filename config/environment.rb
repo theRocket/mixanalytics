@@ -28,6 +28,8 @@ Rails::Initializer.run do |config|
   config.gem "libxml-ruby", :lib => "xml/libxml"
   config.gem "soap4r", :lib => "soap/mapping"
   config.gem "uuidtools"
+  config.gem "rubyist-aasm", :lib => "aasm", :source => "http://gems.github.com" 
+  config.gem "actionmailer",:lib => "actionmailer"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -67,5 +69,17 @@ Rails::Initializer.run do |config|
 
   # Activate observers that should always be running
   # config.active_record.observers = :cacher, :garbage_collector
+  config.active_record.observers = :user_observer
+
 
 end
+
+APP_CONFIG = YAML.load_file("#{RAILS_ROOT}/config/settings.yml")[RAILS_ENV].symbolize_keys
+
+ActionMailer::Base.smtp_settings = {
+  :address        => 'smtp.yourserver.com', # default: localhost
+  :port           => '25',                  # default: 25
+  :user_name      => 'user',
+  :password       => 'pass',
+  :authentication => :plain                 # :plain, :login or :cram_md5
+}

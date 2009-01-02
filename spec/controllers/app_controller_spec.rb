@@ -1,10 +1,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AppsController do
+  fixtures :apps
 
   def mock_app(stubs={})
     @mock_app ||= mock_model(App, stubs)
   end
+  
+  describe "responding to subscribe and unsubscribe" do
+    it "should add a subscription when subscribe is called" do
+      Subscription.should_receive(:create).with({:app_id=>1,:user_id=>2}).and_return([sub])
+      post :subscribe,:id=>1,:subscriber=>'anton'
+      # not really quite sure what this should be on line below?
+      assigns[:sub].should equal(sub)
+    end
+    
+    it "should remove the subscription when unsubscribe is called" do
+      Subscription.should_receive(:delete).with({:app_id=>1,:user_id=>2}).and_return([sub])
+      sub.should_receive(:destroy)
+      post :unsubscribe,:id=>1,:subscriber=>'anton'
+    end
+  end
+  
   
   describe "responding to GET index" do
 

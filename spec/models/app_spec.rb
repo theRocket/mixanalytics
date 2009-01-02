@@ -9,4 +9,11 @@ describe App do
   it "should create a new instance given valid attributes" do
     App.create!(@valid_attributes)
   end
+  
+  describe "responding to subscribe and unsubscribe" do
+    it "should add a subscription when subscribe is called" do
+    end
+    
+  end
+  
 end
