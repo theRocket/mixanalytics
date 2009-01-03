@@ -56,8 +56,6 @@ Rails::Initializer.run do |config|
     :session_key => '_rhosync_session',
     :secret      => '9d694d3f0150ddda62b8b8fc0e5397087abb91e39731f5a916df65203b242b587a29116cc02930929cd3c3c103853db756178f938e5b718afb6a20d86e85877c'
   }
-  
-  ActionController::Base.session_options[:session_expires] = 2.weeks.from_now
 
   # Use the database for sessions instead of the cookie-based default,
   # which shouldn't be used to store highly confidential information
@@ -75,6 +73,8 @@ Rails::Initializer.run do |config|
 
 
 end
+
+ActionController::Base.session_options[:session_expires] = 2.weeks.from_now
 
 APP_CONFIG = YAML.load_file("#{RAILS_ROOT}/config/settings.yml")[RAILS_ENV].symbolize_keys
 
