@@ -7,18 +7,15 @@
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </p>
-  <p>
-     Enter the token used to retrieve the app
-    <%= f.label :token  %><br />
-    <%= f.text_field :token %>
-  </p>
+
   <p>
     <%= f.label :admin %><br />
     <%= f.text_field :admin %>
   </p>
+
   <p>
     <%= f.label :description %><br />
-    <%= f.text_field :description %>
+    <%= f.text_area :description,:rows=>3,:cols=>40 %>
   </p>
   <p>
     <%= f.submit "Create" %>

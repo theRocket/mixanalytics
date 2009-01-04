@@ -3,6 +3,16 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe AppsController do
   fixtures :apps
 
+
+  before(:each) do
+    stubs={:login=>:anton,:password=>'monkey'}
+    @current_user||=mock_model(User,stubs)
+    controller.stub!( :login_required).and_return(true)
+    controller.stub!(:current_user).and_return(@current_user)
+    
+    puts "controller: #{controller.inspect}"
+  end
+  
   def mock_app(stubs={})
     @mock_app ||= mock_model(App, stubs)
   end
@@ -78,7 +88,7 @@ describe AppsController do
       it "should redirect to the created app" do
         App.stub!(:new).and_return(mock_app(:save => true))
         post :create, :app => {}
-        response.should redirect_to(app_url(mock_app))
+        response.should redirect_to(apps_url)
       end
       
     end
