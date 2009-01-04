@@ -4,13 +4,13 @@
 <table>
   <tr>
     <th>Name</th>
-    <th>Admin</th>
+
     <th>Description</th>
   </tr>
   <% for app in @apps %>
   <tr>
     <td><%=link_to app.name, edit_app_path(app) %></td>
-    <td><%=h app.admin %></td>
+
     <td><%=h app.description %></td>
     <td><%= link_to 'X', app, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>
