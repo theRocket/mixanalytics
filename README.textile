@@ -14,7 +14,7 @@ h2. PREREQUISITES
     * Ruby on Rails Version 2.2.2
     * mySQL, SQLite or other database that plays nicely with Rails
 
-h2. INSTALLATION & ADMINISTRATION
+h2. INSTALLATION 
 
   sudo gem install rspec rspec-rails
   sudo gem install rubyist-aasm -s http://gems.github.com
@@ -33,7 +33,7 @@ Then use your Rails server of choice to run the application. For example:
 
   mongrel_rails start
 
-Then you can view the Sources from your web browser:
+Then you can view all of your applications from your web browser by supplying the following URL:
 
   http://localhost:3000
 
@@ -78,14 +78,14 @@ This table contains all of the information necessary to connect to a given backe
 
 h3. Backend Code Columns
 
-	* SOURCE ADAPTER - this is the name of a class used for query, create, update and delete operations.  The Ruby file for this class needs to be placed in the LIB subdirectory of RhoSync
+	* SOURCE ADAPTER - this is the name of a class used for query, create, update and delete operations.  The Ruby file for this class needs to be placed in the LIB subdirectory of RhoSync. OR you can enter all of the code for ech of the methods in the fields below
     * PROLOG – a set of Ruby code generally for logging into the backend system. Generally this is a SOAP or REST call which populates a session_id variable (that variable must be used in the call code below).
     * CALL – the actual code for getting data back (generally uses the session_id acquired in the prolog)
     * CREATECALL - code to create records in the backend from the object values table
     * UPDATECALL - update code for the backend
     * DELETECALL - record deletion code for the backend
     * LOGOUT – OPTIONAL, code to logoff the backend system
-    * SYNC – this is the code used to take apart the returned data and stuff it into the OBJECT_VALUES property bag table. Theoretically this could be done in the CALL column.
+    * SYNC – this is the code used to take apart the returned data and stuff it into the OBJECT_VALUES property bag table. 
 
 h2. SAMPLE SOURCE ADAPTER
 

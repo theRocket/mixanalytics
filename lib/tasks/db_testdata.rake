@@ -8,7 +8,8 @@ namespace :db do
   namespace :fixtures do
     desc "load sample source adapters"
     task :samples => 'db:migrate' do
-      Fixtures.create_fixtures(File.join(File.dirname(__FILE__), '..', '..', 'db', 'migrate'), 'sources')
+      Fixtures.create_fixtures(File.join(File.dirname(__FILE__), '..', '..', 'db', 'migrate'), 'sources')      
+      Fixtures.create_fixtures(File.join(File.dirname(__FILE__), '..', '..', 'db', 'migrate'), 'apps')
     end
   end
 end

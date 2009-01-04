@@ -19,6 +19,7 @@ class User < ActiveRecord::Base
   # ---------------------------------------
 
   include Authentication
+  
   include Authentication::ByPassword
   include Authentication::ByCookieToken
   #include Authorization::AasmRoles
