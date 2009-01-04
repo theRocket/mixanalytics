@@ -53,7 +53,7 @@ Rails::Initializer.run do |config|
   # Make sure the secret is at least 30 characters and all random, 
   # no regular words or you'll be exposed to dictionary attacks.
   config.action_controller.session = {
-    :session_key => '_rhosync_session',
+    :session_key => 'rhosync_session',
     :secret      => '9d694d3f0150ddda62b8b8fc0e5397087abb91e39731f5a916df65203b242b587a29116cc02930929cd3c3c103853db756178f938e5b718afb6a20d86e85877c'
   }
 
