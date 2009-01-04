@@ -78,6 +78,7 @@ ActionController::Base.session_options[:session_expires] = 2.weeks.from_now
 
 APP_CONFIG = YAML.load_file("#{RAILS_ROOT}/config/settings.yml")[RAILS_ENV].symbolize_keys
 
+=begin We actually don't need to set up the mailer 
 ActionMailer::Base.smtp_settings = {
   :address        => 'smtp.yourserver.com', # default: localhost
   :port           => '25',                  # default: 25
@@ -85,3 +86,4 @@ ActionMailer::Base.smtp_settings = {
   :password       => 'pass',
   :authentication => :plain                 # :plain, :login or :cram_md5
 }
+=end
