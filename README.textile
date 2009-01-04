@@ -1,4 +1,4 @@
-= Rhosync
+h1. Rhosync
 
 Rhosync is a Ruby-based framework to access data from various backend applications and sync them to remote devices.
 
@@ -9,13 +9,12 @@ RhoSync retrieves data via web services (REST or SOAP) from backend enterprise a
 
 It is also more focused on the complete end to end ‘web service backend’ to mobile device (with an enabling master data store on the server) than earlier equivalents. These products were generally focused on the device endpoint syncing to a server-based database. With the success of Software as a Service (SaaS) products such as SugarCRM and SalesForce, synchronization directly to a server database is much more rarely a viable option. Instead we focus on the web service access scenario. Rhosync is also focused on arbitrary enterprise application data as opposed to being a PIM and email focused product such as Funambol.
 
-= SYSTEM INSTALLATION AND USAGE
-== PREREQUISITES
+h2. PREREQUISITES
 
     * Ruby on Rails Version 2.2.2
     * mySQL, SQLite or other database that plays nicely with Rails
 
-== INSTALLATION & ADMINISTRATION
+h2. INSTALLATION & ADMINISTRATION
 
   sudo gem install rspec rspec-rails
   sudo gem install rubyist-aasm -s http://gems.github.com
@@ -38,7 +37,7 @@ Then you can view the Sources from your web browser:
 
   http://localhost:3000
 
-== SET UP A BACKEND DATA SOURCE
+h2.  SET UP A BACKEND DATA SOURCE
 
     * we ship with an example "Source" out of the box for integrationg with
       SugarCRM
@@ -46,10 +45,10 @@ Then you can view the Sources from your web browser:
        The Ruby code to interact with the backends is populated into those source records
     * Edit the “login”, “password” and “URL” fields if you are using one of the existing sources
     * Otherwise create a new Source from the application main menu and edit those same fields.
-    * If you are using another backend you may need to create “prolog”, “call”,
+    * If you are using another backend you will need to create a Source Adapter class or create “prolog”, “call”,
      "createcall", "updatecall", "deletecall",  “epilog” and “sync” fields with the appropriate code. See “Creating a Rhosync Datasource”
 
-= HOW IT WORKS
+h2. HOW IT WORKS
 
 Rhosync normalizes all backend application data into a common server-based database schema, in preparation for delivering the further downstream, generally to mobile devices.
 
@@ -61,14 +60,14 @@ DATABASE SCHEMA
 There are two important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models. Other tables include tables to keep of the mobile device users and their subscriptions to the various data sources available.
 OBJECT_VALUES
 
-A “property bag” schema that facilitatest importing any kind of data into a common table for later distribution to downstream clients.
+This “property bag” or "entity-attribute-value" schema facilitates importing any kind of data into a common table for later distribution to downstream clients.
 
     * object – the unique identifier of the object (generally an integer “record ID” from the backend system)
     * attribute – the name of the attribute (e.g. “Account Name”, “Industry”)
     * value – the value of the attribute (e.g. “Acme Corp”, “software”)
     * source_id – reference back to the source (see below) used for syncing
 
-= SOURCES
+h2. SOURCES
 
 This table contains all of the information necessary to connect to a given backend system. These includes the URL to connect to and authentication information.
 
@@ -77,7 +76,7 @@ This table contains all of the information necessary to connect to a given backe
     * LOGIN – the username or logon ID for the backend
     * PASSWORD – password (stored in the clear right now) for the backend system
 
-== Backend Code Columns
+h3. Backend Code Columns
 
 	* SOURCE ADAPTER - this is the name of a class used for query, create, update and delete operations.  The Ruby file for this class needs to be placed in the LIB subdirectory of RhoSync
     * PROLOG – a set of Ruby code generally for logging into the backend system. Generally this is a SOAP or REST call which populates a session_id variable (that variable must be used in the call code below).
@@ -88,7 +87,7 @@ This table contains all of the information necessary to connect to a given backe
     * LOGOUT – OPTIONAL, code to logoff the backend system
     * SYNC – this is the code used to take apart the returned data and stuff it into the OBJECT_VALUES property bag table. Theoretically this could be done in the CALL column.
 
-= SAMPLE SOURCE ADAPTER
+h2. SAMPLE SOURCE ADAPTER
 
 This is a sample source adapter to retrieve Sugar Account objects.
 
@@ -154,6 +153,6 @@ sugar:
   epilog:
     client.logout(session_id)
 
-= SUPPORT
+h2. SUPPORT
 
 Send questions to info@rhomobile.com or, even better, post them to the Google Group called Rhomobile.
