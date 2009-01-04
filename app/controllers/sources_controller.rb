@@ -9,7 +9,7 @@ require 'soap/mapping'
 
 class SourcesController < ApplicationController
 
-  before_filter :login_required
+  before_filter :login_required, :except => :clientcreate
   
   include SourcesHelper
   # shows all object values in XML structure given a supplied source

@@ -74,6 +74,8 @@ Rails::Initializer.run do |config|
 
 end
 
+ActionController::Base.session_options[:session_expires] = 2.weeks.from_now
+
 APP_CONFIG = YAML.load_file("#{RAILS_ROOT}/config/settings.yml")[RAILS_ENV].symbolize_keys
 
 ActionMailer::Base.smtp_settings = {

@@ -169,7 +169,7 @@ module SourcesHelper
         temp_obj = ObjectValue.new
         temp_obj.object = map.object_value_object
         temp_obj.db_operation = 'delete'
-        puts "removing object: #{temp_obj.inspect} from map table and client"
+        logger.debug "Removing object: #{temp_obj.inspect} from map table and client"
         objs_to_return << temp_obj
         # remove from map table
         map.destroy

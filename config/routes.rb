@@ -25,7 +25,7 @@ ActionController::Routing::Routes.draw do |map|
   map.resources :accounts
 
   map.connect 'sources/:id/clientcreate', :controller => 'sources', :action => 'clientcreate'
-  map.connect 'sources/:id/login', :controller => 'sessions', :action => 'create'
+  map.connect 'sources/:id/client_login', :controller => 'sessions', :action => 'client_login'
   
   # build in CRUD
   map.connect 'sources/:id/create', :controller => 'sources', :action => 'create'
