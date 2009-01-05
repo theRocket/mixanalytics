@@ -273,13 +273,14 @@ class SourcesController < ApplicationController
   # GET /sources
   # GET /sources.xml
   # this returns all sources that are associated with a given "app" as determine by the token
-  def index
+  def index    
+    login=@current_user.login.downcase
     if params[:app_id].nil?
-      @app=App.find_by_admin request.headers['login']
+      @app=App.find_by_admin login
     else
       @app=App.find params[:app_id] 
-      @sources=@app.sources if @app
     end
+    @sources=@app.sources if @app
         
     respond_to do |format|
       format.html # index.html.erb

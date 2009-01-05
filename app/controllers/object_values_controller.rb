@@ -3,7 +3,7 @@ class ObjectValuesController < ApplicationController
   # GET /object_values
   # GET /object_values.xml
   def index
-    @object_values = ObjectValue.find(:all)
+    @object_values = ObjectValue.find(:all,:order=>:object)
 
     respond_to do |format|
       format.html # index.html.erb
