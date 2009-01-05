@@ -5,57 +5,7 @@ SugarAccounts:
   login: testuser
   password: testuser
   adapter: SugarAccounts
-  prolog: |
-    u = @source.login
-    p = Digest::MD5.hexdigest(@source.password)
-    ua = {'user_name' => u,'password' => p}
-    ss = client.login(ua,nil)
-    if ss.error.number.to_i != 0
-      p 'failed to login - #{ss.error.description}'
-      return
-    else
-      @session_id = ss['id']
-      uid = client.get_user_id(@session_id)
-    end
-
-  call: |
-    module_name = 'Accounts'
-    query = '' # gets all the acounts, you can also use SQL like 'accounts.name like '%company%''
-    order_by = '' # in default order. you can also use SQL like 'accounts.name'
-    offset = 0
-    select_fields = ['name','industry'] # this can't be an empty array
-    max_results = '10000' # if set to 0 or '', this doesn't return all the results
-    deleted = 0 # whether you want to retrieve deleted records, too
-    result = client.get_entry_list(@session_id,module_name,query,order_by,offset,select_fields,max_results,deleted);
-
-  sync: |
-    result.entry_list.each do |x|
-      x.name_value_list.each do |y|
-        o=ObjectValue.new
-        o.source_id=@source.id
-        o.object=x['id']
-        o.attrib=y.name
-        o.value=y.value
-        o.save
-      end
-    end
-
-  createcall:
-    # name_value_list is passed in and can be used in the code below
-    # for creates we just assume that the primary keys (if fields) are left out
-    result=client.set_entry(@session_id,'Accounts',name_value_list)
-
-  updatecall:
-    # name_value_list is passed in and can be used in the code below
-    result=client.set_entry(@session_id,'Accounts',name_value_list)
-
-  deletecall:
-    name_value_list.push({'name'=>'deleted','value'=>'1'});
-    result=client.set_entry(@session_id,'Accounts',name_value_list)
-
-  epilog:
-    client.logout(@session_id)
-
+  app_id: 1
 
 SugarCases:
   id: 2
@@ -63,6 +13,7 @@ SugarCases:
   url: http://rhomobile.com/sugar/soap.php?wsdl
   login: testuser
   password: testuser
+  app_id: 1
   prolog: |
     u = @source.login
     p = Digest::MD5.hexdigest(@source.password)
@@ -125,6 +76,7 @@ SugarEmployees:
   url: http://rhomobile.com/sugar/soap.php?wsdl
   login: testuser
   password: testuser
+  app_id: 1
   prolog: |
     u = @source.login
     p = Digest::MD5.hexdigest(@source.password)
@@ -177,6 +129,8 @@ SiebelServiceRequests:
   url: secure-ausomxbha.crmondemand.com
   login: RHOMOBILE/ADAM@RHOMOBILE.COM
   password: password1
+  app_id: 2
+
   prolog: |
     https = Net::HTTP.new(@source.url,"443")
     https.use_ssl = true

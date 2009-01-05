@@ -1,4 +1,5 @@
-<form action="/sources/1/save_all">
+<form action="/sources/save_all">
+<input type="hidden" name="app_id" value="<%=@app.id%>">
 <h3>Save Sources</h3>
 Save source adapters to specified YAML file (defaults to sources.yml in db/migrate).
 <p>

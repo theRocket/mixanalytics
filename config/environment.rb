@@ -53,7 +53,7 @@ Rails::Initializer.run do |config|
   # Make sure the secret is at least 30 characters and all random, 
   # no regular words or you'll be exposed to dictionary attacks.
   config.action_controller.session = {
-    :session_key => '_rhosync_session',
+    :session_key => 'rhosync_session',
     :secret      => '9d694d3f0150ddda62b8b8fc0e5397087abb91e39731f5a916df65203b242b587a29116cc02930929cd3c3c103853db756178f938e5b718afb6a20d86e85877c'
   }
 
@@ -74,8 +74,11 @@ Rails::Initializer.run do |config|
 
 end
 
+ActionController::Base.session_options[:session_expires] = 2.weeks.from_now
+
 APP_CONFIG = YAML.load_file("#{RAILS_ROOT}/config/settings.yml")[RAILS_ENV].symbolize_keys
 
+=begin We actually don't need to set up the mailer 
 ActionMailer::Base.smtp_settings = {
   :address        => 'smtp.yourserver.com', # default: localhost
   :port           => '25',                  # default: 25
@@ -83,3 +86,4 @@ ActionMailer::Base.smtp_settings = {
   :password       => 'pass',
   :authentication => :plain                 # :plain, :login or :cram_md5
 }
+=end

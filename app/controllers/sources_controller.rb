@@ -232,10 +232,16 @@ class SourcesController < ApplicationController
 
   def pick_save
     # go to the view to pick the file
+    @app=App.find params[:app_id] if params[:app_id]
   end
 
   def save_all
-    @sources=Source.find :all
+    if params[:app_id].nil?
+      @app=App.find_by_admin request.headers['login']
+    else
+      @app=App.find params[:app_id] 
+      @sources=@app.sources if @app
+    end
     File.open(params[:yaml_file],'w') do |out|
       @sources.each do |x|
         YAML.dump(x,out)

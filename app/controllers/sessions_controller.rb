@@ -4,7 +4,7 @@ class SessionsController < ApplicationController
   # disable forgery protection for login
   # TODO: Only do this for json requests!
   protect_from_forgery :except => :client_login
-  
+
   # render new.rhtml
   def new
   end

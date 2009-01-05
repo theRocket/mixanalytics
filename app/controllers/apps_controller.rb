@@ -44,6 +44,7 @@ class AppsController < ApplicationController
   # GET /apps/1/edit
   def edit
     @app = App.find(params[:id])
+  
     @users = User.find :all
   end
   
@@ -66,8 +67,10 @@ class AppsController < ApplicationController
   # POST /apps
   # POST /apps.xml
   def create
+    
     @app = App.new(params[:app])
-
+    @app.admin=@current_user.login
+    
     respond_to do |format|
       if @app.save
         flash[:notice] = 'App was successfully created.'

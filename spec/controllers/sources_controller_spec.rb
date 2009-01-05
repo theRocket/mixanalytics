@@ -3,6 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe SourcesController do
   fixtures :sources
   
+  before(:each) do
+    stubs={:login=>:anton,:password=>'monkey'}
+    @current_user||=mock_model(User,stubs)
+    controller.stub!( :login_required).and_return(@current_user)
+  end
+  
   def mock_source(stubs={})
     time = Time.now.to_s
     stubs = {:url=>'',
@@ -23,6 +29,17 @@ describe SourcesController do
              :save=>true} unless stubs.size > 0
     @adapter = mock_model(SugarAccounts, stubs)
     stubs['source_adapter'] = @adapter
+    
+    userstubs={:login=>'anton',:password=>'monkey'}
+    anton=mock_model(User,userstubs)
+    userstubs={:login=>'quentin',:password=>'monkey'}
+    quentin=mock_model(User,userstubs)   
+    appstubs={
+      :users=>[quentin,anton]
+    }    
+    stubs['app']||=mock_model(App,appstubs)
+
+
     @mock_source ||= mock_model(Source, stubs)
   end
   
@@ -250,9 +267,11 @@ describe SourcesController do
                              :created_at => nil,
                              :id => -359898525,
                              :source_id => 37)
-      Source.should_receive(:find).with('37').and_return(records)
-      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
+      mock_source                    
+        
+      Source.should_receive(:find).with('37').and_return(mock_source)
       get :show, :id => "37", :format => "json", :client_id => "some-client"
+      p response.inspect.to_s
       assigns[:source].should == records
     end
     
