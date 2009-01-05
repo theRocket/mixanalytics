@@ -292,6 +292,7 @@ class SourcesController < ApplicationController
   # GET /sources/new.xml
   def new
     @source = Source.new
+    @source.app=App.find params[:app] if params[:app]
     @apps=App.find_all_by_admin(@current_user.login)
     respond_to do |format|
       format.html # new.html.erb
