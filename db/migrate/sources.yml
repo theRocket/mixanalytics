@@ -129,6 +129,8 @@ SiebelServiceRequests:
   url: secure-ausomxbha.crmondemand.com
   login: RHOMOBILE/ADAM@RHOMOBILE.COM
   password: password1
+  app_id: 2
+
   prolog: |
     https = Net::HTTP.new(@source.url,"443")
     https.use_ssl = true

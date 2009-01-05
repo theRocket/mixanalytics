@@ -1,13 +1,14 @@
-h1. Rhosync
+h1. RhoSync
 
 Rhosync is a Ruby-based framework to access data from various backend applications and sync them to remote devices.
 
 Specifically it is a Ruby on Rails application that allows managing backend application sources and user subscriptions to those data sources. It is optimized for delivery of ongoing incremental updates of those data sources to users accessing that data via mobile devices.
-Design Goals
+
+h2. INTRODUCTION
 
 RhoSync retrieves data via web services (REST or SOAP) from backend enterprise applications for distribution to downstream mobile devices. It keeps a master store of all enterprise application data and keeps track of the information that users have received. It is written to be far simpler to be far simpler to deploy and configure than similar technologies that have come and gone over the past decade.
 
-It is also more focused on the complete end to end ‘web service backend’ to mobile device (with an enabling master data store on the server) than earlier equivalents. These products were generally focused on the device endpoint syncing to a server-based database. With the success of Software as a Service (SaaS) products such as SugarCRM and SalesForce, synchronization directly to a server database is much more rarely a viable option. Instead we focus on the web service access scenario. Rhosync is also focused on arbitrary enterprise application data as opposed to being a PIM and email focused product such as Funambol.
+It is also more focused on the complete end to end ‘web service backend’ to mobile device (with an enabling master data store on the server) than earlier equivalents. These products were generally focused on the device endpoint syncing to a server-based database. With the success of Software as a Service (SaaS) products such as SugarCRM and SalesForce, synchronization directly to a server database is much more rarely a viable option. Instead we focus on the web service access scenario. RhoSync is also focused on arbitrary enterprise application data as opposed to being a PIM and email focused product such as Funambol.  
 
 h2. PREREQUISITES
 
@@ -21,7 +22,7 @@ h2. INSTALLATION
   git clone git://github.com/rhomobile/rhosync.git
   cd rhosync
 
-Then run the db:bootstrap rake task provided, creating the database and associated tables that RhoSync needs. It will also load the source adapters that we ship with.
+Then run the db:bootstrap rake task provided, creating the database and associated tables that RhoSync needs. It will also load the source adapters and applications (collections of source adapters) that we ship with.
 
   rake db:bootstrap
 
@@ -37,16 +38,15 @@ Then you can view all of your applications from your web browser by supplying th
 
   http://localhost:3000
 
-h2.  SET UP A BACKEND DATA SOURCE
+If you login as "admin" (or create an account with the name "admin" by registering) you will see the default applications that RhoSync ships with (SugarCRM and Siebel).  Each of these has sync data sources associated with it.
 
-    * we ship with an example "Source" out of the box for integrationg with
-      SugarCRM
-    * This is delivered in the Sources.yml files that should execute when you run the migrations.
-       The Ruby code to interact with the backends is populated into those source records
-    * Edit the “login”, “password” and “URL” fields if you are using one of the existing sources
-    * Otherwise create a new Source from the application main menu and edit those same fields.
-    * If you are using another backend you will need to create a Source Adapter class or create “prolog”, “call”,
-     "createcall", "updatecall", "deletecall",  “epilog” and “sync” fields with the appropriate code. See “Creating a Rhosync Datasource”
+h2.  SET UP A DATA SOURCE
+
+    * Edit the “login”, “password” and “URL” fields if you are using one of the existing sources for SugarCRM or Siebel to correspond to your own URL
+    * Otherwise create a new Source from the application form and edit those same fields.
+    * If you are using another backend you will need to create an application and populate it with some data sources
+    * On the Source editing form supply Source Adapter class located in the RhoSync /lib subdirectory OR create individual login, query, create, update and delete fields with the appropriate code.  These methods (from the Source Adapter class or the form) will get called by the RhoSync server to populate data from a data source.
+ 
 
 h2. HOW IT WORKS
 
@@ -67,25 +67,37 @@ This “property bag” or "entity-attribute-value" schema facilitates importing
     * value – the value of the attribute (e.g. “Acme Corp”, “software”)
     * source_id – reference back to the source (see below) used for syncing
 
+h2. APPLICATIONS
+
+A RhoSync Application is a set of data source corresponding to a single backend application.  It has the following columns:
+* NAME - some string to identify the app
+* DESCRIPTION 
+* ADMIN (not exposed in the UI) - who "owns" the app, set to whoever created the app
+
 h2. SOURCES
 
-This table contains all of the information necessary to connect to a given backend system. These includes the URL to connect to and authentication information.
+This table contains all of the information necessary to connect to a given backend system: 
 
-    * URL – the URL to connect to (for REST adapters) or the URL to the WSDL (for SOAP services)
-    * SERVER – OPTIONAL a logical name for the data source server (AcmeCorpSugar)
-    * LOGIN – the username or logon ID for the backend
-    * PASSWORD – password (stored in the clear right now) for the backend system
+* URL – the URL to connect to (for REST adapters) or the URL to the WSDL (for SOAP services)
+* SERVER – OPTIONAL a logical name for the data source server (AcmeCorpSugar)
+* LOGIN – the username or logon ID for the backend
+* PASSWORD – password (stored in the clear right now) for the backend system
+* SOURCE ADAPTER - this is the name of a class used for login, query, create, update and delete operations.  The Ruby file for this class needs to be placed in the /lib subdirectory of your RhoSync installation. 
+	
+OR you can enter all of the code for ech of the methods in the fields below
+* LOGIN – a set of Ruby code generally for logging into the backend system. Generally this is a SOAP or REST call which populates a session_id variable (that variable must be used in the call code below).
+* CALL – the actual code for getting data back (generally uses the session_id acquired in the prolog)
+* CREATECALL - code to create records in the backend from the object values table
+* UPDATECALL - update code for the backend
+* DELETECALL - record deletion code for the backend
+* LOGOUT – OPTIONAL, code to logoff the backend system
+* SYNC – this is the code used to take apart the returned data and stuff it into the OBJECT_VALUES property bag table. 
+* APP_ID (not exposed in the UI) - this refers to the application that contains the data source
 
-h3. Backend Code Columns
+h2. GENERATING A SOURCE ADAPTER
 
-	* SOURCE ADAPTER - this is the name of a class used for query, create, update and delete operations.  The Ruby file for this class needs to be placed in the LIB subdirectory of RhoSync. OR you can enter all of the code for ech of the methods in the fields below
-    * PROLOG – a set of Ruby code generally for logging into the backend system. Generally this is a SOAP or REST call which populates a session_id variable (that variable must be used in the call code below).
-    * CALL – the actual code for getting data back (generally uses the session_id acquired in the prolog)
-    * CREATECALL - code to create records in the backend from the object values table
-    * UPDATECALL - update code for the backend
-    * DELETECALL - record deletion code for the backend
-    * LOGOUT – OPTIONAL, code to logoff the backend system
-    * SYNC – this is the code used to take apart the returned data and stuff it into the OBJECT_VALUES property bag table. 
+The RhoGen utility supplied by Rhodes will generate a RhoSync Source Adapter class.  For example:
+  @rhogen source SugarAccounts@
 
 h2. SAMPLE SOURCE ADAPTER
 
