@@ -7,7 +7,7 @@ sugar:
 siebel:
   id:       2
   name:     Siebel
-  admin:    adam
+  admin:    quentin
   description: sample for Siebel Field Service tickets
 
 lighthouse:

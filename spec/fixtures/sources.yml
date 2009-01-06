@@ -24,3 +24,4 @@ SiebelServiceRequests:
   name:     SiebelServiceRequests
   url:      secure-ausomxbha.crmondemand.com
   adapter:  SiebelServiceRequests
+  app_id:   2

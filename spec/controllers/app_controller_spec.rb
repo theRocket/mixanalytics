@@ -6,7 +6,7 @@ describe AppsController do
 
 
   before(:each) do
-    @current_user=login_as(:quentin)
+    current_user=login_as(:quentin)
   end
   
   def mock_app(stubs={})

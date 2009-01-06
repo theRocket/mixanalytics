@@ -2,9 +2,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe SourcesController do
   fixtures :sources
+  fixtures :users
+  fixtures :apps
   
   before(:each) do
-    @current_user=login_as(:quentin)
+    current_user=login_as(:quentin)
   end
   
   def mock_source(stubs={})
@@ -24,6 +26,8 @@ describe SourcesController do
              :source_adapter=>nil,
              :refreshtime=>time,
              "refreshtime=".to_sym=>time,
+             :app_id=>2,
+             "app_id".to_sym=>2,
              :save=>true} unless stubs.size > 0
     @adapter = mock_model(SugarAccounts, stubs)
     stubs['source_adapter'] = @adapter
@@ -33,6 +37,8 @@ describe SourcesController do
     userstubs={:login=>'quentin',:password=>'monkey'}
     quentin=mock_model(User,userstubs)   
     appstubs={
+      :id=>2,
+      :admin=>'quentin',
       :users=>[quentin,anton]
     }    
     stubs['app']||=mock_model(App,appstubs)
@@ -45,34 +51,12 @@ describe SourcesController do
     @mock_records ||= mock_model(ObjectValue, stubs)
   end
   
-  describe "responding to GET index" do
 
-    it "should expose all sources as @sources" do
-      Source.should_receive(:find).with(:all).and_return([mock_source])
-      get :index
-      assigns[:sources].should == [mock_source]
-    end
-
-    describe "with mime type of xml" do
-  
-      it "should render all sources as xml" do
-        request.env["HTTP_ACCEPT"] = "application/xml"
-        Source.should_receive(:find).with(:all).and_return(sources = mock("Array of Sources"))
-        sources.should_receive(:to_xml).and_return("generated XML")
-        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
-        get :index
-        response.body.should == "generated XML"
-      end
-    
-    end
-
-  end
 
   describe "responding to GET show" do
 
     it "should expose the requested source as @source" do
       Source.should_receive(:find).with("37").and_return(mock_source)
-      @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
       get :show, :id => "37"
       assigns[:source].should equal(mock_source)
     end
@@ -82,7 +66,6 @@ describe SourcesController do
         expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<nil-classes type=\"array\"/>\n"
         request.env["HTTP_ACCEPT"] = "application/xml"
         Source.should_receive(:find).with("37").and_return(mock_source)
-        @request.env["HTTP_AUTHORIZATION"] = "Basic " + Base64::encode64("quentin:password")
         get :show, :id => "37", :format => "xml"
         response.body.should == expected
       end
@@ -151,20 +134,20 @@ describe SourcesController do
 
       it "should update the requested source" do
         Source.should_receive(:find).with("37").and_return(mock_source)
-        mock_source.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => "37", :source => {:these => 'params'}
+        mock_source.should_receive(:update_attributes).with({'these' => 'params','app_id'=>2})
+        put :update, :id => "37", :source => {:these => 'params',:app_id=>2}
       end
 
       it "should expose the requested source as @source" do
         Source.stub!(:find).and_return(mock_source(:update_attributes => true, :save_to_yaml => true))
-        put :update, :id => "1"
+        put :update, :id => "1", :source => {:these => 'params',:app_id=>2}
         assigns(:source).should equal(mock_source)
       end
 
       it "should redirect to the source" do
         Source.stub!(:find).and_return(mock_source(:update_attributes => true, :save_to_yaml => true))
-        put :update, :id => "1"
-        response.should redirect_to(source_url(mock_source))
+        put :update, :id => "1",:source => {:these => 'params',:app_id=>2}
+        response.should redirect_to(app_sources_url(2))
       end
 
     end
@@ -173,19 +156,19 @@ describe SourcesController do
 
       it "should update the requested source" do
         Source.should_receive(:find).with("37").and_return(mock_source)
-        mock_source.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => "37", :source => {:these => 'params'}
+        mock_source.should_receive(:update_attributes).with({'these' => 'params','app_id'=>2})
+        put :update, :id => "37", :source => {:these => 'params',:app_id=>2}
       end
 
       it "should expose the source as @source" do
         Source.stub!(:find).and_return(mock_source(:update_attributes => false))
-        put :update, :id => "1"
+        put :update, :id => "1",:source => {:these => 'params',:app_id=>2}
         assigns(:source).should equal(mock_source)
       end
 
       it "should re-render the 'edit' template" do
         Source.stub!(:find).and_return(mock_source(:update_attributes => false))
-        put :update, :id => "1"
+        put :update, :id => "1",:source => {:these => 'params',:app_id=>2}
         response.should render_template('edit')
       end
 
