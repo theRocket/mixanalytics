@@ -75,7 +75,6 @@ class SourcesController < ApplicationController
     
     respond_to do |format|
       if @client.save
-        format.html { redirect_to(clients_url) }
         format.json { render :json => @client }
         format.xml  { head :ok }
       end

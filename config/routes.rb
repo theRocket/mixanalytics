@@ -12,10 +12,6 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resource :session
 
-  map.resources :clients
-  
-  map.connect 'client/:client_id/show', :controller => 'clients', :action => 'show'
-
   map.resources :apps do |app|
     app.resources :sources
   end
@@ -49,6 +45,7 @@ ActionController::Routing::Routes.draw do |map|
   map.connect 'apps/:app_id/sources/:id/deleteobjects', :controller => 'sources', :action => 'deleteobjects'
 
   map.connect 'sources/:id/refresh', :controller => 'sources', :action => 'refresh'
+  map.connect 'apps/:app_id/sources/:id/refresh', :controller => 'sources', :action => 'refresh'
 
   # yaml saving and loading
   map.connect 'sources/:id/load_all',:controller=>'sources',:action => 'load_all'
