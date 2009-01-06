@@ -9,10 +9,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090106082831) do
+ActiveRecord::Schema.define(:version => 20090106091935) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
+    t.string   "password"
     t.string   "admin"
     t.string   "description"
     t.datetime "created_at"
@@ -27,10 +28,11 @@ ActiveRecord::Schema.define(:version => 20090106082831) do
     t.datetime "updated_at"
     t.string   "object_value_object"
     t.string   "object_value_attrib"
+    t.string   "object_value_value"
   end
 
-  create_table "clients", :id => false, :force => true do |t|
-    t.string   "client_id",  :limit => 36
+  create_table "clients", :force => true do |t|
+    t.string   "client_id"
     t.string   "session"
     t.datetime "created_at"
     t.datetime "updated_at"

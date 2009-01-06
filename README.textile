@@ -1,13 +1,15 @@
 h1. RhoSync
 
-Rhosync is a Ruby-based server to facilitate accessing information from hosted backend applications and sync them to remote devices.
-Specifically it is a Ruby on Rails application that allows managing backend application sources and synchronization of the information they contain to and from mobile devices. 
+Rhosync is a Ruby-based server to facilitate accessing information from backend applications and keeping that information
+in sync with occasionally connected mobile devices.  Specifically it is a Ruby on Rails application that allows managing groups of application objects exposed by a web service.  The RhoSync server then manages synchronization of that information to and from mobile devices. 
 
 h2. INTRODUCTION
 
-RhoSync retrieves data via web services (REST or SOAP) from backend enterprise applications for distribution to downstream mobile devices. It keeps a master store of all enterprise application data and keeps track of the information that users have received. It is written to be far simpler to be far simpler to deploy and configure than similar technologies that have come and gone over the past decade.
+RhoSync retrieves data via web services (REST or SOAP) from backend enterprise applications for distribution to downstream mobile devices. It keeps a master store of all enterprise application data and keeps track of the information that users have received. It is written to be far simpler to be far simpler to deploy and configure than similar technologies that have come and gone over the past 20 years.
 
 It is also more focused on the complete end to end ‘web service backend’ to mobile device (with an enabling master data store on the server) than earlier equivalents. These products were generally focused on the device endpoint syncing to a server-based database. With the success of Software as a Service (SaaS) products such as SugarCRM and SalesForce, synchronization directly to a server database is much more rarely a viable option. Instead we focus on the web service access scenario. RhoSync is also focused on arbitrary enterprise application data as opposed to being a PIM and email focused product such as Funambol.  
+
+There is a RhoSync client embedded in the "Rhodes":http://github.com/rhomobile/rhodes/tree/master runtime, but other RhoSync clients could be created.   
 
 h2. PREREQUISITES
 
@@ -168,4 +170,4 @@ This is a sample source adapter Rub class to retrieve and edit Sugar Account obj
 
 h2. SUPPORT
 
-"Email us":mailto:info@rhomobile.com questions  or, even better, post them to "the Google Group called Rhomobile":http://groups.google.com/rhomobile.
+"Email us":mailto:info@rhomobile.com questions  or, even better, post them to "the Google Group called Rhomobile":http://groups.google.com/group/rhomobile.

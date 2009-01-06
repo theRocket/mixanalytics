@@ -1,11 +1,11 @@
 class AppsController < ApplicationController
   
   before_filter :login_required
-  
+
   # GET /apps
   # GET /apps.xml
   def index
-    login=@current_user.login.downcase
+    login=current_user.login.downcase
     @apps = App.find_all_by_admin login
     if @apps.nil?
       flash[:notice]="You have no existing apps"
@@ -69,7 +69,7 @@ class AppsController < ApplicationController
   def create
     
     @app = App.new(params[:app])
-    @app.admin=@current_user.login
+    @app.admin=current_user.login
     
     respond_to do |format|
       if @app.save

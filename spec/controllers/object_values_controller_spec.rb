@@ -9,7 +9,7 @@ describe ObjectValuesController do
   describe "responding to GET index" do
 
     it "should expose all object_values as @object_values" do
-      ObjectValue.should_receive(:find).with(:all).and_return([mock_object_value])
+      ObjectValue.should_receive(:find).with(:all,{:order=>:object}).and_return([mock_object_value])
       get :index
       assigns[:object_values].should == [mock_object_value]
     end
@@ -18,7 +18,7 @@ describe ObjectValuesController do
   
       it "should render all object_values as xml" do
         request.env["HTTP_ACCEPT"] = "application/xml"
-        ObjectValue.should_receive(:find).with(:all).and_return(object_values = mock("Array of ObjectValues"))
+        ObjectValue.should_receive(:find).with(:all,{:order=>:object}).and_return(object_values = mock("Array of ObjectValues"))
         object_values.should_receive(:to_xml).and_return("generated XML")
         get :index
         response.body.should == "generated XML"

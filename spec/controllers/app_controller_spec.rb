@@ -2,41 +2,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AppsController do
   fixtures :apps
+  fixtures :users
 
 
   before(:each) do
-    stubs={:login=>:anton,:password=>'monkey'}
-    @current_user||=mock_model(User,stubs)
-    controller.stub!( :login_required).and_return(true)
-    controller.stub!(:current_user).and_return(@current_user)
-    
-    puts "controller: #{controller.inspect}"
+    @current_user=login_as(:quentin)
   end
   
   def mock_app(stubs={})
+    stubs = {:name=>"test",:description=>"test description"} unless stubs.size > 0
+    @adapter = mock_model(Source, stubs)
     @mock_app ||= mock_model(App, stubs)
   end
   
-  describe "responding to subscribe and unsubscribe" do
-    it "should add a subscription when subscribe is called" do
-      Subscription.should_receive(:create).with({:app_id=>1,:user_id=>2}).and_return([sub])
-      post :subscribe,:id=>1,:subscriber=>'anton'
-      # not really quite sure what this should be on line below?
-      assigns[:sub].should equal(sub)
-    end
-    
-    it "should remove the subscription when unsubscribe is called" do
-      Subscription.should_receive(:delete).with({:app_id=>1,:user_id=>2}).and_return([sub])
-      sub.should_receive(:destroy)
-      post :unsubscribe,:id=>1,:subscriber=>'anton'
-    end
-  end
   
   
   describe "responding to GET index" do
 
     it "should expose all apps as @apps" do
-      App.should_receive(:find).with(:all).and_return([mock_app])
+      App.should_receive(:find).with(:all,{:conditions=>{:admin=>"quentin"}}).and_return([mock_app])
       get :index
       assigns[:apps].should == [mock_app]
     end
@@ -45,7 +29,7 @@ describe AppsController do
   
       it "should render all apps as xml" do
         request.env["HTTP_ACCEPT"] = "application/xml"
-        App.should_receive(:find).with(:all).and_return(apps = mock("Array of Apps"))
+        App.should_receive(:find).with(:all,{:conditions=>{:admin=>"quentin"}}).and_return(apps = mock("Array of Apps"))
         apps.should_receive(:to_xml).and_return("generated XML")
         get :index
         response.body.should == "generated XML"
@@ -130,7 +114,7 @@ describe AppsController do
       it "should redirect to the app" do
         App.stub!(:find).and_return(mock_app(:update_attributes => true))
         put :update, :id => "1"
-        response.should redirect_to(app_url(mock_app))
+        response.should redirect_to(apps_url)
       end
 
     end
