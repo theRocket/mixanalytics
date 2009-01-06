@@ -11,8 +11,8 @@ It is also more focused on the complete end to end ‘web service backend’ to 
 
 h2. PREREQUISITES
 
-    * Ruby on Rails Version 2.2.2
-    * mySQL, SQLite or other database that plays nicely with Rails
+    * Ruby on Rails Version 2.2.2 or greater
+    * SQLite, mySQL or other database that plays nicely with Rails
 
 h2. INSTALLATION 
 
@@ -37,45 +37,39 @@ Then you can view all of your applications from your web browser by supplying th
 
   http://localhost:3000
 
-If you login as "admin" (or create an account with the name "admin" by registering) you will see the default applications that RhoSync ships with (SugarCRM and Siebel).  Each of these has sync data sources associated with it.
+If you login as "admin" (or create an account with the name "admin" by registering) you will see the default applications that RhoSync ships with (SugarCRM and Siebel), since they are by default owned by "admin".  Each of these has sync data sources associated with it.
 
 h2.  SET UP A DATA SOURCE
 
     * Edit the “login”, “password” and “URL” fields if you are using one of the existing sources for SugarCRM or Siebel to correspond to your own URL
     * Otherwise create a new Source from the application form and edit those same fields.
     * If you are using another backend you will need to create an application and populate it with some data sources
-    * On the Source editing form supply Source Adapter class located in the RhoSync /lib subdirectory OR create individual login, query, create, update and delete fields with the appropriate code.  These methods (from the Source Adapter class or the form) will get called by the RhoSync server to populate data from a data source.
+    * On the Source editing form supply Source Adapter class, the file for which must be located in the RhoSync /lib subdirectory 
+    * OR you can create individual login, query, create, update and delete fields with the appropriate code.  These methods (from the Source Adapter class or the form) will get called by the RhoSync server to populate data from a data source.
  
 
 h2. HOW IT WORKS
 
 Rhosync normalizes all backend application data into a common server-based database schema, in preparation for delivering the further downstream, generally to mobile devices.
 
-Specifically the “master server data table” is a “property bag” model, which keeps track of data sources, individual objects and the name/value pairs for those objects. This allows handling of diverse backend application data structures within a single master store. It also provides for efficient delivery of single “fields” of data in either direction (e.g. just the status changing of a trouble ticket).
+Specifically the “master server data table” is a “property bag” (also known as an "entity-attribute-value" or EAV) model, which keeps track of data sources, individual objects and the name/value pairs for those objects. This allows handling of diverse backend application data structures within a single master store. It also provides for efficient delivery of single “fields” of data in either direction (e.g. just the status changing of a trouble ticket).
 
-The connection code for logging into a backend application (via REST or SOAP APIs), calling the data retrieval and update functions, logging off, and populating the master data table are each written in Ruby but stored in the application sources table. The schema for this table and other tables involved in supporting this functionality are as described below.
-DATABASE SCHEMA
+The connection code for logging into a backend application (via REST or SOAP APIs), calling the data retrieval, create, update and delete functions, logging off, and populating the master data table (OBJECT_VALUES described below) are each written in Ruby. 
 
-There are two important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models. Other tables include tables to keep of the mobile device users and their subscriptions to the various data sources available.
-OBJECT_VALUES
+h2. DATABASE SCHEMA
 
-This “property bag” or "entity-attribute-value" schema facilitates importing any kind of data into a common table for later distribution to downstream clients.
+There are three important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the APPLICATIONS table, the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models). Other tables include tables to keep of the mobile device users and their subscriptions to the various data sources available.
 
-    * object – the unique identifier of the object (generally an integer “record ID” from the backend system)
-    * attribute – the name of the attribute (e.g. “Account Name”, “Industry”)
-    * value – the value of the attribute (e.g. “Acme Corp”, “software”)
-    * source_id – reference back to the source (see below) used for syncing
+h3. APPLICATIONS TABLE
 
-h2. APPLICATIONS
-
-A RhoSync Application is a set of data source corresponding to a single backend application.  It has the following columns:
+A RhoSync Application is a grouped set of data source objects.  It has the following columns:
 * NAME - some string to identify the app
-* DESCRIPTION 
-* ADMIN (not exposed in the UI) - who "owns" the app, set to whoever created the app
+* DESCRIPTION - some text to describe the collection of source
+* ADMIN (not exposed in the UI) - who "owns" the app, set to whoever created the app automatically by the RhoSync web UI
 
-h2. SOURCES
+h3. SOURCES TABLE
 
-This table contains all of the information necessary to connect to a given backend system: 
+This table contains all of the information necessary to connect to a given backend application object: 
 
 * URL – the URL to connect to (for REST adapters) or the URL to the WSDL (for SOAP services)
 * SERVER – OPTIONAL a logical name for the data source server (AcmeCorpSugar)
@@ -83,7 +77,7 @@ This table contains all of the information necessary to connect to a given backe
 * PASSWORD – password (stored in the clear right now) for the backend system
 * SOURCE ADAPTER - this is the name of a class used for login, query, create, update and delete operations.  The Ruby file for this class needs to be placed in the /lib subdirectory of your RhoSync installation. 
 	
-OR you can enter all of the code for ech of the methods in the fields below
+OR you can enter all of the code for each of the methods in the fields below
 * LOGIN – a set of Ruby code generally for logging into the backend system. Generally this is a SOAP or REST call which populates a session_id variable (that variable must be used in the call code below).
 * CALL – the actual code for getting data back (generally uses the session_id acquired in the prolog)
 * CREATECALL - code to create records in the backend from the object values table
@@ -93,14 +87,22 @@ OR you can enter all of the code for ech of the methods in the fields below
 * SYNC – this is the code used to take apart the returned data and stuff it into the OBJECT_VALUES property bag table. 
 * APP_ID (not exposed in the UI) - this refers to the application that contains the data source
 
+h3. OBJECT_VALUES
+
+Thid table contains all of the actual instance data for all applications and sources. 
+    * object – the unique identifier of the object (generally an integer “record ID” from the backend system)
+    * attribute – the name of the attribute (e.g. “Account Name”, “Industry”)
+    * value – the value of the attribute (e.g. “Acme Corp”, “software”)
+    * source_id – reference back to the source (see below) used for syncing
+
 h2. GENERATING A SOURCE ADAPTER
 
 The RhoGen utility supplied by Rhodes will generate a RhoSync Source Adapter class.  For example:
-  @rhogen source SugarAccounts@
+  rhogen source SugarAccounts
 
 h2. SAMPLE SOURCE ADAPTER
 
-This is a sample source adapter class to retrieve Sugar Account objects.  It is located in the lib subdirectory of RhoSync
+This is a sample source adapter Rub class to retrieve and edit Sugar Account objects.  It is the SugarAccounts.rb located in the /lib subdirectory of RhoSync.  
 
   class SugarAccounts < SourceAdapter
 
@@ -166,4 +168,4 @@ This is a sample source adapter class to retrieve Sugar Account objects.  It is 
 
 h2. SUPPORT
 
-Send questions to info@rhomobile.com or, even better, post them to the Google Group called Rhomobile.
+"Email us":mailto:info@rhomobile.com questions  or, even better, post them to "the Google Group called Rhomobile":http://groups.google.com/rhomobile.
