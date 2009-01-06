@@ -20,9 +20,6 @@ class SourcesController < ApplicationController
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
-    request.headers.each do |header,value|
-      logger.debug "Header: #{header}, #{value}"
-    end
     last_update_time=Time.parse(params[:last_update]) if params[:last_update]
     @source=Source.find params[:id]
     @app=@source.app
