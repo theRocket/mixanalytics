@@ -91,7 +91,7 @@ class AppsController < ApplicationController
     respond_to do |format|
       if @app.update_attributes(params[:app])
         flash[:notice] = 'App was successfully updated.'
-        format.html { redirect_to(@app) }
+        format.html { redirect_to(apps_url) }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
