@@ -260,7 +260,7 @@ class SourcesController < ApplicationController
   # - reads (queries) records from the backend
   # - logs off
   #
-  # It should be invoked on a scheduled basis by some admin process,
+  # It should be invoked on a schedcurrent_useruled basis by some admin process,
   # for example by using CURL.  It should also be done with a separate instance
   # than the one used to service create, update and delete calls from the client
   # device.
@@ -276,7 +276,7 @@ class SourcesController < ApplicationController
   # GET /sources.xml
   # this returns all sources that are associated with a given "app" as determine by the token
   def index    
-    login=@current_user.login.downcase
+    login=current_user.login.downcase
     if params[:app_id].nil?
       @app=App.find_by_admin login
     else
@@ -295,7 +295,7 @@ class SourcesController < ApplicationController
   def new
     @source = Source.new
     @source.app=App.find params[:app] if params[:app]
-    @apps=App.find_all_by_admin(@current_user.login)
+    @apps=App.find_all_by_admin(current_user.login)
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @source }
@@ -304,14 +304,14 @@ class SourcesController < ApplicationController
 
   # GET /sources/1/edit
   def edit
-    if @current_user.nil?
+    if current_user.nil?
       redirect_to :controller=>:sessions,:action=>:new 
     else
-      p "Current user: " + @current_user.login
+      p "Current user: " + current_user.login
     end
     @source = Source.find(params[:id])
     @app=App.find(@source.app)
-    @apps=App.find_all_by_admin(@current_user.login) 
+    @apps=App.find_all_by_admin(current_user.login) 
     render :action=>"edit"
   end
 

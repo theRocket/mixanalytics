@@ -4,9 +4,7 @@ describe SourcesController do
   fixtures :sources
   
   before(:each) do
-    stubs={:login=>:anton,:password=>'monkey'}
-    @current_user||=mock_model(User,stubs)
-    controller.stub!( :login_required).and_return(@current_user)
+    @current_user=login_as(:quentin)
   end
   
   def mock_source(stubs={})
@@ -270,6 +268,7 @@ describe SourcesController do
       mock_source                    
         
       Source.should_receive(:find).with('37').and_return(mock_source)
+
       get :show, :id => "37", :format => "json", :client_id => "some-client"
       p response.inspect.to_s
       assigns[:source].should == records
