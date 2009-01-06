@@ -310,7 +310,7 @@ class SourcesController < ApplicationController
       p "Current user: " + current_user.login
     end
     @source = Source.find(params[:id])
-    @app=App.find(@source.app)
+    @app=@source.app
     @apps=App.find_all_by_admin(current_user.login) 
     render :action=>"edit"
   end

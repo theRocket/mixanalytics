@@ -6,11 +6,15 @@ describe AppsController do
 
 
   before(:each) do
-    @current_user=login_as(:quentin)
+    current_user=login_as(:quentin)
   end
   
   def mock_app(stubs={})
-    stubs = {:name=>"test",:description=>"test description"} unless stubs.size > 0
+    basestubs = {:name=>"test",
+      :description=>"test description",
+      :admin=>'quentin',
+      "admin=".to_sym=>'quentin'} 
+    stubs.merge!(basestubs)
     @adapter = mock_model(Source, stubs)
     @mock_app ||= mock_model(App, stubs)
   end
