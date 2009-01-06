@@ -154,18 +154,20 @@ module SourcesHelper
     end
     
     # look for changes in the current object_values list
-    @object_values = ObjectValue.find_all_by_source_id(source_id)
+    @object_values = ObjectValue.find_all_by_source_id_and_update_type(source_id, 'query')
     objs_to_return = []
     if @object_values
       
       # find the new records
       @object_values.each do |ov|
+        logger.debug "current object_value: #{ov.inspect}"
         map = ClientMap.find_or_initialize_by_client_id_and_object_value_id({:client_id => client_id, 
                                                                              :object_value_id => ov.id,
                                                                              :object_value_object => ov.object,
                                                                              :object_value_attrib => ov.attrib,
                                                                              :object_value_value => ov.value,
                                                                              :db_operation => 'insert'})
+        logger.debug "client_map record: #{map.inspect}"                                                                     
         if map and map.new_record?
           map.save
           map.object_value.db_operation = map.db_operation
@@ -178,9 +180,9 @@ module SourcesHelper
     maps_to_delete = ClientMap.find_all_by_client_id(client_id)
     maps_to_delete.each do |map|
       obj = map.object_value
-      puts "COMPARING[obj]: #{obj.inspect}"
-      puts "COMPARING[map]: #{map.inspect}"
-      if obj.nil? or obj.object != map.object_value_object
+      #puts "COMPARING[obj]: #{obj.inspect}"
+      #puts "COMPARING[map]: #{map.inspect}"
+      if obj.nil?
         temp_obj = ObjectValue.new
         temp_obj.object = map.object_value_object
         temp_obj.db_operation = 'delete'
@@ -193,7 +195,10 @@ module SourcesHelper
         logger.debug "Removing object: #{temp_obj.inspect} from map table and client"
         objs_to_return << temp_obj
         # remove from map table
-        ClientMap.delete_all(:client_id => map.client_id, :object_value_object => map.object_value_object)
+        ClientMap.delete_all(:client_id => map.client_id, 
+                             :object_value_object => map.object_value_object,
+                             :object_value_attrib => map.object_value_attrib,
+                             :object_value_value => map.object_value_value)
       end
     end
     objs_to_return
