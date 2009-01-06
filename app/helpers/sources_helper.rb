@@ -142,6 +142,8 @@ module SourcesHelper
   # only delete and insert are required
   def process_objects_for_client(client_id, source_id)
     
+    @client = Client.find_or_create_by_client_id(:client_id => client_id)
+    
     # look for changes in the current object_values list
     @object_values = ObjectValue.find_all_by_source_id(source_id)
     objs_to_return = []
