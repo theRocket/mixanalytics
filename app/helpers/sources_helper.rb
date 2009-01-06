@@ -164,6 +164,7 @@ module SourcesHelper
                                                                              :object_value_id => ov.id,
                                                                              :object_value_object => ov.object,
                                                                              :object_value_attrib => ov.attrib,
+                                                                             :object_value_value => ov.value,
                                                                              :db_operation => 'insert'})
         if map and map.new_record?
           map.save
@@ -185,7 +186,7 @@ module SourcesHelper
         temp_obj.db_operation = 'delete'
         temp_obj.created_at = temp_obj.updated_at = Time.now.to_s
         temp_obj.attrib = map.object_value_attrib
-        temp_obj.value = "temp"
+        temp_obj.value = map.object_value_value
         temp_obj.update_type = "delete"
         temp_obj.id = map.object_value_id
         temp_obj.source_id = 0
