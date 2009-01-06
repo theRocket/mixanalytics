@@ -50,6 +50,9 @@ module AuthenticatedSystem
     #   skip_before_filter :login_required
     #
     def login_required
+      # request.headers.each do |header,value|
+      #   logger.debug "Header: #{header}, #{value}"
+      # end
       authorized? || access_denied
     end
 

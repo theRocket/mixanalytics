@@ -106,6 +106,7 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
+    @client = Client.find_by_client_id(params[:client_id]) if params[:client_id]
     params[:attrvals].each do |x| # for each hash in the array
        # note that there should NOT be an object value for new records
        o=ObjectValue.new
@@ -117,6 +118,8 @@ class SourcesController < ApplicationController
        o.save
        # add the created ID + created_at time to the list
        objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects
+       # add to the client_map so next refresh will delete this temporary object
+       @client.object_values << o if @client
     end
 
     respond_to do |format|
@@ -273,13 +276,14 @@ class SourcesController < ApplicationController
   # GET /sources
   # GET /sources.xml
   # this returns all sources that are associated with a given "app" as determine by the token
-  def index
+  def index    
+    login=@current_user.login.downcase
     if params[:app_id].nil?
-      @app=App.find_by_admin request.headers['login']
+      @app=App.find_by_admin login
     else
       @app=App.find params[:app_id] 
-      @sources=@app.sources if @app
     end
+    @sources=@app.sources if @app
         
     respond_to do |format|
       format.html # index.html.erb
@@ -291,6 +295,7 @@ class SourcesController < ApplicationController
   # GET /sources/new.xml
   def new
     @source = Source.new
+    @source.app=App.find params[:app] if params[:app]
     @apps=App.find_all_by_admin(@current_user.login)
     respond_to do |format|
       format.html # new.html.erb
