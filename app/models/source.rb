@@ -1,7 +1,7 @@
 class Source < ActiveRecord::Base
   has_many :object_values
   belongs_to :app
-  attr_accessor :source_adapter
+  attr_accessor :source_adapter,:current_user
 
   def before_validate
     self.initadapter
