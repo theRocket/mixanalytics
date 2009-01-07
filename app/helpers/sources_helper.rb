@@ -121,7 +121,7 @@ module SourcesHelper
       callbinding=eval(@source.sync+";binding",callbinding) if @source.sync
     end
     ObjectValue.delete_all "(update_type='query') and source_id="+@source.id.to_s
-    ObjectValue.find_by_sql("update object_values set update_type='query' where (update_type='pending' or update_type is null) and source_id="+@source.id.to_s)
+    ObjectValue.find_by_sql("update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+@source.id.to_s)
 
     # now do the logoff
     if @source.source_adapter
