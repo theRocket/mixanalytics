@@ -11,11 +11,11 @@ class ObjectValue < ActiveRecord::Base
   end
   
   def before_save
-    self.id = hash_from_data(self.attrib, self.object, self.value, self.update_type)
+    self.id = hash_from_data(self.attrib, self.object, self.value, self.update_type,Time.new)
   end
 
   private
-  def hash_from_data(attrib=nil,object=nil,value=nil,update_type=nil)
-    "#{object}#{attrib}#{value}#{update_type}".hash.to_i
+  def hash_from_data(attrib=nil,object=nil,value=nil,update_type=nil,time=nil)
+    "#{object}#{attrib}#{value}#{update_type}#{time}".hash.to_i
   end
 end

@@ -28,6 +28,7 @@ module SourcesHelper
 
   def do_refresh(id)
     @source=Source.find id
+    @source.current_user=@current_user
     @source.initadapter
     # not all endpoints require WSDL! dont do this if you dont see WSDL in the URL (a bit of a hack)
     client = SOAP::WSDLDriverFactory.new(@source.url).create_rpc_driver if @source.url and @source.url.size>0 and @source.url=~/wsdl/
