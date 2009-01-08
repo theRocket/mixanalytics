@@ -27,51 +27,58 @@
 # </ticket>
 
 class LighthouseTickets < SourceAdapter
+  
+  include RestAPIHelpers
     
   def initialize(source)
     super
   end
+  
+  # login and logoff are left intentionally unimplemented (i.e. we use baseclass implementation) in REST
 
-  def login
-    #left intentionally blank, as we authenticate as part of each request
-  end
-
+  # curl -u "<API key>:x" -H 'Accept: application/xml'  http://<account>.lighthouseapp.com/projects/<project-id>/tickets.xml
   def query
     log "LighthouseTickets query"
     
-    # this query will get all tickets for a given project which is specified in the URL for this source
-    # example, http://<account>.lighthouseapp.com/projects/<project-id>
-    # a later improvement would iterate over all projects for a user and get the tickets for each
+    @result = []
     
-    uri = URI.parse(@source.url+"/tickets.xml")
-    req = Net::HTTP::Get.new(uri.path, 'Accept' => 'application/xml')
-    req.basic_auth @source.login, @source.password
-    response = Net::HTTP.start(uri.host,uri.port) do |http|
-      http.request(req)
+    # iterate over all projects and get the tickets for for each
+    # we use the IDs of the projects already synced in LighthouseProjects adapter
+    projectSource = Source.find_by_adapter("LighthouseProjects")
+    projects = ObjectValue.find(:all, :conditions => ["source_id = ? and update_type = 'query' and attrib = 'name'", 
+      projectSource.id])
+      
+    projects.each do |project|  
+      uri = URI.parse(@source.url+"/projects/#{project.object}/tickets.xml")
+      req = Net::HTTP::Get.new("/projects/#{project.object}/tickets.xml?q=all", 'Accept' => 'application/xml')
+      req.basic_auth @source.login, @source.password
+      response = Net::HTTP.start(uri.host,uri.port) do |http|
+        http.request(req)
+      end
+      xml_data = XmlSimple.xml_in(response.body); 
+
+      # if there are no tickets for a project this will be nil
+      if xml_data["ticket"]
+        @result = @result + xml_data["ticket"]
+      end
     end
-    xml_data = XmlSimple.xml_in(response.body); 
-    @result = xml_data["ticket"]
   end
 
+  # TODO: @source.current_user.login
   def sync
-    log "LighthouseTickets sync"
+    log "LighthouseTickets sync, with #{@result.length} results"
     
     @result.each do |ticket|
-      user_id = ticket["assigned-user-id"][0]["content"]
-      # right now we just filter for this user in the adapater   
+      # construct unique ID for ticket, tickets are identified by project-id/number in lighthouse
+      # and number itself is not unique
+      id = "#{ticket['project-id'][0]['content']}/#{ticket['number'][0]['content']}"
       
-      #TODO: @source.current_user.login
-      if (user_id.to_i == 9435)
-        id = ticket["number"][0]["content"]      
-        
-        # iterate over all possible values, if the value is not found we just pass "" in to rhosync
-        %w(body closed created-at creator-id milestone-id priority state tag title updated-at project-id).each do |key|
-          value = ticket[key] ? ticket[key][0] : ""
-          add_triple(@source.id, id, key.gsub('-','_'), value)
-          # convert "-" to "_" because "-" is not valid in ruby variable names   
-        end
-      end
-      
+      # iterate over all possible values, if the value is not found we just pass "" in to rhosync
+      %w(assigned-user-id body closed created-at creator-id milestone-id number priority state tag title updated-at project-id).each do |key|
+        value = ticket[key] ? ticket[key][0] : ""
+        add_triple(@source.id, id, key.gsub('-','_'), value)
+        # convert "-" to "_" because "-" is not valid in ruby variable names   
+      end    
     end
   end
 
@@ -88,7 +95,7 @@ class LighthouseTickets < SourceAdapter
     uri = URI.parse(@source.url)
     Net::HTTP.start(uri.host) do |http|
       http.set_debug_output $stderr
-      request = Net::HTTP::Post.new(uri.path + "/tickets.xml", {'Content-type' => 'application/xml'})
+      request = Net::HTTP::Post.new(uri.path + "/projects/#{params['project_id']}/tickets.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
       request.basic_auth @source.login, @source.password
       response = http.request(request)
@@ -107,23 +114,15 @@ class LighthouseTickets < SourceAdapter
     log "LighthouseTickets update"
     
     get_params(name_value_list)
-    
-    # we are only passed the attributes that changed. we need to fill in all the others from the DB
-    %w(body closed creator-id milestone-id priority state tag title project-id).each do |key|
-      searchkey = key.gsub('-','_')
-      unless params[searchkey]
-        o=ObjectValue.find(:first, :conditions => ["source_id = ? and object = ? and attrib = ?", 
-          @source.id, params['id'], searchkey])
-        params.merge!(key => o.value) if o
-      end  
-    end
+    complete_missing_params
+    project, number = split_id(params['id'])
 
     xml_str = xml_template(params)
 
     uri = URI.parse(@source.url)
     Net::HTTP.start(uri.host) do |http|
       http.set_debug_output $stderr
-      request = Net::HTTP::Put.new(uri.path + "/tickets/#{params['id']}.xml", {'Content-type' => 'application/xml'})
+      request = Net::HTTP::Put.new(uri.path + "/projects/#{project}/tickets/#{number}.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
       request.basic_auth @source.login, @source.password
       response = http.request(request)
@@ -138,15 +137,19 @@ class LighthouseTickets < SourceAdapter
     end
   end
 
+  # {"id"=>"500/8"}, delete ticket #8 from project #500
   def delete(name_value_list)
     log "LighthouseTickets delete"
     
     get_params(name_value_list)
+    project, number = split_id(params['id'])
     
     uri = URI.parse(@source.url)
     Net::HTTP.start(uri.host) do |http|
      http.set_debug_output $stderr
-     request = Net::HTTP::Delete.new(uri.path + "/tickets/#{params['id']}.xml", {'Content-type' => 'application/xml'})
+     url = uri.path + "/projects/#{project}/tickets/#{number}.xml"
+     log url
+     request = Net::HTTP::Delete.new(url, {'Content-type' => 'application/xml'})
      request.basic_auth @source.login, @source.password
      response = http.request(request)
      log response.body
@@ -159,37 +162,32 @@ class LighthouseTickets < SourceAdapter
      # end
     end
   end
-
-  def logoff
-    #left intentionally blank, not used in REST
-  end
   
   protected
   
-  def log(msg)
-    puts msg
+  # "recover parts of id 1000/6 => 1000, 6"
+  def split_id(idstring)
+    idstring =~/(\d*)\/(\d*)/
+    return Regexp.last_match(1), Regexp.last_match(2)
   end
   
-  # convert name_value_list to a params hash
-  # name_value_list example, "[{'name' => 'title', 'value' => 'testing'},{'name' => 'state', 'value' => 'new'}]"
-  # => params['title'] = 'testing', etc.
-  def get_params(name_value_list)
-    @params = {}
-    name_value_list.each do |pair| 
-      @params.merge!(Hash[pair['name'], pair['value']])
+ # use this to fill params from the DB to make a complete request
+  def complete_missing_params
+    %w(assigned-user-id body closed creator-id milestone-id number priority state tag title project-id).each do |key|
+      searchkey = key.gsub('-','_')
+      unless params[searchkey]
+        o=ObjectValue.find(:first, :conditions => ["source_id = ? and object = ? and attrib = ?", 
+          @source.id, params['id'], searchkey])
+        params.merge!(key => o.value) if o
+      end  
     end
-    log @params.inspect
-  end
-  
-  def params
-    @params
   end
   
   # construct and fill in XML template for lighthouse xml API
   def xml_template(params)
     xml_str  = <<-EOT
     <ticket>
-      <assigned-user-id type="integer">9435</assigned-user-id>
+      <assigned-user-id type="integer">#{params['assigned_user_id']}</assigned-user-id>
       <body>#{params['body']}</body>
       <milestone-id type="integer">#{params['milestone_id']}</milestone-id>
       <state>#{params['state']}</state>
@@ -204,32 +202,5 @@ class LighthouseTickets < SourceAdapter
     xml_str
   end
   
-  # make an ObjectValue triple for rhosync
-  def add_triple(source_id, object_id, attrib, value)
-    o = ObjectValue.new
-    o.source_id=source_id
-    o.object=object_id
-    o.attrib=attrib
-        
-    # all values are strings
-    if value.class == String
-      o.value = value
-    elsif value.class == Hash
-      if value["nil"] && value["nil"] == "true"
-        o.value = ""
-      else
-        o.value = value["content"].to_s
-      end
-    end
-    
-    # values cannot contain double quotes, convert to single
-    # there might be other characters as well that need escaping TBD
-    o.value.gsub!(/\"/, "\'")
-          
-    if !o.save
-      log "failed creating triple"
-    end
-    
-    log "Add ObjectValue: #{source_id}, #{object_id}, #{attrib}, #{value.inspect} => \n #{o.inspect}\n"
-  end
+
 end

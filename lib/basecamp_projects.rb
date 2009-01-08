@@ -1,7 +1,7 @@
 class BasecampProjects 
   attr_accessor :client
   
-  include BasecampAPIHelpers
+  include RestAPIHelpers
 
   def initialize(source)
     @source=source
