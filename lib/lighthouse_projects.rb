@@ -65,18 +65,6 @@ class LighthouseProjects < SourceAdapter
       end
     end
   end
-
-  def create(name_value_list)
-    #TODO: write some code here
-  end
-
-  def update(name_value_list)
-    #TODO: write some code here
-  end
-
-  def delete(name_value_list)
-    #TODO: write some code here if applicable
-  end
-
-
+  
+  # not planning to create, update or delete projects on device
 end
