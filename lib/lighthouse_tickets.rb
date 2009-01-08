@@ -49,7 +49,7 @@ class LighthouseTickets < SourceAdapter
       projectSource.id])
       
     projects.each do |project|  
-      uri = URI.parse(@source.url+"/projects/#{project.object}/tickets.xml")
+      uri = URI.parse(@source.url)
       req = Net::HTTP::Get.new("/projects/#{project.object}/tickets.xml?q=all", 'Accept' => 'application/xml')
       req.basic_auth @source.login, @source.password
       response = Net::HTTP.start(uri.host,uri.port) do |http|
@@ -99,7 +99,7 @@ class LighthouseTickets < SourceAdapter
       request.body = xml_str
       request.basic_auth @source.login, @source.password
       response = http.request(request)
-      log response.body
+      # log response.body
       
       # case response
       # when Net::HTTPSuccess, Net::HTTPRedirection
@@ -126,7 +126,6 @@ class LighthouseTickets < SourceAdapter
       request.body = xml_str
       request.basic_auth @source.login, @source.password
       response = http.request(request)
-      log response.body
 
       # case response
       # when Net::HTTPSuccess, Net::HTTPRedirection
@@ -148,11 +147,9 @@ class LighthouseTickets < SourceAdapter
     Net::HTTP.start(uri.host) do |http|
      http.set_debug_output $stderr
      url = uri.path + "/projects/#{project}/tickets/#{number}.xml"
-     log url
      request = Net::HTTP::Delete.new(url, {'Content-type' => 'application/xml'})
      request.basic_auth @source.login, @source.password
      response = http.request(request)
-     log response.body
 
      # case response
      # when Net::HTTPSuccess, Net::HTTPRedirection
