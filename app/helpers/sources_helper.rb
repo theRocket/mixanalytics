@@ -161,14 +161,14 @@ module SourcesHelper
       
       # find the new records
       @object_values.each do |ov|
-        logger.debug "current object_value: #{ov.inspect}"
+        #logger.debug "current object_value: #{ov.inspect}"
         map = ClientMap.find_or_initialize_by_client_id_and_object_value_id({:client_id => client_id, 
                                                                              :object_value_id => ov.id,
                                                                              :object_value_object => ov.object,
                                                                              :object_value_attrib => ov.attrib,
                                                                              :object_value_value => ov.value,
                                                                              :db_operation => 'insert'})
-        logger.debug "client_map record: #{map.inspect}"                                                                     
+        #logger.debug "client_map record: #{map.inspect}"                                                                     
         if map and map.new_record?
           map.save
           map.object_value.db_operation = map.db_operation
@@ -181,8 +181,6 @@ module SourcesHelper
     maps_to_delete = ClientMap.find_all_by_client_id(client_id)
     maps_to_delete.each do |map|
       obj = map.object_value
-      #puts "COMPARING[obj]: #{obj.inspect}"
-      #puts "COMPARING[map]: #{map.inspect}"
       if obj.nil?
         temp_obj = ObjectValue.new
         temp_obj.object = map.object_value_object
@@ -191,7 +189,7 @@ module SourcesHelper
         temp_obj.attrib = map.object_value_attrib
         temp_obj.value = map.object_value_value
         temp_obj.update_type = "delete"
-        temp_obj.id = map.object_value_id
+        temp_obj.id = 0
         temp_obj.source_id = 0
         logger.debug "Removing object: #{temp_obj.inspect} from map table and client"
         objs_to_return << temp_obj
