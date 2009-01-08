@@ -191,7 +191,7 @@ module SourcesHelper
         temp_obj.attrib = map.object_value_attrib
         temp_obj.value = map.object_value_value
         temp_obj.update_type = "delete"
-        temp_obj.id = map.object_value_id
+        temp_obj.id = 0
         temp_obj.source_id = 0
         logger.debug "Removing object: #{temp_obj.inspect} from map table and client"
         objs_to_return << temp_obj
