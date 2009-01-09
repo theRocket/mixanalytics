@@ -33,7 +33,7 @@ Mobile client instructions
 
 1/ Go to rhodes/apps/Lighthouse directory
 
-2/ You will need to edit 3 files
+2/ You will need to edit the folllowing 3 files
 
 rhodes/apps/Lighthouse/Ticket/config.rb
 rhodes/apps/Lighthouse/User/config.rb
@@ -47,10 +47,12 @@ to the URL of your tickets source adapter from above and the correct source_id. 
 
 change the other two files to the corresponding URLs and source_ids for you system.
 
-3/ Build and install rhodes to your device simulator or emulator.
+3/ Edit Lighthouse/application.rb and set LIGHTHOUSE_ID to your Lighthouse user id.
 
-4/ From the device, login.
+4/ Build and install rhodes to your device simulator or emulator.
 
-5/ Then click "Lighthouse" from the list of applications
+5/ From the device, login.
 
-6/ You should now see your projects, users, and tickets. 
+6/ Then click "Lighthouse" from the list of applications
+
+7/ You should now see your projects, users, and tickets. 
