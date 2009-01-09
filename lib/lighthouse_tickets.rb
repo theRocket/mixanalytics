@@ -71,7 +71,7 @@ class LighthouseTickets < SourceAdapter
     @result.each do |ticket|
       # construct unique ID for ticket, tickets are identified by project-id/number in lighthouse
       # and number itself is not unique
-      id = "#{ticket['project-id'][0]['content']}/#{ticket['number'][0]['content']}"
+      id = "#{ticket['project-id'][0]['content']}-#{ticket['number'][0]['content']}"
       
       # iterate over all possible values, if the value is not found we just pass "" in to rhosync
       %w(assigned-user-id body closed created-at creator-id milestone-id number priority state tag title updated-at project-id).each do |key|
@@ -162,9 +162,9 @@ class LighthouseTickets < SourceAdapter
   
   protected
   
-  # "recover parts of id 1000/6 => 1000, 6"
+  # "recover parts of id 1000-6 => 1000, 6"
   def split_id(idstring)
-    idstring =~/(\d*)\/(\d*)/
+    idstring =~/(\d*)\-(\d*)/
     return Regexp.last_match(1), Regexp.last_match(2)
   end
   
