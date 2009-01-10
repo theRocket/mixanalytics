@@ -5,6 +5,12 @@
 
 module RestAPIHelpers
   
+  # "recover parts of id 1000-6 => 1000, 6"
+  def split_id(idstring)
+    idstring =~/(\d*)\-(\d*)/
+    return Regexp.last_match(1), Regexp.last_match(2)
+  end
+  
   # convert name_value_list to a params hash
   # name_value_list example, "[{'name' => 'title', 'value' => 'testing'},{'name' => 'state', 'value' => 'new'}]"
   # => params['title'] = 'testing', etc.
