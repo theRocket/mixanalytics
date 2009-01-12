@@ -1,29 +1,53 @@
-<h3>Your Apps</h3>
-<%= @current_user.login%>
-<%if @apps and @apps.size>0%>, below are your RhoSync applications.
+<h3>Your Owned Apps</h3>
+<%= @current_user.login%><%if @apps and @apps.size>0%>, below are your RhoSync applications.
 <table>
   <tr>
     <th>Name</th>
-
     <th>Description</th>
   </tr>
   <% for app in @apps %>
   <tr>
     <td><%=link_to app.name, edit_app_path(app) %></td>
-
     <td><%=h app.description %></td>
     <td><%= link_to 'X', app, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>
-<% end %>
+  <% end %>
 </table>
 <%else%>
-, you have no apps.
+, you have no owned apps.
 <%end%>
 
-<p/>
+<%= link_to 'Create new app', new_app_path %><p/>
 
-<%= link_to 'New app', new_app_path %><p/>
-<% if @current_user.nil? %><br/>
+<p/>
+<h3>Your Subscribed Apps</h3>
+<table>
+<%if @subapps and @subapps.size>0%>These are the apps you are subcribed to.
+  <tr>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Credentials</th>
+  </tr>
+<%for app in @subapps %>
+<tr>
+  <td><%=app.name %></td>
+  <td><%=h app.description %></td>
+  <td>
+  <%sub=Subscription.find_by_app_id_and_user_id app.id,@current_user.id
+    if sub.credential%>
+  <%=link_to "Edit", {:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+  <%else%>
+  <%=link_to "Create",{:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+  <%end%>
+  </td>
+</tr>
+  <% end %>
+  <%else%>
+  , you have no subscribed apps.
+  <%end%>
+</table>
+<p/>
+<%if @current_user.nil? %><br/>
 <%= link_to 'Login',{:controller=>'sessions',:action=>'new'}%><br/>
 <%= link_to 'Register',{:controller=>'users',:action=>'new'}%><br/>
 <%else%>
