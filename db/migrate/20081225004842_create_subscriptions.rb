@@ -1,6 +1,6 @@
 class CreateSubscriptions < ActiveRecord::Migration
   def self.up
-    create_table :subscriptions, :id=>false do |t|
+    create_table :subscriptions do |t|
       t.integer :app_id 
       t.integer :user_id 
       t.timestamps

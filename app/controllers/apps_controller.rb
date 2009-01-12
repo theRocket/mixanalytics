@@ -1,6 +1,26 @@
 class AppsController < ApplicationController
   
   before_filter :login_required
+  
+  def getcred
+    @sub=Subscription.find params[:sub_id]
+    if @sub and @sub.credential.nil?
+      @sub.credential=Credential.new
+      @sub.credential.save
+      @sub.save
+    end
+  end
+  
+  def givecred
+    @sub=Subscription.find params[:sub_id]
+    @sub.credential.login=params[:login]
+    @sub.credential.password=params[:password]
+    @sub.credential.token=params[:token]
+    @sub.credential.save
+    @sub.save
+    flash[:notice]="Updated credential for subscription"
+    redirect_to :action=>'index'
+  end
 
   # GET /apps
   # GET /apps.xml
@@ -10,7 +30,8 @@ class AppsController < ApplicationController
     if @apps.nil?
       flash[:notice]="You have no existing apps"
     end
-
+    apps=App.find :all
+    @subapps=apps.reject { |app| !current_user.apps.index(app) }
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @apps }
