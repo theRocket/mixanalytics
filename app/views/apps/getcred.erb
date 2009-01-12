@@ -1,0 +1,9 @@
+<h3>Editing Credential</h3>
+
+<form action="<%=url_for(:controller=>"apps",:action=>"givecred",:id=>@sub.app)%>">
+    <input type="hidden" name="sub_id" value="<%=@sub.id%>"/>
+    Login <input name="login" value="<%=@sub.credential.login%>"><br>
+    Password <input name="password" value="<%=@sub.credential.password%>"><br>
+    Token <input name="token" value="<%=@sub.credential.token%>"><br>
+    <input type="submit" value="Save Credential"/>
+</form>
