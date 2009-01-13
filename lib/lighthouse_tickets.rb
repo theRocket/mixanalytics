@@ -96,7 +96,7 @@ class LighthouseTickets < SourceAdapter
       http.set_debug_output $stderr
       request = Net::HTTP::Post.new(uri.path + "/projects/#{params['project_id']}/tickets.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
-      req.basic_auth @source.credential.token, "x"
+      request.basic_auth @source.credential.token, "x"
       response = http.request(request)
       # log response.body
       
@@ -123,7 +123,7 @@ class LighthouseTickets < SourceAdapter
       http.set_debug_output $stderr
       request = Net::HTTP::Put.new(uri.path + "/projects/#{project}/tickets/#{number}.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
-      req.basic_auth @credential.token, "x"
+      request.basic_auth @credential.token, "x"
       response = http.request(request)
 
       # case response
@@ -147,7 +147,7 @@ class LighthouseTickets < SourceAdapter
      http.set_debug_output $stderr
      url = uri.path + "/projects/#{project}/tickets/#{number}.xml"
      request = Net::HTTP::Delete.new(url, {'Content-type' => 'application/xml'})
-     req.basic_auth @source.credential.token, "x"
+     request.basic_auth @source.credential.token, "x"
      response = http.request(request)
 
      # case response
