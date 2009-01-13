@@ -40,6 +40,8 @@ module SourcesHelper
     else
       callbinding=eval %"#{@source.prolog};binding"
     end
+    # also you can get user credentials from @credential
+    @source.credential=@source.app.subscriptions.find_by_user_id(@current_user.id).credential
 
     # first do all the the creates
     creates=ObjectValue.find_by_sql("select * from object_values where update_type='create' and source_id="+id)
