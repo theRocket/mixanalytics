@@ -32,11 +32,15 @@ class LighthouseUsers < SourceAdapter
       
     projects.each do |project|  
       uri = URI.parse(@source.url)
-      req = Net::HTTP::Get.new("/projects/#{project.object}/memberships.xml", 'Accept' => 'application/xml')      
-      req.basic_auth @source.login, @source.password
+      url = "/projects/#{project.object}/memberships.xml"
+      req = Net::HTTP::Get.new(url, 'Accept' => 'application/xml')      
+      req.basic_auth @source.credential.token, "x"
+
       response = Net::HTTP.start(uri.host,uri.port) do |http|
+        http.set_debug_output $stderr
         http.request(req)
       end
+      log response.body
       xml_data = XmlSimple.xml_in(response.body); 
 
       # <memberships type="array">
@@ -65,8 +69,9 @@ class LighthouseUsers < SourceAdapter
       uri = URI.parse(@source.url)
       req = Net::HTTP::Get.new("/users/#{user_id}.xml", 'Accept' => 'application/xml')
       log "/users/#{user_id}.xml"
-      req.basic_auth @source.login, @source.password
+      req.basic_auth @source.credential.token, "x"
       response = Net::HTTP.start(uri.host,uri.port) do |http|
+        http.set_debug_output $stderr
         http.request(req)
       end
       xml_data = XmlSimple.xml_in(response.body);
