@@ -20,7 +20,7 @@
 <%= link_to "Load all sources from YAML", :app_id=>@app.id,:action=>"pick_load"  %><br/>
 <%= link_to "Save all sources to YAML", :app_id=>@app.id,:action=>"pick_save"  %><br/>
 -->
-<%= link_to 'Create new source', new_app_source_path(@app) %><br/>
+<%= link_to 'Create new source', :action=>"sources",:app=>@app,:action=>"new" %><br/>
 
 <% if @current_user.nil? %><br/>
 <%= link_to 'Login',{:controller=>'sessions',:action=>'new'}%><br/>
