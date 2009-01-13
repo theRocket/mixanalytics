@@ -123,7 +123,7 @@ class LighthouseTickets < SourceAdapter
       http.set_debug_output $stderr
       request = Net::HTTP::Put.new(uri.path + "/projects/#{project}/tickets/#{number}.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
-      request.basic_auth @credential.token, "x"
+      request.basic_auth @source.credential.token, "x"
       response = http.request(request)
 
       # case response
