@@ -43,7 +43,8 @@ class LighthouseProjects < SourceAdapter
     
     uri = URI.parse(@source.url+"/projects.xml")
     req = Net::HTTP::Get.new(uri.path, 'Accept' => 'application/xml')
-    req.basic_auth @source.login, @source.password
+    req.basic_auth @source.credential.token, "x"
+    
     response = Net::HTTP.start(uri.host,uri.port) do |http|
       http.request(req)
     end

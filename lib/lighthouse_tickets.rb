@@ -51,7 +51,7 @@ class LighthouseTickets < SourceAdapter
     projects.each do |project|  
       uri = URI.parse(@source.url)
       req = Net::HTTP::Get.new("/projects/#{project.object}/tickets.xml?q=all", 'Accept' => 'application/xml')
-      req.basic_auth @source.login, @source.password
+      req.basic_auth @source.credential.token, "x"
       response = Net::HTTP.start(uri.host,uri.port) do |http|
         http.request(req)
       end
@@ -64,7 +64,6 @@ class LighthouseTickets < SourceAdapter
     end
   end
 
-  # TODO: @source.current_user.login
   def sync
     log "LighthouseTickets sync, with #{@result.length} results"
     
@@ -74,7 +73,7 @@ class LighthouseTickets < SourceAdapter
       id = "#{ticket['project-id'][0]['content']}-#{ticket['number'][0]['content']}"
       
       # iterate over all possible values, if the value is not found we just pass "" in to rhosync
-      %w(assigned-user-id body closed created-at creator-id milestone-id number priority state tag title updated-at project-id).each do |key|
+      %w(assigned-user-id body closed created-at creator-id milestone-id number priority state tag title updated-at project-id user-id).each do |key|
         value = ticket[key] ? ticket[key][0] : ""
         add_triple(@source.id, id, key.gsub('-','_'), value)
         # convert "-" to "_" because "-" is not valid in ruby variable names   
@@ -97,7 +96,7 @@ class LighthouseTickets < SourceAdapter
       http.set_debug_output $stderr
       request = Net::HTTP::Post.new(uri.path + "/projects/#{params['project_id']}/tickets.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
-      request.basic_auth @source.login, @source.password
+      req.basic_auth @source.credential.token, "x"
       response = http.request(request)
       # log response.body
       
@@ -124,7 +123,7 @@ class LighthouseTickets < SourceAdapter
       http.set_debug_output $stderr
       request = Net::HTTP::Put.new(uri.path + "/projects/#{project}/tickets/#{number}.xml", {'Content-type' => 'application/xml'})
       request.body = xml_str
-      request.basic_auth @source.login, @source.password
+      req.basic_auth @credential.token, "x"
       response = http.request(request)
 
       # case response
@@ -148,7 +147,7 @@ class LighthouseTickets < SourceAdapter
      http.set_debug_output $stderr
      url = uri.path + "/projects/#{project}/tickets/#{number}.xml"
      request = Net::HTTP::Delete.new(url, {'Content-type' => 'application/xml'})
-     request.basic_auth @source.login, @source.password
+     req.basic_auth @source.credential.token, "x"
      response = http.request(request)
 
      # case response
@@ -161,12 +160,6 @@ class LighthouseTickets < SourceAdapter
   end
   
   protected
-  
-  # "recover parts of id 1000-6 => 1000, 6"
-  def split_id(idstring)
-    idstring =~/(\d*)\-(\d*)/
-    return Regexp.last_match(1), Regexp.last_match(2)
-  end
   
  # use this to fill params from the DB to make a complete request
   def complete_missing_params
