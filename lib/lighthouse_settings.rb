@@ -14,9 +14,7 @@ class LighthouseSettings < SourceAdapter
   def query
     log "LighthouseSettings query"
     
-    @result = [ {"lighthouse_id" => "9435"
-#      @source.current_user.backend_id 
-      } ]
+    @result = [ {"lighthouse_id" => @source.credential.login.to_s } ]
   end
   
   def sync

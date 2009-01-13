@@ -31,7 +31,7 @@ class LighthouseTicketVersions < SourceAdapter
       uri = URI.parse(@source.url)
       project, number = split_id(ticket.object)    
       req = Net::HTTP::Get.new("/projects/#{project}/tickets/#{number}.xml", 'Accept' => 'application/xml')
-      req.basic_auth @source.login, @source.password
+      req.basic_auth @source.credential.token, "x"
       response = Net::HTTP.start(uri.host,uri.port) do |http|
         http.request(req)
       end
@@ -60,26 +60,29 @@ class LighthouseTicketVersions < SourceAdapter
         # convert "-" to "_" because "-" is not valid in ruby variable names   
       end    
       
-      # deal with "diffable-attributes"
+      # process the "diffable-attributes"
       changes = YAML::load(version['diffable-attributes'][0]['content'])
       # log changes.inspect.to_s
       
-      # prepare change message
-      change_msg = ""
-      changes.each_pair do |field,value|
-        if !value
-          change_msg += "→ #{field} cleared.\n"
-        else
-          change_msg += "→ #{field} changed from \“xxx\” to \“#{value}\”\n"
+      # this is temporary. we prepare the HTML here for the changes, really should be made on the client
+      if changes && changes.length > 0
+        # prepare change message
+        events = []
+        changes.each_pair do |field,value|
+          if !value
+            events << "#{field} cleared."
+          else
+            events << "#{field} changed from xxx to #{value}"
+          end
         end
-      end
-      
-      # if there are no changes then that means there was a comment which is in body
-      if change_msg.blank?
+        change_msg = events.join("||||") # assume no ticket contains this in the body
+      else
+        # if there are no changes then that means there was a comment which is in body
         change_msg = version['body'][0] 
       end
       
       add_triple(@source.id, id, "changes", change_msg)
+      add_triple(@source.id, id, "ticket_id", "#{version['project-id'][0]['content']}-#{version['number'][0]['content']}")    
     end
   end
   

@@ -11,7 +11,6 @@ Pre-requistes
 1/ You need a lighthouseapp account
 2/ You need to get an API token for your account and enable access to any projects that you want to sync
 3/ You need to be able to run your own copy of rhosync
-4/ You need to be able to build for at least one handheld platform using rhodes
 
 Rhosync adapters
 
@@ -21,23 +20,38 @@ Rhosync adapters
 
 3/ On the list of "Existing Subscribers" for the application, add your account by clicking "Subscribe user" button
 
-4/ Create 3 sources for the application.
+4/ Create 5 sources for the application.
 
-5/ Create the first source and name it "Projects". Set the URL to http://<your subdomain>.lighthouseapp.com, example http://vdggroup.lighthouseapp.com. Set login to your lighthouse API token, and password to "x". For the source adapter class enter "LighthouseProjects"
+5/ Create the first source and name it "LighthouseProjects". Set the URL to http://<your subdomain>.lighthouseapp.com, example http://rhomobile.lighthouseapp.com. 
 
-6/ Create sources for "Users" and "Tickets" with source adapter classes "LighthouseUsers" and "LighthouseTickets" respectively. Use the same URL, login, and password that you entered for Projects.
+6/ Create sources for "Users", "Tickets", "TicketVersions" and "LighthouseSettings" with source adapter classes "LighthouseUsers", "LighthouseTickets", "LighthouseTicketVersions" and "LighthouseSettings" respectively. 
 
-7/ Go to each of the 3 new sources starting with Projects. From "Editing Source Adapter", click "Show records" and then "Refresh object-value records". You should see records corresponding to your data in Lighthouse. If you see no records, then examine log/development.log for any errors. Double check that you have entered all the values correctly in the fields.
+7/ Go to Your Subscribed Apps ("/")
+
+These are the apps you are subscribed to.
+Name 	Description 	Credentials
+Lighthouse 		Create
+
+Click create credentials.
+
+Enter your lighthouse user id under login, example "9810"
+Enter "x" for password
+Enter your lighthouse API token under token
+
+8/ Go to each of the 5 new sources starting with LighthouseProjects. From "Editing Source Adapter", click "Show records" and then "Refresh object-value records". You should see records corresponding to your data in Lighthouse. If you see no records, then examine log/development.log for any errors. Double check that you have entered all the values correctly in the fields.
 
 Mobile client instructions
 
 1/ Go to rhodes/apps/Lighthouse directory
 
-2/ You will need to edit the folllowing 3 files
+2/ You will need to update your client to point to your rhosync server. You can do this 2 ways.
+
+a. Update the following files and rebuild the client
 
 rhodes/apps/Lighthouse/Ticket/config.rb
 rhodes/apps/Lighthouse/User/config.rb
 rhodes/apps/Lighthouse/Project/config.rb
+rhodes/apps/Lighthouse/LighthouseSettings/config.rb
 
 For example, in Ticket/config.rb change where it says 
 
@@ -47,12 +61,12 @@ to the URL of your tickets source adapter from above and the correct source_id. 
 
 change the other two files to the corresponding URLs and source_ids for you system.
 
-3/ Edit Lighthouse/application.rb and set LIGHTHOUSE_ID to your Lighthouse user id.
+b. From the pre-build executables, go to Edit Sources and change each of the 4 sources, "Projects", "Users", "Tickets" and "LighthouseSettings" and point them to your source URLs for your local Rhosync.
 
-4/ Build and install rhodes to your device simulator or emulator.
+3/ (Build and) install rhodes to your device simulator or emulator.
 
-5/ From the device, login.
+4/ From the device, login.
 
-6/ Then click "Lighthouse" from the list of applications
+5/ Then click "Lighthouse" from the list of applications
 
-7/ You should now see your projects, users, and tickets. 
+6/ You should now see your projects, users, and tickets. 
