@@ -20,11 +20,18 @@ Rhosync adapters
 
 3/ On the list of "Existing Subscribers" for the application, add your account by clicking "Subscribe user" button
 
-4/ Create 5 sources for the application.
+4/ Create 6 sources for the application. The order matters, and you should create them in the following order.
+
+LighthouseProjects
+LighthouseTickets
+LighthouseUsers
+LighthouseSettings
+LighthouseMilestones
+LighthouseTicketVersions
 
 5/ Create the first source and name it "LighthouseProjects". Set the URL to http://<your subdomain>.lighthouseapp.com, example http://rhomobile.lighthouseapp.com. 
 
-6/ Create sources for "Users", "Tickets", "TicketVersions" and "LighthouseSettings" with source adapter classes "LighthouseUsers", "LighthouseTickets", "LighthouseTicketVersions" and "LighthouseSettings" respectively. 
+6/ Create sources for "LighthouseTickets", "LighthouseUsers", "LighthouseSettings", "LighthouseMilestones" and "LighthouseTicketVersions" with source adapter classes "LighthouseTickets", "LighthouseUsers", "LighthouseSettings" "LighthouseMilestones" and "LighthouseTicketVersions" respectively. 
 
 7/ Go to Your Subscribed Apps ("/")
 
@@ -38,7 +45,7 @@ Enter your lighthouse user id under login, example "9810"
 Enter "x" for password
 Enter your lighthouse API token under token
 
-8/ Go to each of the 5 new sources starting with LighthouseProjects. From "Editing Source Adapter", click "Show records" and then "Refresh object-value records". You should see records corresponding to your data in Lighthouse. If you see no records, then examine log/development.log for any errors. Double check that you have entered all the values correctly in the fields.
+8/ Go to each of the new sources starting with LighthouseProjects. From "Editing Source Adapter", click "Show records" and then "Refresh object-value records". You should see records corresponding to your data in Lighthouse. If you see no records, then examine log/development.log for any errors. Double check that you have entered all the values correctly in the fields.
 
 Mobile client instructions
 

@@ -62,38 +62,89 @@ class LighthouseTicketVersions < SourceAdapter
       end    
       
       # process the "diffable-attributes"
-      changes = YAML::load(version['diffable-attributes'][0]['content'])
-      # log changes.inspect.to_s
-      
-      # this is temporary. we prepare the HTML here for the changes, really should be made on the client
-      if changes && changes.length > 0
-        # prepare change message
-        events = []
-        changes.each_pair do |field,value|
-          if !value
-            events << "#{humanize(field)} cleared."
-          else
-            key = case field
-            when :milestone:
-              "milestone-id"
-            when :assigned_user:
-              "assigned-user-id"
-            else
-              field.to_s
-            end
-      
-            events << "#{humanize(field)} changed from \"#{eval_value(version[key][0])}\" to \"#{value}\""
-          end
-        end
-        change_msg = events.join("||||") # assume no ticket contains this in the body
-      else
-        # if there are no changes then that means there was a comment which is in body
-        change_msg = version['body'][0] 
-      end
+      change_msg = calculate_change_history(version, YAML::load(version['diffable-attributes'][0]['content']))
             
       add_triple(@source.id, id, "changes", change_msg)
       add_triple(@source.id, id, "ticket_id", "#{version['project-id'][0]['content']}-#{version['number'][0]['content']}")    
     end
   end
   
+  def calculate_change_history(version, changes)
+    change_msg = ""
+    
+    if changes && changes.length > 0
+      events = []
+      changes.each_pair do |field,value|
+        if !value
+          events << "#{humanize(field)} cleared."
+        else
+          # we need to pluck the right value from the diff, the key does not alway match exactly as id is stripped
+          # and it is a symbol not a string
+          key = case field
+          when :milestone:
+            "milestone-id"
+          when :assigned_user:
+            "assigned-user-id"
+          else
+            field.to_s
+          end
+          
+          value_pre = eval_value(version[key][0])
+          value_post = value
+          
+          # if we are dealing with a milestone or assigned-user-id, then we need to look up the name
+          if (key == "milestone-id")
+            
+            lighthouseMilestones = Source.find_by_adapter("LighthouseMilestones")
+            
+            unless value_pre.blank?
+              milestone = ObjectValue.find(:first, :conditions => 
+                ["source_id = ? and update_type = 'query' and attrib = 'title' and object = ?", 
+                  lighthouseMilestones.id, value_pre])
+              
+              value_pre = milestone.value
+            end
+          
+            unless value_post.blank?
+              milestone = ObjectValue.find(:first, :conditions => 
+                ["source_id = ? and update_type = 'query' and attrib = 'title' and object = ?", 
+                lighthouseMilestones.id, value_post])
+              
+              value_post = milestone.value
+            end
+          
+          elsif (key == "assigned-user-id")
+            
+            lighthouseUsers = Source.find_by_adapter("LighthouseUsers")
+            
+            unless value_pre.blank?
+              milestone = ObjectValue.find(:first, :conditions => 
+                ["source_id = ? and update_type = 'query' and attrib = 'name' and object = ?", 
+                  lighthouseUsers.id, value_pre])
+              
+              value_pre = milestone.value
+            end
+          
+            unless value_post.blank?
+              milestone = ObjectValue.find(:first, :conditions => 
+                ["source_id = ? and update_type = 'query' and attrib = 'name' and object = ?", 
+                lighthouseUsers.id, value_post])
+              
+              value_post = milestone.value
+            end
+            
+          end
+    
+          events << "#{humanize(field)} changed from \"#{value_pre}\" to \"#{value_post}\""
+        end
+      end
+      change_msg = events.join("||||") # assume no ticket contains this in the body
+    else
+      # if there are no changes then that means there was a comment which is in body
+      change_msg = version['body'][0] 
+    end
+    
+    change_msg
+  end
+      
 end
