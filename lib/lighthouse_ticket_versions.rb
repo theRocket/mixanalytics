@@ -13,6 +13,7 @@
 class LighthouseTicketVersions < SourceAdapter
   
   include RestAPIHelpers
+  include ActiveSupport::Inflector
   
   def initialize(source)
     super
@@ -70,9 +71,18 @@ class LighthouseTicketVersions < SourceAdapter
         events = []
         changes.each_pair do |field,value|
           if !value
-            events << "#{field} cleared."
+            events << "#{humanize(field)} cleared."
           else
-            events << "#{field} changed from xxx to #{value}"
+            key = case field
+            when :milestone:
+              "milestone-id"
+            when :assigned_user:
+              "assigned-user-id"
+            else
+              field.to_s
+            end
+      
+            events << "#{humanize(field)} changed from \"#{eval_value(version[key][0])}\" to \"#{value}\""
           end
         end
         change_msg = events.join("||||") # assume no ticket contains this in the body
@@ -80,7 +90,7 @@ class LighthouseTicketVersions < SourceAdapter
         # if there are no changes then that means there was a comment which is in body
         change_msg = version['body'][0] 
       end
-      
+            
       add_triple(@source.id, id, "changes", change_msg)
       add_triple(@source.id, id, "ticket_id", "#{version['project-id'][0]['content']}-#{version['number'][0]['content']}")    
     end

@@ -26,23 +26,29 @@ module RestAPIHelpers
     @params
   end
   
+  def eval_value(value)
+    # make all values strings
+    if value.class == String
+      value
+    elsif value.class == Hash
+      if value["nil"] && value["nil"] == "true"
+        ""
+      else
+        value["content"].to_s
+      end
+    else
+      value
+    end
+  end
+  
   # make an ObjectValue triple for rhosync
   def add_triple(source_id, object_id, attrib, value)
     o = ObjectValue.new
     o.source_id=source_id
     o.object=object_id
     o.attrib=attrib
-        
-    # all values are strings
-    if value.class == String
-      o.value = value
-    elsif value.class == Hash
-      if value["nil"] && value["nil"] == "true"
-        o.value = ""
-      else
-        o.value = value["content"].to_s
-      end
-    end
+    o.value = eval_value(value)
+
     
     # values cannot contain double quotes, convert to single
     # TBD: there might be other characters as well that need escaping
