@@ -5,6 +5,6 @@ class UserObserver < ActiveRecord::Observer
   #end
 
   def after_save(user) 
-    UserMailer.deliver_activation(user) 
+  # I BELIEVE THIS IS A BUG IN RESTFULAUTH!  UserMailer.deliver_activation(user) 
   end
 end
