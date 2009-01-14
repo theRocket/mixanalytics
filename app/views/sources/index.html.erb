@@ -10,7 +10,7 @@
   <tr>
     <td><%=link_to source.name,edit_app_source_path(:id=>source.id,:app_id=>@app.id) %></td>
     <td><%=source.url%></td>
-    <td><%= link_to 'X', :action=>"destroy", :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= link_to 'X',{:action=>"destroy",:app_id=>@app.id}, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>
 <% end %>
 </table>

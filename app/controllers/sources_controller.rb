@@ -347,7 +347,6 @@ class SourcesController < ApplicationController
     respond_to do |format|
       begin
         if @source.update_attributes(params[:source])
-          @source.save_to_yaml
           flash[:notice] = 'Source was successfully updated.'
           format.html { redirect_to(:action=>:index,:app_id=>@app.id) }
           format.xml  { head :ok }
@@ -370,7 +369,7 @@ class SourcesController < ApplicationController
   # DELETE /sources/1
   # DELETE /sources/1.xml
   def destroy
-    @source = Source.find(params[:id])
+    @source=Source.find(params[:id])
     @source.destroy
 
     respond_to do |format|
