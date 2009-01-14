@@ -75,22 +75,24 @@ class LighthouseTicketVersions < SourceAdapter
     if changes && changes.length > 0
       events = []
       changes.each_pair do |field,value|
-        if !value
+        
+        # we need to pluck the right value from the diff, the key does not alway match exactly as id is stripped
+        # and it is a symbol not a string
+        key = case field
+        when :milestone:
+          "milestone-id"
+        when :assigned_user:
+          "assigned-user-id"
+        else
+          field.to_s
+        end
+        
+        value_pre = value
+        value_post = eval_value(version[key][0])
+        
+        if value_post.blank? 
           events << "#{humanize(field)} cleared."
         else
-          # we need to pluck the right value from the diff, the key does not alway match exactly as id is stripped
-          # and it is a symbol not a string
-          key = case field
-          when :milestone:
-            "milestone-id"
-          when :assigned_user:
-            "assigned-user-id"
-          else
-            field.to_s
-          end
-          
-          value_pre = eval_value(version[key][0])
-          value_post = value
           
           # if we are dealing with a milestone or assigned-user-id, then we need to look up the name
           if (key == "milestone-id")
