@@ -1,12 +1,18 @@
 SugarCRM:
-    id: 1
-    name: SugarCRM
-    description: sync data sources for SugarCRM
-    admin: admin
+  id: 1
+  name: SugarCRM
+  description: sync data sources for SugarCRM
+  admin: admin
 
 Siebel:
-    id: 2
-    name: Siebel
-    description: sync data sources for Siebel
-    admin: admin
+  id: 2
+  name: Siebel
+  description: sync data sources for Siebel
+  admin: admin
+    
+Lighthouse:
+  id: 4
+  name: Lighthouse
+  description: 
+  admin: admin  
  

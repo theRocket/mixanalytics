@@ -235,3 +235,88 @@ SiebelServiceRequests:
     output=obj.serviceRequestUpdate(input)
 
   epilog:
+
+LighthouseProjects:
+  id: 5
+  app_id: 4
+  adapter: "LighthouseProjects"
+  name: "LighthouseProjects"
+  url: "http://rhomobile.lighthouseapp.com"
+  login: 
+  password: 
+  prolog: ""
+  deletecall: ""
+  sync: ""
+  updatecall: ""
+  call: ""
+  
+LighthouseMilestones:
+  id: 6
+  app_id: 4
+  adapter: "LighthouseMilestones"
+  name: "LighthouseMilestones"
+  url: "http://rhomobile.lighthouseapp.com"
+  login: 
+  password: 
+  prolog: ""
+  deletecall: ""
+  sync: ""
+  updatecall: ""
+  call: ""
+  
+LighthouseTickets:
+  id: 7
+  app_id: 4
+  adapter: "LighthouseTickets"
+  name: "LighthouseTickets"
+  url: "http://rhomobile.lighthouseapp.com"
+  login: 
+  password: 
+  prolog: ""
+  deletecall: ""
+  sync: ""
+  updatecall: ""
+  call: ""
+
+LighthouseUsers:
+  id: 8
+  app_id: 4
+  adapter: "LighthouseUsers"
+  name: "LighthouseUsers"
+  url: "http://rhomobile.lighthouseapp.com"
+  login: 
+  password: 
+  prolog: ""
+  deletecall: ""
+  sync: ""
+  updatecall: ""
+  call: ""
+  
+LighthouseTicketVersions:
+  id: 9
+  app_id: 4
+  adapter: "LighthouseTicketVersions"
+  name: "LighthouseTicketVersions"
+  url: "http://rhomobile.lighthouseapp.com"
+  login: 
+  password: 
+  prolog: ""
+  deletecall: ""
+  sync: ""
+  updatecall: ""
+  call: ""
+  
+LighthouseSettings:
+  id: 10
+  app_id: 4
+  adapter: "LighthouseSettings"
+  name: "LighthouseSettings"
+  url: "http://rhomobile.lighthouseapp.com"
+  login: 
+  password: 
+  prolog: ""
+  deletecall: ""
+  sync: ""
+  updatecall: ""
+  call: ""
+      
