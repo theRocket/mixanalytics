@@ -27,11 +27,12 @@ class SourcesController < ApplicationController
 
     # if there are any pending updates then we need a refresh, so go invoke it!
     update_values=ObjectValue.find_by_sql "select * from object_values where update_type!='query' and source_id="+params[:id]
+    
     if (update_values.size>0)
-      p "Pending updates, need to do refresh/sync first!"
+      logger.info "Pending updates, need to do refresh/sync first."
       do_refresh(params[:id])
     else
-      p "No pending updates"
+      logger.info "No pending updates"
     end
     
     # if client_id is provided, return only relevant objects
