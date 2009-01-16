@@ -16,6 +16,8 @@ class SessionsController < ApplicationController
       self.current_user = user
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
+    else
+      render :status => 401
     end
   end
 
