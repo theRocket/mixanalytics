@@ -3,7 +3,7 @@
 Rhosync is a Ruby-based framework to access data from various backend applications
 and sync them to remote devices.
 Specifically it is a Ruby on Rails application that allows managing backend
-application sources and user subscriptions to those data sources. It is
+application sources and user memberships to those data sources. It is
 optimized for delivery of ongoing incremental updates of those data sources
 to users accessing that data via mobile devices.
 
@@ -70,7 +70,7 @@ in supporting this functionality are as described below.
 
 = DATABASE SCHEMA
 
-There are two important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models. Other tables include tables to keep of the mobile device users and their subscriptions to the various data sources available.
+There are two important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models.
 
 === OBJECT_VALUES
 A “property bag” schema that facilitatest importing any kind of data into a common table for later distribution to downstream clients.

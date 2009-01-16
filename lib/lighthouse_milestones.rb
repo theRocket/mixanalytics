@@ -29,7 +29,7 @@ class LighthouseMilestones < SourceAdapter
   def query
     log "LighthouseMilestones query"
         
-    # iterate over all projects/<id>/memberships.xml to get user ids
+    # iterate over all projects/<id>/Memberships.xml to get user ids
     # we use the IDs of the projects already synced in LighthouseProjects adapter
     projectSource = Source.find_by_adapter("LighthouseProjects")
     projects = ObjectValue.find(:all, :conditions => ["source_id = ? and update_type = 'query' and attrib = 'name'", 

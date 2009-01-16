@@ -4,7 +4,7 @@ class CreateCredentials < ActiveRecord::Migration
       t.string :login
       t.string :password
       t.string :token
-      t.integer :subscription_id
+      t.integer :membership_id
       t.timestamps
     end
   end

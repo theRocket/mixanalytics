@@ -41,7 +41,7 @@ module SourcesHelper
       callbinding=eval %"#{@source.prolog};binding"
     end
     # also you can get user credentials from @source.credential
-    usersub=@source.app.subscriptions.find_by_user_id(@current_user.id)
+    usersub=@source.app.memberships.find_by_user_id(@current_user.id)
     @source.credential=usersub.credential if usersub # this variable is available in your source adapter
 
     # first do all the the creates

@@ -3,7 +3,7 @@ class AppsController < ApplicationController
   before_filter :login_required
   
   def getcred
-    @sub=Subscription.find params[:sub_id]
+    @sub=Membership.find params[:sub_id]
     if @sub and @sub.credential.nil?
       @sub.credential=Credential.new
       @sub.credential.save
@@ -12,13 +12,13 @@ class AppsController < ApplicationController
   end
   
   def givecred
-    @sub=Subscription.find params[:sub_id]
+    @sub=Membership.find params[:sub_id]
     @sub.credential.login=params[:login]
     @sub.credential.password=params[:password]
     @sub.credential.token=params[:token]
     @sub.credential.save
     @sub.save
-    flash[:notice]="Updated credential for subscription"
+    flash[:notice]="Updated credential for membership"
     redirect_to :action=>'index'
   end
 

@@ -60,7 +60,7 @@ The connection code for logging into a backend application (via REST or SOAP API
 
 h2. DATABASE SCHEMA
 
-There are three important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the APPLICATIONS table, the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models). Other tables include tables to keep of the mobile device users and their subscriptions to the various data sources available.
+There are three important tables that describe fully the universe of data sources and their contents for downstream syncing. These are the APPLICATIONS table, the SOURCES table and the OBJECT_VALUES table (and the corresponding Source and ObjectValues models).   
 
 h3. APPLICATIONS TABLE
 

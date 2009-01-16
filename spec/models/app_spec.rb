@@ -11,7 +11,7 @@ describe App do
   end
   
   describe "responding to subscribe and unsubscribe" do
-    it "should add a subscription when subscribe is called" do
+    it "should add a membership when subscribe is called" do
     end
     
   end

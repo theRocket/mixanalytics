@@ -45,12 +45,19 @@ ActiveRecord::Schema.define(:version => 20090112211452) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "subscription_id"
+    t.integer  "membership_id"
   end
 
   create_table "credentials_sources", :force => true do |t|
     t.integer  "credential_id"
     t.integer  "source_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "memberships", :force => true do |t|
+    t.integer  "app_id"
+    t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -85,13 +92,6 @@ ActiveRecord::Schema.define(:version => 20090112211452) do
     t.datetime "refreshtime"
     t.string   "adapter"
     t.integer  "app_id"
-  end
-
-  create_table "subscriptions", :force => true do |t|
-    t.integer  "app_id"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "users", :force => true do |t|

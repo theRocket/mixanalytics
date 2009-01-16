@@ -3,7 +3,7 @@
 #
 # Example REST source adapter using http://lighthouseapp.com/api/users
 #
-# <user>
+# <user>Subscription
 #   <id type="integer">1</id>
 #   <job>Rails Monkey</job>
 #   <name>rick</name>

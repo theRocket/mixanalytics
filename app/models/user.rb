@@ -2,8 +2,8 @@ require 'digest/sha1'
 require 'rubygems'
 require 'aasm'
 class User < ActiveRecord::Base
-  has_many :apps, :through=>:subscriptions
-  has_many :subscriptions
+  has_many :apps, :through=>:memberships
+  has_many :memberships
   has_many :clients
 
   include Authentication
