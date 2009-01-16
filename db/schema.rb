@@ -56,6 +56,7 @@ ActiveRecord::Schema.define(:version => 20090112210648) do
     t.datetime "updated_at"
   end
 
+
   create_table "memberships", :force => true do |t|
     t.integer  "app_id"
     t.integer  "user_id"
