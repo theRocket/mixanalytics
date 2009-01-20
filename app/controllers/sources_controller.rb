@@ -365,9 +365,9 @@ class SourcesController < ApplicationController
   def destroy
     @source=Source.find(params[:id])
     @source.destroy
-
+    @app=App.find params[:app_id]
     respond_to do |format|
-      format.html { redirect_to(sources_url) }
+      format.html { redirect_to :controller=>"apps",:action=>"edit",:id=>@app.id }
       format.xml  { head :ok }
     end
   end
