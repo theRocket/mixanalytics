@@ -16,7 +16,6 @@ class SourcesController < ApplicationController
   # if a :last_update parameter is supplied then only show data that has been
   # refreshed (retrieved from the backend) since then
   protect_from_forgery :only => [:create, :delete, :update]
-  
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
@@ -24,22 +23,10 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     @app=@source.app
     check_access(@app)
-
-    # if there are any pending updates then we need a refresh, so go invoke it!
-    update_values=ObjectValue.find_by_sql "select * from object_values where update_type!='query' and source_id="+params[:id]
-    
-    if (update_values.size>0)
-      logger.info "Pending updates, need to do refresh/sync first."
-      do_refresh(params[:id])
-    else
-      logger.info "No pending updates"
-    end
-    
-    # if client_id is provided, return only relevant objects
-    # for that client
-    if params[:client_id]
-      @object_values=process_objects_for_client(params[:client_id], params[:id])
-      
+    @source.refresh(@current_user) if@source.needs_refresh
+    # if client_id is provided, return only relevant object for that client
+    if params[:client_id] and params[:id]
+      @object_values=process_objects_for_client(params[:client_id], params[:id]) 
     # if we have a last_update parameter then only do the update
     # if the last update time is before the most recent refresh then bring back values
     elsif !last_update_time or (@source.refreshtime and (last_update_time<=>@source.refreshtime)<0)
@@ -47,12 +34,18 @@ class SourcesController < ApplicationController
     else  # no need to bring back values because we're still waiting for a refresh on the server!
       @object_values=nil
     end
-
     respond_to do |format|
       format.html
       format.xml  { render :xml => @object_values}
       format.json
     end
+  end
+  
+  # this is effectively the "callback" or notify function that needs to be called from the backend app
+  # this is installed by the "set_callback" method that should be written for source adapters when appropriate
+  def refresh
+    @source=Source.find params[:id]
+    @source.refresh(@current_user) if @source
   end
 
   # return the metadata for the specified source
@@ -274,7 +267,7 @@ class SourcesController < ApplicationController
   def refresh
     source=Source.find params[:id]
     check_access(source.app)
-    do_refresh(params[:id])
+    source.refresh
 
     redirect_to :action=>"show",:id=>@source.id, :app_id=>@source.app.id
   end

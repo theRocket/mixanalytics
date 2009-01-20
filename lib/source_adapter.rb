@@ -11,14 +11,15 @@ class SourceAdapter
   def query
   end
 
-  def sync(result)
-    result.entry_list.each do |x|
+  def sync(user_id)
+    @result.entry_list.each do |x|
       x.name_value_list.each do |y|
         o=ObjectValue.new
         o.source_id=@source.id
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
+        o.user_id=user_id if user_id
         o.save
       end
     end
@@ -34,5 +35,8 @@ class SourceAdapter
   end
 
   def logoff
+  end
+  
+  def set_callback
   end
 end

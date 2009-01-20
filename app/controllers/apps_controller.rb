@@ -41,7 +41,7 @@ class AppsController < ApplicationController
   # GET /apps/1
   # GET /apps/1.xml
   def show
-    @app = App.find(params[:id])
+    @app = App.find params[:id]
     @sources=@app.sources
     @users=User.find :all
     
@@ -49,6 +49,15 @@ class AppsController < ApplicationController
       format.html # show.html.erb
       format.xml  { render :xml => @app }
     end
+  end
+  
+  def refresh # execute a refresh on all sources associated with an app 
+    @app=App.find params[:id]
+    @sources=@app.sources
+    @sources.each do |src|
+      src.refresh(@current_user)
+    end
+    redirect_to :action=>:edit
   end
 
   # GET /apps/new
@@ -64,8 +73,7 @@ class AppsController < ApplicationController
 
   # GET /apps/1/edit
   def edit
-    @app = App.find(params[:id])
-  
+    @app = App.find(params[:id]) 
     @users = User.find :all
   end
   
