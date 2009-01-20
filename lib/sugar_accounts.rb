@@ -19,7 +19,6 @@ class SugarAccounts < SourceAdapter
   end
 
   def query
-    p "Current user: " + @source.current_user.login
     module_name = 'Accounts'
     query = '' # gets all the acounts, you can also use SQL like 'accounts.name like '%company%''
     order_by = '' # in default order. you can also use SQL like 'accounts.name'
