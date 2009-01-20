@@ -51,7 +51,7 @@ class Source < ActiveRecord::Base
     end
     # also you can get user credentials from credential
     usersub=app.memberships.find_by_user_id(current_user.id) if current_user
-    credential=usersub.credential if usersub # this variable is available in your source adapter
+    @credential=usersub.credential if usersub # this variable is available in your source adapter
 
     # first do all the the creates
     creates=ObjectValue.find_by_sql("select * from object_values where update_type='create' and source_id="+id.to_s)
