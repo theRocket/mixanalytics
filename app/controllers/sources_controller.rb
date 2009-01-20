@@ -267,9 +267,8 @@ class SourcesController < ApplicationController
   def refresh
     source=Source.find params[:id]
     check_access(source.app)
-    source.refresh
-
-    redirect_to :action=>"show",:id=>@source.id, :app_id=>@source.app.id
+    source.refresh @current_user
+    redirect_to :action=>"show",:id=>source.id, :app_id=>source.app.id
   end
   
   # GET /sources
