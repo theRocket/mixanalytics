@@ -73,7 +73,7 @@ class LighthouseTicketVersions < SourceAdapter
     change_msg = ""
     
     if changes && changes.length > 0
-      events = []
+      events = ["<<<EOC>>>"] # dummy to indicate end of changes, parsed out by client
       changes.each_pair do |field,value|
         
         # we need to pluck the right value from the diff, the key does not alway match exactly as id is stripped
