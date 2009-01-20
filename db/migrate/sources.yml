@@ -15,8 +15,8 @@ SugarCases:
   password: testuser
   app_id: 1
   prolog: |
-    u = @source.login
-    p = Digest::MD5.hexdigest(@source.password)
+    u = source.login
+    p = Digest::MD5.hexdigest(password)
     ua = {'user_name' => u,'password' => p}
     ss = client.login(ua,nil)
     if ss.error.number.to_i != 0
@@ -36,7 +36,7 @@ SugarCases:
     result.entry_list.each do |x|
       x.name_value_list.each do |y|
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=.id
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
@@ -46,7 +46,7 @@ SugarCases:
       entry_result=client.get_entry(@session_id,'Cases',x['id'],['assigned_user_id','account_id'])
       entry_result.entry_list[0].name_value_list.each do |y|
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=.id
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
@@ -78,8 +78,8 @@ SugarEmployees:
   password: testuser
   app_id: 1
   prolog: |
-    u = @source.login
-    p = Digest::MD5.hexdigest(@source.password)
+    u = login
+    p = Digest::MD5.hexdigest(password)
     ua = {'user_name' => u,'password' => p}
     ss = client.login(ua,nil)
     if ss.error.number.to_i != 0
@@ -99,7 +99,7 @@ SugarEmployees:
     result.entry_list.each do |x|
       x.name_value_list.each do |y|
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=id
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
@@ -132,10 +132,10 @@ SiebelServiceRequests:
   app_id: 2
 
   prolog: |
-    https = Net::HTTP.new(@source.url,"443")
+    https = Net::HTTP.new(url,"443")
     https.use_ssl = true
     https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    headers={"UserName"=>@source.login,"Password"=>@source.password}
+    headers={"UserName"=>login,"Password"=>password}
     @session_id=nil
     https.start do |https|
         req = Net::HTTP::Get.new("/Services/Integration?command=login", headers)
@@ -170,21 +170,21 @@ SiebelServiceRequests:
     output.listOfServiceRequest.each do |x|
         # subject
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=id
         o.object=x.serviceRequestId
         o.attrib="subject"
         o.value=x.subject
         o.save
         #accountName
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=id
         o.object=x.serviceRequestId
         o.attrib="accountName"
         o.value=x.accountName
         o.save
         #description
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=id
         o.object=x.serviceRequestId
         o.attrib="description"
         o.value=x.description
@@ -192,14 +192,14 @@ SiebelServiceRequests:
         o.save
         #priority
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=id
         o.object=x.serviceRequestId
         o.attrib="priority"
         o.value=x.priority
         o.save
         #createdDate attribute
         o=ObjectValue.new
-        o.source_id=@source.id
+        o.source_id=id
         o.object=x.serviceRequestId
         o.attrib="createdDate"
         o.value=x.createdDate

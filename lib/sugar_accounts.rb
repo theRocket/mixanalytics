@@ -30,7 +30,7 @@ class SugarAccounts < SourceAdapter
     @result = client.get_entry_list(@session_id,module_name,query,order_by,offset,select_fields,max_results,deleted);
   end
 
-  def sync
+  def sync(user_id)
     @result.entry_list.each do |x|
       x.name_value_list.each do |y|
         o=ObjectValue.new
@@ -38,6 +38,7 @@ class SugarAccounts < SourceAdapter
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
+        o.user_id=user_id if user_id
         o.save
       end
     end
@@ -58,5 +59,8 @@ class SugarAccounts < SourceAdapter
 
   def logoff
     client.logout(@session_id)
+  end
+  
+  def set_callback
   end
 end

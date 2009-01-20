@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090112210648) do
+ActiveRecord::Schema.define(:version => 20090116232127) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
@@ -51,11 +51,9 @@ ActiveRecord::Schema.define(:version => 20090112210648) do
   create_table "credentials_sources", :force => true do |t|
     t.integer  "credential_id"
     t.integer  "source_id"
-    t.integer  "membership_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
 
   create_table "memberships", :force => true do |t|
     t.integer  "app_id"
@@ -73,6 +71,7 @@ ActiveRecord::Schema.define(:version => 20090112210648) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "pending_id"
+    t.integer  "user_id"
   end
 
   create_table "sources", :force => true do |t|
@@ -94,6 +93,7 @@ ActiveRecord::Schema.define(:version => 20090112210648) do
     t.datetime "refreshtime"
     t.string   "adapter"
     t.integer  "app_id"
+    t.integer  "pollinterval"
   end
 
   create_table "users", :force => true do |t|
