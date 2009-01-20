@@ -128,7 +128,7 @@ class Source < ActiveRecord::Base
     user_id=User.find_by_login credential.login if credential
     if source_adapter
       source_adapter.query
-      source_adapter.sync(user_id)
+      source_adapter.sync
     else
       callbinding=eval(call+";binding",callbinding)
       callbinding=eval(sync+";binding",callbinding) if sync
