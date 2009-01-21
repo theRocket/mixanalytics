@@ -100,19 +100,21 @@ class LighthouseTicketVersions < SourceAdapter
             lighthouseMilestones = Source.find_by_adapter("LighthouseMilestones")
             
             unless value_pre.blank?
-              milestone = ObjectValue.find(:first, :conditions => 
+              if milestone = ObjectValue.find(:first, :conditions => 
                 ["source_id = ? and update_type = 'query' and attrib = 'title' and object = ?", 
                   lighthouseMilestones.id, value_pre])
               
-              value_pre = milestone.value
+                  value_pre = milestone.value
+              end
             end
           
             unless value_post.blank?
-              milestone = ObjectValue.find(:first, :conditions => 
+              if milestone = ObjectValue.find(:first, :conditions => 
                 ["source_id = ? and update_type = 'query' and attrib = 'title' and object = ?", 
                 lighthouseMilestones.id, value_post])
               
-              value_post = milestone.value
+                value_post = milestone.value
+              end
             end
           
           elsif (key == "assigned-user-id")
@@ -120,19 +122,21 @@ class LighthouseTicketVersions < SourceAdapter
             lighthouseUsers = Source.find_by_adapter("LighthouseUsers")
             
             unless value_pre.blank?
-              milestone = ObjectValue.find(:first, :conditions => 
+              if assigned = ObjectValue.find(:first, :conditions => 
                 ["source_id = ? and update_type = 'query' and attrib = 'name' and object = ?", 
                   lighthouseUsers.id, value_pre])
               
-              value_pre = milestone.value
+                  value_pre = assigned.value
+              end
             end
           
             unless value_post.blank?
-              milestone = ObjectValue.find(:first, :conditions => 
+              if assigned = ObjectValue.find(:first, :conditions => 
                 ["source_id = ? and update_type = 'query' and attrib = 'name' and object = ?", 
                 lighthouseUsers.id, value_post])
               
-              value_post = milestone.value
+                value_post = assigned.value
+              end
             end
             
           end
