@@ -81,13 +81,16 @@ class Source < ActiveRecord::Base
     end
 
     # now do the updates
-    updates=ObjectValue.find_by_sql("select * from object_values where update_type='update' and source_id="+id.to_s)
-    uniqobjs=updates.map {|x|x.object}
-    uniqobjs.uniq!
-    uniqobjs.each do |x|
-      objvals=ObjectValue.find_all_by_object_and_update_type(x,'update')  # this has all the attribute value pairs now
+    updates=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='update' and source_id="+id.to_s)
+    updates.each do |u|
+      begin
+        objvals=ObjectValue.find :all,:conditions=>{:object=>u.object,:update_type=>'update'}  # this has all the attribute value pairs now
+      rescue => e
+        p "exception"
+        p e.inspect
+      end
       attrvalues={}
-      attrvalues["id"]=x  # setting the ID allows it be an update
+      attrvalues["id"]=u  # setting the ID allows it be an update
       objvals.each do |y|
         attrvalues[y.attrib]=y.value
         y.destroy
