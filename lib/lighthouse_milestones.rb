@@ -40,7 +40,6 @@ class LighthouseMilestones < SourceAdapter
     projects.each do |project|  
       uri = URI.parse(@source.url)
       url = "/projects/#{project.object}/milestones.xml"
-      log url
       req = Net::HTTP::Get.new(url, 'Accept' => 'application/xml')      
       req.basic_auth @source.credential.token, "x"
 
@@ -48,7 +47,6 @@ class LighthouseMilestones < SourceAdapter
         http.set_debug_output $stderr
         http.request(req)
       end
-      log response.body
       xml_data = XmlSimple.xml_in(response.body); 
 
       if xml_data["milestone"]

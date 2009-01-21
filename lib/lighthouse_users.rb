@@ -40,7 +40,6 @@ class LighthouseUsers < SourceAdapter
         http.set_debug_output $stderr
         http.request(req)
       end
-      log response.body
       xml_data = XmlSimple.xml_in(response.body); 
 
       # <memberships type="array">
@@ -68,7 +67,6 @@ class LighthouseUsers < SourceAdapter
     user_ids.each do |user_id|
       uri = URI.parse(@source.url)
       req = Net::HTTP::Get.new("/users/#{user_id}.xml", 'Accept' => 'application/xml')
-      log "/users/#{user_id}.xml"
       req.basic_auth @source.credential.token, "x"
       response = Net::HTTP.start(uri.host,uri.port) do |http|
         http.set_debug_output $stderr

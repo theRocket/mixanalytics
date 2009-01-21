@@ -110,7 +110,7 @@ class LighthouseTickets < SourceAdapter
   end
 
   def update(name_value_list)
-    log "LighthouseTickets update"
+    log "++LighthouseTickets update"
     
     get_params(name_value_list)
     complete_missing_params
@@ -137,7 +137,7 @@ class LighthouseTickets < SourceAdapter
 
   # {"id"=>"500/8"}, delete ticket #8 from project #500
   def delete(name_value_list)
-    log "LighthouseTickets delete"
+    log "--LighthouseTickets delete"
     
     get_params(name_value_list)
     project, number = split_id(params['id'])

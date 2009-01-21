@@ -67,5 +67,42 @@ class LighthouseProjects < SourceAdapter
     end
   end
   
+  #
   # not planning to create, update or delete projects on device
+  #
+  
+  # register callback with lighthouse API
+  def set_callback(notify_url)
+    log "!LighthouseProjects set_callback with #{notify_url}"
+    
+    projects = ObjectValue.find(:all, :conditions => 
+      ["source_id = ? and update_type = 'query' and attrib = 'name'", @source.id])
+      
+    projects.each do |project|
+      xml_str  = <<-EOT
+      <?xml version="1.0" encoding="UTF-8"?>
+      <callback-handler>
+        <url>#{notify_url}</url>
+        <project-id>#{project.object}</project_id>
+      </callback-handler>
+      EOT
+    
+      uri = URI.parse(@source.url)
+      Net::HTTP.start(uri.host) do |http|
+        http.set_debug_output $stderr
+        request = Net::HTTP::Post.new(uri.path + "/callback_handlers.xml", {'Content-type' => 'application/xml'})
+        request.body = xml_str
+        request.basic_auth @source.credential.token, "x"
+        response = http.request(request)
+        # log response.body
+      
+        # case response
+        # when Net::HTTPSuccess, Net::HTTPRedirection
+        #   # OK
+        # else
+        #   raise "Failed to create  ticket"
+        # end
+      end
+    end
+  end
 end
