@@ -315,11 +315,12 @@ class SourcesController < ApplicationController
   # POST /sources.xml
   def create
     @source = Source.new(params[:source])
-
+    @app=App.find params["source"]["app_id"]
+    
     respond_to do |format|
       if @source.save
         flash[:notice] = 'Source was successfully created.'
-        format.html { redirect_to(@source) }
+        format.html { redirect_to(:controller=>"apps",:action=>:edit,:id=>@app.id) }
         format.xml  { render :xml => @source, :status => :created, :location => @source }
       else
         format.html { render :action => "new" }
