@@ -17,7 +17,7 @@ module SourcesHelper
     # refresh if there are any updates to come
     result=true if (ObjectValue.count_by_sql "select count(*) from object_values where update_type!='query' and source_id="+id.to_s) > 0
     # refresh if there is no data
-    result=true if (ObjectValue.count_by_sql "select count(*) from object_values where update_type=='query' and source_id="+id.to_s) == 0
+    result=true if (ObjectValue.count_by_sql "select count(*) from object_values where update_type='query' and source_id="+id.to_s) <= 0
     # refresh is the data is old
     self.pollinterval||=300 # 5 minute default if there's no pollinterval or its a bad value
     if !self.refreshtime or ((Time.new - self.refreshtime)>pollinterval)
@@ -28,7 +28,7 @@ module SourcesHelper
   end
 
   def finalize_query_records
-    delete_cmd= "(update_type='query') and source_id="+id.to_s
+    delete_cmd= "(update_type=='query') and source_id="+id.to_s
     (delete_cmd << " and user_id="+ @user_id) if @user_id # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
     pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+id.to_s

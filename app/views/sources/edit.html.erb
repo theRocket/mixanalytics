@@ -5,6 +5,7 @@
 Name <%=@source.name%>
   <%= f.submit "Update source adapter code" %>
 <%=link_to 'Show records',{:action=>'show',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
+<%=link_to 'Force refresh',{:action=>'refresh',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
 <%=link_to "Back to application",{:controller=>"apps",:action=>"edit",:id=>@source.app_id} %>&nbsp;
   <p>
     <%= f.label "Source Name" %> <%=f.text_field :name,:size=>20 %>

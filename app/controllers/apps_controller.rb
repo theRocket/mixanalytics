@@ -55,6 +55,7 @@ class AppsController < ApplicationController
     @app=App.find params[:id]
     @sources=@app.sources
     @sources.each do |src|
+      p "Refreshing " + src.name
       src.refresh(@current_user)
     end
     redirect_to :action=>:edit

@@ -17,15 +17,20 @@
   </p>
 <% end %>
 
+
 <h4>Sources</h4>
 <table>
 <% @app.sources.each do |source| %>
 <tr>
 <td><%= link_to  source.name,edit_source_path(source,:app_id=>@app.id)%></td>
 <td><%= link_to 'X',app_source_path(@app,source), :confirm => 'Are you sure?', :method => :delete %></td>
+<!--<td><%= link_to "Refresh",:controller=>"sources",:action=>"refresh",:id=>source.id%></td>-->
 </tr>
 <%end %>
 </table>
+<p>
+<%=link_to "Refresh All",:controller=>"apps",:action=>"refresh",:id=>@app.id%>
+</p>
 <p>
 <%=link_to 'Add Source',:controller=>"sources",:action=>"new",:app=>@app.id %>
 </p>
