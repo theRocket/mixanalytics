@@ -4,6 +4,8 @@ class ObjectValue < ActiveRecord::Base
   set_primary_key :id
   belongs_to :source
   has_many :clients, :through => :client_maps
+  has_many :client_maps
+  
   attr_accessor :db_operation
 
   def before_validate
