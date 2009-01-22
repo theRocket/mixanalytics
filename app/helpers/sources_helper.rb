@@ -26,9 +26,15 @@ module SourcesHelper
     end
     result  # return true of false (nil)
   end
+  
+  def clear_pending_records
+    delete_cmd= "(update_type='pending') and source_id="+id.to_s
+    (delete_cmd << " and user_id="+ @user_id) if @user_id # if there is a credential then just do delete and update based upon the records with that credential
+    ObjectValue.delete_all delete_cmd
+  end
 
   def finalize_query_records
-    delete_cmd= "(update_type=='query') and source_id="+id.to_s
+    delete_cmd= "(update_type='query') and source_id="+id.to_s
     (delete_cmd << " and user_id="+ @user_id) if @user_id # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
     pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+id.to_s

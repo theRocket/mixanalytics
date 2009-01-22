@@ -12,10 +12,9 @@ class ObjectValue < ActiveRecord::Base
   
   def before_save
     self.id=(Time.new.to_s+rand.to_s).hash.to_i
-    self.pending_id = hash_from_data(self.attrib, self.object, self.value,self.update_type,self.source_id)
+    self.pending_id = hash_from_data(self.attrib, self.object, self.value,self.update_type,self.source_id)    
   end
-
-  private
+  
   def hash_from_data(attrib=nil,object=nil,value=nil,update_type=nil,source_id=nil)
     "#{object}#{attrib}#{value}#{update_type}#{source_id}".hash.to_i
   end

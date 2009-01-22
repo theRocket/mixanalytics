@@ -26,8 +26,6 @@ class SourcesController < ApplicationController
     # if client_id is provided, return only relevant object for that client
     if params[:client_id] and params[:id]
       @object_values=process_objects_for_client(params[:client_id], params[:id]) 
-    # if we have a last_update parameter then only do the update
-    # if the last update time is before the most recent refresh then bring back values
     else
       @object_values=ObjectValue.find_all_by_update_type_and_source_id "query",params[:id],:order=>"object"
     end
