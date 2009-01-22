@@ -46,7 +46,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.connect 'sources/:id/refresh', :controller => 'sources', :action => 'refresh'
   map.connect 'apps/:app_id/sources/:id/refresh', :controller => 'sources', :action => 'refresh'
-
+  map.connect 'apps/:app_id/sources/:id', :controller => 'sources', :action => 'delete'
+  
   # yaml saving and loading
   map.connect 'sources/:id/load_all',:controller=>'sources',:action => 'load_all'
   map.connect 'sources/:id/save_all',:controller=>'sources',:action => 'save_all'

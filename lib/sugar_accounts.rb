@@ -61,6 +61,6 @@ class SugarAccounts < SourceAdapter
     client.logout(@session_id)
   end
   
-  def set_callback
+  def set_callback(notify_url)
   end
 end

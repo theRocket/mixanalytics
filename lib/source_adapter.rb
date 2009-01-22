@@ -38,6 +38,6 @@ class SourceAdapter
   def logoff
   end
   
-  def set_callback
+  def set_callback(notify_urL)
   end
 end

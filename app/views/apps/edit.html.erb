@@ -22,7 +22,7 @@
 <% @app.sources.each do |source| %>
 <tr>
 <td><%= link_to  source.name,edit_source_path(source,:app_id=>@app.id)%></td>
-<td><%= link_to 'X',{:controller=>"sources",:action=>"destroy",:id=>source.id,:app_id=>@app.id}%></td>
+<td><%= link_to 'X',app_source_path(@app,source), :confirm => 'Are you sure?', :method => :delete %></td>
 </tr>
 <%end %>
 </table>

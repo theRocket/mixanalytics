@@ -26,6 +26,7 @@ Name <%=@source.name%>
     <%= f.text_field "url", :size=>50%> &nbsp;
     <%= f.label :login %><%= f.text_field :login, :size=>10%> &nbsp;
     <%= f.label :password %><%= f.text_field :password, :size=>20 %>
+    <%= f.label "Poll Interval (seconds)" %><%= f.text_field :pollinterval, :size=>10 %>
   </p>
 Provide the name of the source adapter class located in your lib directory which has
 login, query, sync, create, update, delete, and logoff methods.
