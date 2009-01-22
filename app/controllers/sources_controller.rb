@@ -338,7 +338,7 @@ class SourcesController < ApplicationController
       begin
         if @source.update_attributes(params[:source])
           flash[:notice] = 'Source was successfully updated.'
-          format.html { redirect_to(:action=>:index,:app_id=>@app.id) }
+          format.html { redirect_to(:controller=>"apps",:action=>:edit,:id=>@app.id) }
           format.xml  { head :ok }
         else
           begin  # call underlying save! so we can get some exceptions back to report

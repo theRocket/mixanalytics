@@ -10,6 +10,7 @@ class Source < ActiveRecord::Base
 
   def before_save
     self.pollinterval||=300
+    self.priority||=3
   end
   
   def initadapter

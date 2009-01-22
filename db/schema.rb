@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090116232127) do
+ActiveRecord::Schema.define(:version => 20090122191208) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
@@ -94,6 +94,7 @@ ActiveRecord::Schema.define(:version => 20090116232127) do
     t.string   "adapter"
     t.integer  "app_id"
     t.integer  "pollinterval"
+    t.integer  "priority"
   end
 
   create_table "users", :force => true do |t|
