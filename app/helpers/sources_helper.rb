@@ -27,19 +27,22 @@ module SourcesHelper
     result  # return true of false (nil)
   end
   
-  def clear_pending_records
+  def clear_pending_records(current_user)
     delete_cmd= "(update_type='pending') and source_id="+id.to_s
-    (delete_cmd << " and user_id="+ @user_id) if @user_id # if there is a credential then just do delete and update based upon the records with that credential
+    (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
+    p "Deleting pending records " + delete_cmd
     ObjectValue.delete_all delete_cmd
   end
 
-  def finalize_query_records
+  def finalize_query_records(current_user)
     delete_cmd= "(update_type='query') and source_id="+id.to_s
-    (delete_cmd << " and user_id="+ @user_id) if @user_id # if there is a credential then just do delete and update based upon the records with that credential
+    (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
+    p "Deleting query records: " + delete_cmd
     pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+id.to_s
-    (pending_to_query << " and user_id=" + @user_id) if @user_id 
+    (pending_to_query << " and user_id=" + current_user.id.to_s) if current_user 
     ObjectValue.find_by_sql pending_to_query
+    p "Setting pending to query: " + pending_to_query
     self.refreshtime=Time.new # timestamp    
   end
 
@@ -146,6 +149,8 @@ module SourcesHelper
                              :object_value_value => map.object_value_value)
       end
     end
+    # Update the last updated time for this client
+    @client.update_attribute(:updated_at, Time.now)
     objs_to_return
   end
   

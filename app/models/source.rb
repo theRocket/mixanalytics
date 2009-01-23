@@ -31,7 +31,7 @@ class Source < ActiveRecord::Base
     # also you can get user credentials from credential
     usersub=app.memberships.find_by_user_id(current_user.id) if current_user
     @credential=usersub.credential if usersub # this variable is available in your source adapter
-    
+
     source_adapter.client=@client if source_adapter
     # make sure to use @client and @session_id variable in your code that is edited into each source!
     if source_adapter
@@ -44,9 +44,8 @@ class Source < ActiveRecord::Base
     process_update_type('create',createcall)
     process_update_type('update',updatecall)
     process_update_type('delete',deletecall)      
-    # do the query call and sync of records
-    @user_id=User.find_by_login credential.login if credential
-    clear_pending_records
+
+    clear_pending_records(current_user)
     if source_adapter
       source_adapter.query
       source_adapter.sync
@@ -54,7 +53,7 @@ class Source < ActiveRecord::Base
       callbinding=eval(call+";binding",callbinding)
       callbinding=eval(sync+";binding",callbinding) if sync
     end 
-    finalize_query_records
+    finalize_query_records(current_user)
     # now do the logoff
     if source_adapter
       source_adapter.logoff
