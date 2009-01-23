@@ -25,7 +25,7 @@ class SourcesController < ApplicationController
     @source.refresh(@current_user) if @source.needs_refresh
     # if client_id is provided, return only relevant object for that client
     if params[:client_id] and params[:id]
-      @object_values=process_objects_for_client(params[:client_id], params[:id]) 
+      @object_values=process_objects_for_client(@source, params[:client_id]) 
     else
       @object_values=ObjectValue.find_all_by_update_type_and_source_id "query",params[:id],:order=>"object"
     end

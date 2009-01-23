@@ -84,7 +84,7 @@ module SourcesHelper
   # and the current state of the object_values table
   # since we do a delete_all in rhosync refresh, 
   # only delete and insert are required
-  def process_objects_for_client(client_id, source_id)
+  def process_objects_for_client(source,client_id)
     
     # setup client & user association if it doesn't exist
     if client_id and client_id != 'client_id'
@@ -97,8 +97,11 @@ module SourcesHelper
       @client.save
     end
     
-    # look for changes in the current object_values list
-    @object_values = ObjectValue.find_all_by_source_id_and_update_type(source_id, 'query')
+    # look for changes in the current object_values list, return only records
+    # for the current user if required
+    if current_user
+      @object_values = ObjectValue.find_all_by_source_id_and_update_type_and_user_id(source.id, 'query', current_user.id)
+    end
     objs_to_return = []
     if @object_values
       

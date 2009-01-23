@@ -61,7 +61,7 @@ class LighthouseProjects < SourceAdapter
       # iterate over all possible values, if the value is not found we just pass "" in to rhosync
       %w(created-at default-assigned-user-id default-milestone-id description name public updated-at open-states-list closed-states-list).each do |key|
         value = project[key] ? project[key][0] : ""
-        add_triple(@source.id, id, key.gsub('-','_'), value)
+        add_triple(@source.id, id, key.gsub('-','_'), value, @source.current_user.id)
         # convert "-" to "_" because "-" is not valid in ruby variable names   
       end
     end
