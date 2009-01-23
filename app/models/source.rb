@@ -10,6 +10,7 @@ class Source < ActiveRecord::Base
 
   def before_save
     self.pollinterval||=300
+    self.priority||=3
   end
   
   def initadapter
@@ -42,6 +43,7 @@ class Source < ActiveRecord::Base
     process_update_type('delete',deletecall)      
     # do the query call and sync of records
     @user_id=User.find_by_login credential.login if credential
+    clear_pending_records
     if source_adapter
       source_adapter.query
       source_adapter.sync

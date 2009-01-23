@@ -26,8 +26,6 @@ class SourcesController < ApplicationController
     # if client_id is provided, return only relevant object for that client
     if params[:client_id] and params[:id]
       @object_values=process_objects_for_client(params[:client_id], params[:id]) 
-    # if we have a last_update parameter then only do the update
-    # if the last update time is before the most recent refresh then bring back values
     else
       @object_values=ObjectValue.find_all_by_update_type_and_source_id "query",params[:id],:order=>"object"
     end
@@ -315,11 +313,12 @@ class SourcesController < ApplicationController
   # POST /sources.xml
   def create
     @source = Source.new(params[:source])
-
+    @app=App.find params["source"]["app_id"]
+    
     respond_to do |format|
       if @source.save
         flash[:notice] = 'Source was successfully created.'
-        format.html { redirect_to(@source) }
+        format.html { redirect_to(:controller=>"apps",:action=>:edit,:id=>@app.id) }
         format.xml  { render :xml => @source, :status => :created, :location => @source }
       else
         format.html { render :action => "new" }
@@ -338,7 +337,7 @@ class SourcesController < ApplicationController
       begin
         if @source.update_attributes(params[:source])
           flash[:notice] = 'Source was successfully updated.'
-          format.html { redirect_to(:action=>:index,:app_id=>@app.id) }
+          format.html { redirect_to(:controller=>"apps",:action=>:edit,:id=>@app.id) }
           format.xml  { head :ok }
         else
           begin  # call underlying save! so we can get some exceptions back to report

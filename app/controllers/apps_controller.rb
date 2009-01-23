@@ -53,10 +53,12 @@ class AppsController < ApplicationController
   
   def refresh # execute a refresh on all sources associated with an app 
     @app=App.find params[:id]
-    @sources=@app.sources
+    @sources=Source.find_all_by_app_id @app.id,:order=>:priority
     @sources.each do |src|
+      p "Refreshing " + src.name
       src.refresh(@current_user)
     end
+    flash[:notice]="Refreshed all sources"
     redirect_to :action=>:edit
   end
 

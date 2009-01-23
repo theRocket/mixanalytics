@@ -1,39 +1,35 @@
-<h1>New source</h1>
+<h2>New Source Adapter </h2>
 
-<% form_for(@source) do |f| %>
-  <%= f.error_messages %>
+<% form_for(@source,:url=>{:action=>:create}) do |f| %>
 
+Name <%=@source.name%>
+  <%= f.submit "Create Source" %>
+<%=link_to "Back to application",{:controller=>"apps",:action=>"edit",:id=>@source.app_id} %>&nbsp;
   <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <%= f.label "Source Name" %> <%=f.text_field :name,:size=>20 %>
   </p>
-
   <p>
     <%= f.label "Application" %> 
     <select id="source_app_id" name="source[app_id]">
       <%@apps.each do |a| %>
         <option value="<%=a.id%>"
-<%if @source.app.id==a.id%>
+<%if @source.app_id==a.id%>
  selected
 <%end%>
 ><%=a.name%></option>
       <%end%>
     </select>
   </p>
-    <p>
-    <%= f.label :url %><br />
-    <%= f.text_field :url %>
-  </p>
-
   <p>
-    <%= f.label :login %><br />
-    <%= f.text_field :login %>
+    <%= f.label :url %>
+    <%= f.text_field "url", :size=>50%> &nbsp;
+    <%= f.label :login %><%= f.text_field :login, :size=>10%> &nbsp;
+    <%= f.label :password %><%= f.text_field :password,:size=>20 %>
   </p>
   <p>
-    <%= f.label :password %><br />
-    <%= f.text_field :password %>
+      <%= f.label "Poll Interval (seconds)"%><%= f.text_field :pollinterval,:value=>300 ,:size=>10 %>&nbsp;
+      <%= f.label :priority%><%=f.text_field :priority, :value=>"3",:size=>10%>&nbsp;
   </p>
-
 Provide the name of the source adapter class located in your lib directory which has
 login, query, sync, create, update, delete, and logoff methods.
 <p>
@@ -74,9 +70,6 @@ Be careful to only use apostrophes (single quotes) for strings versus double quo
     <%= f.text_area :epilog ,:rows=>3,:cols=>60%>
   </p>
 
-  <p>
-    <%= f.submit "Create" %>
-  </p>
 <% end %>
 
-<%= link_to 'Back', sources_path %>
+

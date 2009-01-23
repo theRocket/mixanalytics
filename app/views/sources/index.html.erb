@@ -1,5 +1,4 @@
-<h1>Listing sources</h1>
-
+<h1>Listing sources for <%=@app.name%></h1>
 <table>
   <tr>
     <th>Name</th>
@@ -14,14 +13,16 @@
   </tr>
 <% end %>
 </table>
-
+<p>
+<%=link_to "Refresh All",:controller=>"apps",:action=>"refresh",:id=>@app.id%>
+</p> 
 <br />
 <!--
 <%= link_to "Load all sources from YAML", :app_id=>@app.id,:action=>"pick_load"  %><br/>
 <%= link_to "Save all sources to YAML", :app_id=>@app.id,:action=>"pick_save"  %><br/>
 -->
 <%= link_to 'Create new source', :action=>"sources",:app=>@app,:action=>"new" %><br/>
-
+<%= link_to 'Back to application',:controller=>"apps",:action=>"edit",:id=>@app.id%><br/>
 <% if @current_user.nil? %><br/>
 <%= link_to 'Login',{:controller=>'sessions',:action=>'new'}%><br/>
 <%= link_to 'Register',{:controller=>'users',:action=>'new'}%><br/>

@@ -5,6 +5,7 @@
 Name <%=@source.name%>
   <%= f.submit "Update source adapter code" %>
 <%=link_to 'Show records',{:action=>'show',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
+<%=link_to 'Force refresh',{:action=>'refresh',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
 <%=link_to "Back to application",{:controller=>"apps",:action=>"edit",:id=>@source.app_id} %>&nbsp;
   <p>
     <%= f.label "Source Name" %> <%=f.text_field :name,:size=>20 %>
@@ -25,8 +26,11 @@ Name <%=@source.name%>
     <%= f.label :url %>
     <%= f.text_field "url", :size=>50%> &nbsp;
     <%= f.label :login %><%= f.text_field :login, :size=>10%> &nbsp;
-    <%= f.label :password %><%= f.text_field :password, :size=>20 %>
-    <%= f.label "Poll Interval (seconds)" %><%= f.text_field :pollinterval, :size=>10 %>
+    <%= f.label :password %><%= f.text_field :password,:size=>20 %>
+  </p>
+  <p>
+      <%= f.label "Poll Interval (seconds)"%><%= f.text_field :pollinterval, :size=>10 %>&nbsp;
+      <%= f.label :priority%><%=f.text_field :priority, :size=>10%>&nbsp;
   </p>
 Provide the name of the source adapter class located in your lib directory which has
 login, query, sync, create, update, delete, and logoff methods.
