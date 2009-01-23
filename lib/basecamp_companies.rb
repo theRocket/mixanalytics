@@ -31,7 +31,7 @@ class BasecampCompanies
       
       %w(name city zip phone-number-office address-one address-two country web-address uuid 
         phone-number-fax url-name time-zone-id state).each do |key|
-          add_triple(@source.id, id, key.gsub('-','_'), company[key][0])      
+          add_triple(@source.id, id, key.gsub('-','_'), company[key][0], @source.current_user.id)      
       end
     end
   end

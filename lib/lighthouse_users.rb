@@ -89,7 +89,7 @@ class LighthouseUsers < SourceAdapter
       # iterate over all possible values, if the value is not found we just pass "" in to rhosync
       %w(job name website).each do |key|
         value = user[key] ? user[key][0] : ""
-        add_triple(@source.id, id, key.gsub('-','_'), value)
+        add_triple(@source.id, id, key.gsub('-','_'), value, @source.current_user.id)
         # convert "-" to "_" because "-" is not valid in ruby variable names   
       end
     end
