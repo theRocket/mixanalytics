@@ -27,6 +27,8 @@ class Source < ActiveRecord::Base
     initadapter
     # not all endpoints require WSDL! dont do this if you dont see WSDL in the URL (a bit of a hack)
     @client = SOAP::WSDLDriverFactory.new(url).create_rpc_driver if url and url.size>0 and url=~/wsdl/
+    # also you can get user credentials from credential
+    usersub=app.memberships.find_by_user_id(current_user.id) if current_user
     @credential=usersub.credential if usersub # this variable is available in your source adapter
     source_adapter.client=@client if source_adapter
     # make sure to use @client and @session_id variable in your code that is edited into each source!
@@ -35,8 +37,7 @@ class Source < ActiveRecord::Base
     else
       callbinding=eval %"#{prolog};binding"
     end
-    # also you can get user credentials from credential
-    usersub=app.memberships.find_by_user_id(current_user.id) if current_user
+
 
     # perform core create, update and delete operations
     process_update_type('create',createcall)
