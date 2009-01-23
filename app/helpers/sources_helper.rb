@@ -146,6 +146,8 @@ module SourcesHelper
                              :object_value_value => map.object_value_value)
       end
     end
+    # Update the last updated time for this client
+    @client.update_attribute(:updated_at, Time.now)
     objs_to_return
   end
   
