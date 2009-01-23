@@ -40,7 +40,7 @@ SugarCases:
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
-        o.user_id=@source.current_user.id
+        o.user_id=@current_user.id
         o.save
       end
       # add fields that didn't come back originally!: the assigned_to and account_id
@@ -51,6 +51,7 @@ SugarCases:
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
+        o.user_id=@current_user.id
         o.save
       end
     end
@@ -104,7 +105,7 @@ SugarEmployees:
         o.object=x['id']
         o.attrib=y.name
         o.value=y.value
-        o.user_id=@source.current_user.id
+        o.user_id=@current_user.id
         o.save
       end
     end
