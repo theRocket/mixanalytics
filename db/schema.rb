@@ -97,6 +97,13 @@ ActiveRecord::Schema.define(:version => 20090122191208) do
     t.integer  "priority"
   end
 
+  create_table "subscriptions", :force => true do |t|
+    t.integer  "app_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "login",                     :limit => 40
     t.string   "name",                      :limit => 100, :default => ""
