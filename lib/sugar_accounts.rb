@@ -1,66 +1,46 @@
-class SugarAccounts < SourceAdapter
+class SugarAccounts < SugarAdapter
 
   def initialize(source)
     super(source)
-  end
-
-  def login
-    u = @source.login
-    p = Digest::MD5.hexdigest(@source.password)
-    ua = {'user_name' => u,'password' => p}
-    ss = client.login(ua,nil)
-    if ss.error.number.to_i != 0
-      p 'failed to login - #{ss.error.description}'
-      return
-    else
-      @session_id = ss['id']
-      uid = client.get_user_id(@session_id)
-    end
-  end
-
-  def query
-    module_name = 'Accounts'
-    query = '' # gets all the acounts, you can also use SQL like 'accounts.name like '%company%''
-    order_by = '' # in default order. you can also use SQL like 'accounts.name'
-    offset = 0
-    select_fields = ['name','industry'] # this can't be an empty array
-    max_results = '10000' # if set to 0 or '', this doesn't return all the results
-    deleted = 0 # whether you want to retrieve deleted records, too
-    @result = client.get_entry_list(@session_id,module_name,query,order_by,offset,select_fields,max_results,deleted);
-  end
-
-  def sync
-    user_id=@source.current_user.id
-    @result.entry_list.each do |x|
-      x.name_value_list.each do |y|
-        o=ObjectValue.new
-        o.source_id=@source.id
-        o.object=x['id']
-        o.attrib=y.name
-        o.value=y.value
-        o.user_id=user_id 
-        o.save
-      end
-    end
-  end
-
-  def create(name_value_list)
-    result=client.set_entry(@session_id,'Accounts',name_value_list)
-  end
-
-  def update(name_value_list)
-    result=client.set_entry(@session_id,'Accounts',name_value_list)
-  end
-
-  def delete(name_value_list)
-    name_value_list.push({'name'=>'deleted','value'=>'1'});
-    result=client.set_entry(@session_id,'Accounts',name_value_list)
-  end
-
-  def logoff
-    client.logout(@session_id)
-  end
-  
-  def set_callback(notify_url)
+    
+    @module_name = 'Accounts'
+    @select_fields = %w(
+      name
+      date_entered
+      date_modified
+      modified_user_id
+      modified_by_name
+      created_by
+      created_by_name
+      description
+      assigned_user_id
+      assigned_user_name
+      account_type
+      industry
+      annual_revenue
+      phone_fax
+      billing_address_street
+      billing_address_city
+      billing_address_state
+      billing_address_postalcode
+      billing_address_country
+      rating
+      phone_office
+      phone_alternate
+      website
+      ownership
+      employees
+      ticker_symbol
+      shipping_address_street
+      shipping_address_city
+      shipping_address_state
+      shipping_address_postalcode
+      shipping_address_country
+      email1
+      parent_id
+      sic_code
+      parent_name
+      campaign_id
+    )
   end
 end

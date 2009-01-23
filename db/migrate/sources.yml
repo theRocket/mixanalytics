@@ -14,63 +14,7 @@ SugarCases:
   login: testuser
   password: testuser
   app_id: 1
-  prolog: |
-    u = login
-    p = Digest::MD5.hexdigest(password)
-    ua = {'user_name' => u,'password' => p}
-    ss = @client.login(ua,nil)
-    if ss.error.number.to_i != 0
-      p 'failed to login - #{ss.error.description}'
-      return
-    else
-      @session_id = ss['id']
-      uid = @client.get_user_id(@session_id)
-    end
-
-  call: |
-    select_fields = ['name','case_number','priority','status','type','description','resolution']
-    result = @client.get_entry_list(@session_id,'Cases','','case_number',0,select_fields,'10000',0);
-
-
-  sync: |
-    result.entry_list.each do |x|
-      x.name_value_list.each do |y|
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x['id']
-        o.attrib=y.name
-        o.value=y.value
-        o.user_id=@current_user.id
-        o.save
-      end
-      # add fields that didn't come back originally!: the assigned_to and account_id
-      entry_result=@client.get_entry(@session_id,'Cases',x['id'],['assigned_user_id','account_id'])
-      entry_result.entry_list[0].name_value_list.each do |y|
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x['id']
-        o.attrib=y.name
-        o.value=y.value
-        o.user_id=@current_user.id
-        o.save
-      end
-    end
-
-  createcall:
-    # name_value_list is passed in and can be used in the code below
-    # for creates we just assume that the primary keys (if fields) are left out
-    result=@client.set_entry(@session_id,'Cases',name_value_list);
-
-  updatecall:
-    # name_value_list is passed in and can be used in the code below
-    result=@client.set_entry(@session_id,'Cases',name_value_list);
-
-  deletecall:
-    name_value_list.push({'name'=>'deleted','value'=>'1'});
-    result=@client.set_entry(@session_id,'Cases',name_value_list);
-
-  epilog:
-    @client.logout(@session_id)
+  adapter: SugarCases
 
 SugarEmployees:
   id: 3
@@ -79,53 +23,8 @@ SugarEmployees:
   login: testuser
   password: testuser
   app_id: 1
-  prolog: |
-    u = login
-    p = Digest::MD5.hexdigest(password)
-    ua = {'user_name' => u,'password' => p}
-    ss = @client.login(ua,nil)
-    if ss.error.number.to_i != 0
-      p 'failed to login - #{ss.error.description}'
-      return
-    else
-      @session_id = ss['id']
-      uid = @client.get_user_id(@session_id)
-    end
-
-  call: |
-    select_fields = ['first_name','last_name','status','title','phone_mobile','user_name']
-    result = @client.get_entry_list(@session_id,'Employees',"(users.status='Active')",'last_name',0,select_fields,'10000',0);
-
-
-  sync: |
-    result.entry_list.each do |x|
-      x.name_value_list.each do |y|
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x['id']
-        o.attrib=y.name
-        o.value=y.value
-        o.user_id=@current_user.id
-        o.save
-      end
-    end
-
-  createcall: |
-    # name_value_list is passed in and can be used in the code below
-    # for creates we just assume that the primary keys (if fields) are left out
-    result=@client.set_entry(@session_id,'Employees',name_value_list);
-
-  updatecall: |
-    # name_value_list is passed in and can be used in the code below
-    result=@client.set_entry(@session_id,'Employees',name_value_list);
-
-  deletecall:
-    name_value_list.push({'name'=>'deleted','value'=>'1'});
-    result=@client.set_entry(@session_id,'Employees',name_value_list);
-
-  epilog:
-    @client.logout(@session_id)
-
+  adapter: SugarEmployees
+  
 SiebelServiceRequests:
   id: 4
   name: SiebelServiceRequests
