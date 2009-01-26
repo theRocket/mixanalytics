@@ -21,7 +21,6 @@ module SourcesHelper
     # refresh is the data is old
     self.pollinterval||=300 # 5 minute default if there's no pollinterval or its a bad value
     if !self.refreshtime or ((Time.new - self.refreshtime)>pollinterval)
-      p "Data is old. Last refreshed= " + self.refreshtime.to_s + ", poll interval=" + pollinterval.to_s
       result=true
     end
     result  # return true of false (nil)
@@ -30,7 +29,6 @@ module SourcesHelper
   def clear_pending_records(current_user)
     delete_cmd= "(update_type='pending') and source_id="+id.to_s
     (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
-    p "Deleting pending records " + delete_cmd
     ObjectValue.delete_all delete_cmd
   end
 
@@ -38,11 +36,9 @@ module SourcesHelper
     delete_cmd= "(update_type='query') and source_id="+id.to_s
     (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
-    p "Deleting query records: " + delete_cmd
     pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+id.to_s
     (pending_to_query << " and user_id=" + current_user.id.to_s) if current_user 
-    ObjectValue.find_by_sql pending_to_query
-    p "Setting pending to query: " + pending_to_query
+    ActiveRecord::Base.connection.execute(pending_to_query)
     self.refreshtime=Time.new # timestamp    
   end
 
