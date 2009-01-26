@@ -33,7 +33,6 @@ Rails::Initializer.run do |config|
   config.gem "rspec", :lib => "spec"
   config.gem "rspec-rails", :lib => "spec/rake/spectask"
   config.gem "rcov"
-  config.gem "sqlite3-ruby", :lib => "sqlite3", :version => "1.2.3"
   config.gem "libxml-ruby", :lib => "xml/libxml"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
