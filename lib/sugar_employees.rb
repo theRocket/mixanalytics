@@ -43,6 +43,6 @@ class SugarEmployees < SugarAdapter
       created_by_name
     )
     @order_by = 'last_name'
-    @query_filter = "(users.status='Active')"
+    @query_filter = "(users.employee_status='Active')"
   end
 end
