@@ -25,12 +25,16 @@ Rails::Initializer.run do |config|
   # config.gem "bj"
   # config.gem "hpricot", :version => '0.6', :source => "http://code.whytheluckystiff.net"
   # config.gem "aws-s3", :lib => "aws/s3"
+  config.gem "rubyist-aasm", :lib => "aasm", :source => "http://gems.github.com"
   config.gem "httpclient", :version => "2.1.2"
-  config.gem "libxml-ruby", :lib => "xml/libxml"
   config.gem "soap4r", :lib => "soap/mapping"
   config.gem "uuidtools"
-  config.gem "rubyist-aasm", :lib => "aasm", :source => "http://gems.github.com" 
   config.gem "actionmailer",:lib => "actionmailer"
+  config.gem "rspec", :lib => "spec"
+  config.gem "rspec-rails", :lib => "spec/rake/spectask"
+  config.gem "rcov"
+  config.gem "sqlite3-ruby", :lib => "sqlite3", :version => "1.2.3"
+  config.gem "libxml-ruby", :lib => "xml/libxml"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -75,7 +79,7 @@ Rails::Initializer.run do |config|
 
 end
 
-ActionController::Base.session_options[:session_expires] = 2.weeks.from_now
+ActionController::Base.session_options[:session_expires] = 1.year.from_now
 
 APP_CONFIG = YAML.load_file("#{RAILS_ROOT}/config/settings.yml")[RAILS_ENV].symbolize_keys
 
