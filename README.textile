@@ -13,29 +13,46 @@ There is a RhoSync client embedded in the "Rhodes":http://github.com/rhomobile/r
 
 h2. PREREQUISITES
 
-    * Ruby on Rails Version 2.2.2 or greater
-    * SQLite, mySQL or other database that plays nicely with Rails
+    * Ruby w/ rubygems installed
+    * SQLite, MySQL or other database that plays nicely with Rails
 
 h2. INSTALLATION 
 
-  sudo gem install rspec rspec-rails
-  sudo gem install rubyist-aasm -s http://gems.github.com
+  sudo gem install rspec-rails rake
   git clone git://github.com/rhomobile/rhosync.git
   cd rhosync
 
-Then run the db:bootstrap rake task provided, creating the database and associated tables that RhoSync needs. It will also load the source adapters and applications (collections of source adapters) that we ship with.
+Install your database driver of choice
 
-  rake db:bootstrap
+  sudo gem install sqlite3-ruby (-v=1.2.3 if you're in windows)
+  or
+  sudo gem install msyql
 
-Install any required gems
+If you don't have the file "log/development.log" then go ahead and create the file:
+
+  mkdir -p log; touch log/development.log (or create manually if in windows)
+
+Install required gems
 
   sudo rake gems:install
 
-Then use your Rails server of choice to run the application. For example:
+Configure config/database.yml to tell rails how to connect to your database:
 
-  mongrel_rails start
+  <edit> config/database.yml
 
-Then you can view all of your applications from your web browser by supplying the following URL:
+Then run the db:bootstrap rake task provided, creating the database and associated tables that RhoSync needs. It will also load the source adapters that we ship with.
+
+  rake db:bootstrap
+
+Then use your Rails server of choice to run the application. If you don't have a Rails server, you can install mongrel with:
+
+  sudo gem install mongrel
+
+Then start your server:
+
+  script/server
+
+Then you can view the Sources from your web browser:
 
   http://localhost:3000
 
