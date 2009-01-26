@@ -41,13 +41,12 @@ class SugarAdapter < SourceAdapter
     max_results = '10000' # if set to 0 or '', this doesn't return all the results
     deleted = 0 # whether you want to retrieve deleted records, too
   
-    puts "============\n"
-    client.get_module_fields(@session_id,@module_name).module_fields.each do |field|
-      puts field.name
-    end
-    puts "============\n"
+    # puts "============\n"
+    # client.get_module_fields(@session_id,@module_name).module_fields.each do |field|
+    #   puts field.name
+    # end
+    # puts "============\n"
   
-    
     @result = client.get_entry_list(@session_id,@module_name,@query_filter,@order_by,offset,@select_fields,max_results,deleted);
   end
 
