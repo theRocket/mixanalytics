@@ -16,6 +16,7 @@ class AppsController < ApplicationController
     @sub.credential.login=params[:login]
     @sub.credential.password=params[:password]
     @sub.credential.token=params[:token]
+    @sub.credential.url=params[:url]
     @sub.credential.save
     @sub.save
     flash[:notice]="Updated credential for membership"
