@@ -5,6 +5,10 @@
 
 module RestAPIHelpers
   
+  def base_url
+    @source.credential.url || @source.url
+  end
+  
   # "recover parts of id 1000-6 => 1000, 6"
   def split_id(idstring)
     idstring =~/(\d*)\-(\d*)/

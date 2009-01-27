@@ -49,7 +49,7 @@ class LighthouseTickets < SourceAdapter
       projectSource.id])
       
     projects.each do |project|  
-      uri = URI.parse(@source.url)
+      uri = URI.parse(base_url)
       req = Net::HTTP::Get.new("/projects/#{project.object}/tickets.xml?q=all", 'Accept' => 'application/xml')
       req.basic_auth @source.credential.token, "x"
       response = Net::HTTP.start(uri.host,uri.port) do |http|
@@ -91,7 +91,7 @@ class LighthouseTickets < SourceAdapter
     get_params(name_value_list)
     xml_str = xml_template(params)
     
-    uri = URI.parse(@source.url)
+    uri = URI.parse(base_url)
     Net::HTTP.start(uri.host) do |http|
       http.set_debug_output $stderr
       request = Net::HTTP::Post.new(uri.path + "/projects/#{params['project_id']}/tickets.xml", {'Content-type' => 'application/xml'})
@@ -118,7 +118,7 @@ class LighthouseTickets < SourceAdapter
 
     xml_str = xml_template(params)
 
-    uri = URI.parse(@source.url)
+    uri = URI.parse(base_url)
     Net::HTTP.start(uri.host) do |http|
       http.set_debug_output $stderr
       request = Net::HTTP::Put.new(uri.path + "/projects/#{project}/tickets/#{number}.xml", {'Content-type' => 'application/xml'})
@@ -142,7 +142,7 @@ class LighthouseTickets < SourceAdapter
     get_params(name_value_list)
     project, number = split_id(params['id'])
     
-    uri = URI.parse(@source.url)
+    uri = URI.parse(base_url)
     Net::HTTP.start(uri.host) do |http|
      http.set_debug_output $stderr
      url = uri.path + "/projects/#{project}/tickets/#{number}.xml"

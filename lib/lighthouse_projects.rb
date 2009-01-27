@@ -41,7 +41,7 @@ class LighthouseProjects < SourceAdapter
   def query
     log "LighthouseProjects query"
     
-    uri = URI.parse(@source.url+"/projects.xml")
+    uri = URI.parse(base_url+"/projects.xml")
     req = Net::HTTP::Get.new(uri.path, 'Accept' => 'application/xml')
     req.basic_auth @source.credential.token, "x"
     
@@ -87,7 +87,7 @@ class LighthouseProjects < SourceAdapter
       </callback-handler>
       EOT
     
-      uri = URI.parse(@source.url)
+      uri = URI.parse(base_url)
       Net::HTTP.start(uri.host) do |http|
         http.set_debug_output $stderr
         request = Net::HTTP::Post.new(uri.path + "/callback_handlers.xml", {'Content-type' => 'application/xml'})
