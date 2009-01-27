@@ -69,19 +69,19 @@ class SugarAdapter < SourceAdapter
   end
 
   def create(name_value_list)
-    puts "SugarCRM #{@module_name} create #{name_value_list}"
+    puts "SugarCRM #{@module_name} create #{name_value_list.inspect.to_s}"
     
     result=client.set_entry(@session_id,@module_name,name_value_list)
   end
 
   def update(name_value_list)
-    puts "SugarCRM #{@module_name} update #{name_value_list}"
+    puts "SugarCRM #{@module_name} update #{name_value_list.inspect.to_s}"
     
     result=client.set_entry(@session_id,@module_name,name_value_list)
   end
 
   def delete(name_value_list)
-    puts "SugarCRM #{@module_name} delete #{name_value_list}"
+    puts "SugarCRM #{@module_name} delete #{name_value_list.inspect.to_s}"
     
     name_value_list.push({'name'=>'deleted','value'=>'1'});
     result=client.set_entry(@session_id,@module_name,name_value_list)
