@@ -47,6 +47,8 @@ module RestAPIHelpers
   
   # make an ObjectValue triple for rhosync
   def add_triple(source_id, object_id, attrib, value, user_id)
+    return if value.blank?
+    
     o = ObjectValue.new
     o.source_id=source_id
     o.object=object_id

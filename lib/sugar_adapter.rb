@@ -57,13 +57,15 @@ class SugarAdapter < SourceAdapter
     user_id=@source.current_user.id
     @result.entry_list.each do |x|      
       x.name_value_list.each do |y|
-        o=ObjectValue.new
-        o.source_id=@source.id
-        o.object=x['id']
-        o.attrib=y.name
-        o.value=y.value
-        o.user_id=user_id 
-        o.save
+        unless y.value.blank?
+          o=ObjectValue.new
+          o.source_id=@source.id
+          o.object=x['id']
+          o.attrib=y.name
+          o.value=y.value
+          o.user_id=user_id 
+          o.save
+        end
       end
     end
   end

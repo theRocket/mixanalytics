@@ -14,6 +14,8 @@ class SugarContacts < SugarAdapter
       description
       assigned_user_id
       assigned_user_name
+      team_id
+      team_name
       salutation
       first_name
       last_name
