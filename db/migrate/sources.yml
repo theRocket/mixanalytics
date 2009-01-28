@@ -88,6 +88,15 @@ SugarProducts:
   app_id: 1
   adapter: SugarProducts
       
+SugarTeams:
+  id: 18
+  name: SugarTeams
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  login: testuser
+  password: testuser
+  app_id: 1
+  adapter: SugarTeams
+    
 SiebelServiceRequests:
   id: 4
   name: SiebelServiceRequests
