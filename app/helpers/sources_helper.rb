@@ -27,15 +27,33 @@ module SourcesHelper
   end
   
   def clear_pending_records(current_user)
-    delete_cmd= "(update_type='pending') and source_id="+id.to_s
+    delete_cmd= "(update_type='pending' or update_type='' or update_type is null) and source_id="+id.to_s
     (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
   end
+  
+  def remove_dupe_pendings(current_user)
+    dupe_cmd = "select object,attrib, count(*) as dupecount from object_values where update_type='pending' and source_id="+id.to_s
+    (dupe_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
+    dupe_cmd << " and dupecount >= 2 group by pending_id"
+   
+    objs=ObjectValue.find_by_sql dupe_cmd
+    objs.each do |obj|  # remove dupes
+      # delete if there is a LATER object-attribute record with the same pending_ID
+      later_object="select object from object_values where pending_id=" + obj.pending + " and updated_at > " + obj.updated_at
+      dupes=ObjectValue.find_by_sql later_object
+      dupes.each do |dupe|
+        dupe.destroy
+      end
+    end
+  end
 
   def finalize_query_records(current_user)
-    delete_cmd= "(update_type='query') and source_id="+id.to_s
+    # first delete the existing query records
+    delete_cmd = "(update_type='query') and source_id="+id.to_s
     (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
+    # remove_dupe_pendings(current_user)
     pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+id.to_s
     (pending_to_query << " and user_id=" + current_user.id.to_s) if current_user 
     ActiveRecord::Base.connection.execute(pending_to_query)
