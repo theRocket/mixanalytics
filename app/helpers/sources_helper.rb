@@ -102,52 +102,57 @@ module SourcesHelper
       @object_values = ObjectValue.find_all_by_source_id_and_update_type_and_user_id(source.id, 'query', current_user.id)
     end
     objs_to_return = []
-    if @object_values
-      
-      # find the new records
-      @object_values.each do |ov|
-        #logger.debug "current object_value: #{ov.inspect}"
-        map = ClientMap.find_or_initialize_by_client_id_and_object_value_id({:client_id => client_id, 
-                                                                             :object_value_id => ov.id,
-                                                                             :object_value_object => ov.object,
-                                                                             :object_value_attrib => ov.attrib,
-                                                                             :object_value_value => ov.value,
-                                                                             :db_operation => 'insert'})
-        #logger.debug "client_map record: #{map.inspect}"                                                                     
-        if map and map.new_record?
-          map.save
-          map.object_value.db_operation = map.db_operation
-          objs_to_return << map.object_value
-        end
-      end
-    end
     
-    # delete records that don't exist in the cache table anymore
+    # VERY IMPORTANT - delete records that don't exist in the cache table anymore
+    # We MUST do this before the insert loop below to avoid ID collisions
     maps_to_delete = ClientMap.find_all_by_client_id(client_id)
     maps_to_delete.each do |map|
       obj = map.object_value
-      if obj.nil?
-        temp_obj = ObjectValue.new
-        temp_obj.object = map.object_value_object
-        temp_obj.db_operation = 'delete'
-        temp_obj.created_at = temp_obj.updated_at = Time.now.to_s
-        temp_obj.attrib = map.object_value_attrib
-        temp_obj.value = map.object_value_value
-        temp_obj.update_type = "delete"
-        temp_obj.id = 0
-        temp_obj.source_id = 0
-        logger.debug "Removing object: #{temp_obj.inspect} from map table and client"
-        objs_to_return << temp_obj
-        # remove from map table
-        ClientMap.delete_all(:client_id => map.client_id, 
+      if obj.nil? or obj.value != map.object_value_value
+        objs_to_return << new_delete_obj(map.object_value_object,
+                                         map.object_value_attrib,
+                                         map.object_value_value)
+        ClientMap.delete_all(:client_id => map.client_id,
                              :object_value_object => map.object_value_object,
                              :object_value_attrib => map.object_value_attrib,
                              :object_value_value => map.object_value_value)
       end
     end
+    
+    if @object_values
+      # find the new records
+      @object_values.each do |ov|
+        map = ClientMap.find_or_initialize_by_client_id_and_object_value_id_and_object_value_object_and_object_value_attrib_and_object_value_value(
+                        {:client_id => client_id, 
+                         :object_value_id => ov.id,
+                         :object_value_object => ov.object,
+                         :object_value_attrib => ov.attrib,
+                         :object_value_value => ov.value,
+                         :db_operation => 'insert'})             
+                                                                              
+        if map and map.new_record?
+          map.object_value.db_operation = map.db_operation
+          objs_to_return << map.object_value
+          map.save
+        end
+      end
+    end
     # Update the last updated time for this client
     @client.update_attribute(:updated_at, Time.now)
     objs_to_return
+  end
+  
+  def new_delete_obj(object,attrib,value)
+    temp_obj = ObjectValue.new
+    temp_obj.object = object
+    temp_obj.db_operation = 'delete'
+    temp_obj.created_at = temp_obj.updated_at = Time.now.to_s
+    temp_obj.attrib = attrib
+    temp_obj.value = value
+    temp_obj.update_type = "delete"
+    temp_obj.id = 0
+    temp_obj.source_id = 0
+    temp_obj
   end
   
   # useful to be able to have the source adapter code available for viewing in YAML files
@@ -156,5 +161,4 @@ module SourcesHelper
       out.puts to_yaml
     end
   end
-
 end

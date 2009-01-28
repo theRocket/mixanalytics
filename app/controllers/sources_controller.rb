@@ -106,14 +106,6 @@ class SourcesController < ApplicationController
        o.save
        # add the created ID + created_at time to the list
        objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects
-       # add to the client_map so next refresh will delete this temporary object
-       if @client
-         map = ClientMap.create(:client_id => @client.client_id,
-                                :object_value_id => o.id,
-                                :object_value_object => o.object,
-                                :object_value_attrib => o.attrib,
-                                :object_value_value => o.value)
-       end
     end
 
     respond_to do |format|
