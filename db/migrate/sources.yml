@@ -69,7 +69,43 @@ SugarCalls:
   password: testuser
   app_id: 1
   adapter: SugarCalls
+
+SugarCampaigns:
+  id: 16
+  name: SugarCampaigns
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  login: testuser
+  password: testuser
+  app_id: 1
+  adapter: SugarCampaigns
+    
+SugarProducts:
+  id: 17
+  name: SugarProducts
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  login: testuser
+  password: testuser
+  app_id: 1
+  adapter: SugarProducts
       
+SugarTeams:
+  id: 18
+  name: SugarTeams
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  login: testuser
+  password: testuser
+  app_id: 1
+  adapter: SugarTeams
+  
+SugarUsers:
+  id: 19
+  name: SugarUsers
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  login: testuser
+  password: testuser
+  app_id: 1
+  adapter: SugarUsers
+    
 SiebelServiceRequests:
   id: 4
   name: SiebelServiceRequests

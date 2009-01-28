@@ -29,7 +29,7 @@ class LighthouseTicketVersions < SourceAdapter
       lighthouseTickets.id])
           
     tickets.each do |ticket|  
-      uri = URI.parse(@source.url)
+      uri = URI.parse(base_url)
       project, number = split_id(ticket.object)    
       req = Net::HTTP::Get.new("/projects/#{project}/tickets/#{number}.xml", 'Accept' => 'application/xml')
       req.basic_auth @source.credential.token, "x"

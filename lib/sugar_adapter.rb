@@ -2,12 +2,13 @@ class SugarAdapter < SourceAdapter
 
   attr_accessor :module_name
   attr_accessor :order_by
-  attr_accessor :select_fields
+  attr_accessor :select_fields 
   attr_accessor :query_filter
     
   def initialize(source)
     super(source)
     
+    @select_fields = [] # leave empty like this to get all fields
     @order_by = ''
     @query_filter = '' # you can also use SQL like 'accounts.name like '%company%''
   end
@@ -41,11 +42,11 @@ class SugarAdapter < SourceAdapter
     max_results = '10000' # if set to 0 or '', this doesn't return all the results
     deleted = 0 # whether you want to retrieve deleted records, too
   
-    # puts "============\n"
-    # client.get_module_fields(@session_id,@module_name).module_fields.each do |field|
-    #   puts field.name
-    # end
-    # puts "============\n"
+    puts "============\n"
+    client.get_module_fields(@session_id,@module_name).module_fields.each do |field|
+      puts field.name
+    end
+    puts "============\n"
   
     @result = client.get_entry_list(@session_id,@module_name,@query_filter,@order_by,offset,@select_fields,max_results,deleted);
   end
@@ -68,19 +69,19 @@ class SugarAdapter < SourceAdapter
   end
 
   def create(name_value_list)
-    puts "SugarCRM #{@module_name} create #{name_value_list}"
+    puts "SugarCRM #{@module_name} create #{name_value_list.inspect.to_s}"
     
     result=client.set_entry(@session_id,@module_name,name_value_list)
   end
 
   def update(name_value_list)
-    puts "SugarCRM #{@module_name} update #{name_value_list}"
+    puts "SugarCRM #{@module_name} update #{name_value_list.inspect.to_s}"
     
     result=client.set_entry(@session_id,@module_name,name_value_list)
   end
 
   def delete(name_value_list)
-    puts "SugarCRM #{@module_name} delete #{name_value_list}"
+    puts "SugarCRM #{@module_name} delete #{name_value_list.inspect.to_s}"
     
     name_value_list.push({'name'=>'deleted','value'=>'1'});
     result=client.set_entry(@session_id,@module_name,name_value_list)

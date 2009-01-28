@@ -31,7 +31,7 @@ class LighthouseUsers < SourceAdapter
       projectSource.id])
       
     projects.each do |project|  
-      uri = URI.parse(@source.url)
+      uri = URI.parse(base_url)
       url = "/projects/#{project.object}/memberships.xml"
       req = Net::HTTP::Get.new(url, 'Accept' => 'application/xml')      
       req.basic_auth @source.credential.token, "x"
@@ -65,7 +65,7 @@ class LighthouseUsers < SourceAdapter
     
     #then for each one - GET /users/#{ID}.xml
     user_ids.each do |user_id|
-      uri = URI.parse(@source.url)
+      uri = URI.parse(base_url)
       req = Net::HTTP::Get.new("/users/#{user_id}.xml", 'Accept' => 'application/xml')
       req.basic_auth @source.credential.token, "x"
       response = Net::HTTP.start(uri.host,uri.port) do |http|

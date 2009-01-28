@@ -38,7 +38,7 @@ class LighthouseMilestones < SourceAdapter
     @result = []
       
     projects.each do |project|  
-      uri = URI.parse(@source.url)
+      uri = URI.parse(base_url)
       url = "/projects/#{project.object}/milestones.xml"
       req = Net::HTTP::Get.new(url, 'Accept' => 'application/xml')      
       req.basic_auth @source.credential.token, "x"

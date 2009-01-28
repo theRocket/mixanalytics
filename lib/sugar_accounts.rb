@@ -15,6 +15,8 @@ class SugarAccounts < SugarAdapter
       description
       assigned_user_id
       assigned_user_name
+      team_id
+      team_name
       account_type
       industry
       annual_revenue
@@ -40,7 +42,7 @@ class SugarAccounts < SugarAdapter
       parent_id
       sic_code
       parent_name
-      campaign_id
+      campaign_id      
     )
   end
 end
