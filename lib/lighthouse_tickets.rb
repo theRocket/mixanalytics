@@ -65,7 +65,11 @@ class LighthouseTickets < SourceAdapter
   end
 
   def sync
-    log "LighthouseTickets sync, with #{@result.length} results"
+    if @result
+      log "LighthouseTickets sync, with #{@result.length} results"
+    else
+      log "LighthouseTickets sync, ERROR @result nil" and return
+    end
     
     @result.each do |ticket|
       # construct unique ID for ticket, tickets are identified by project-id/number in lighthouse

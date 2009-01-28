@@ -46,7 +46,11 @@ class LighthouseTicketVersions < SourceAdapter
   end
 
   def sync
-    log "LighthouseTicketVersions sync, with #{@result.length} results"
+    if @result
+      log "LighthouseTicketVersions sync, with #{@result.length} results"
+    else
+      log "LighthouseTicketVersions sync, ERROR @result nil" and return
+    end
     
     @result.each do |version|
       # construct unique ID for ticket versions, tickets are identified by project-id/number in lighthouse

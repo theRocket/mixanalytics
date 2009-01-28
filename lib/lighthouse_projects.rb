@@ -41,8 +41,8 @@ class LighthouseProjects < SourceAdapter
   def query
     log "LighthouseProjects query"
     
-    uri = URI.parse(base_url+"/projects.xml")
-    req = Net::HTTP::Get.new(uri.path, 'Accept' => 'application/xml')
+    uri = URI.parse(base_url)
+    req = Net::HTTP::Get.new("/projects.xml", 'Accept' => 'application/xml')
     req.basic_auth @source.credential.token, "x"
     
     response = Net::HTTP.start(uri.host,uri.port) do |http|
@@ -53,7 +53,11 @@ class LighthouseProjects < SourceAdapter
   end
 
   def sync
-    log "LighthouseProjects sync, with #{@result.length} results"
+    if @result
+      log "LighthouseProjects sync, with #{@result.length} results"
+    else
+      log "LighthouseProjects sync, ERROR @result nil" and return
+    end
     
     @result.each do |project|
       id = project["id"][0]["content"]

@@ -59,8 +59,12 @@ class LighthouseMilestones < SourceAdapter
   end
 
   def sync
-    log "LighthouseMilestones sync, with #{@result.length} results"
-    
+    if @result
+      log "LighthouseMilestones sync, with #{@result.length} results"
+    else
+      log "LighthouseProjects sync, ERROR @result nil" and return
+    end
+        
     @result.each do |user|
       id = user["id"][0]["content"]
       
