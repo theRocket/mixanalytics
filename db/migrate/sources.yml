@@ -96,6 +96,15 @@ SugarTeams:
   password: testuser
   app_id: 1
   adapter: SugarTeams
+  
+SugarUsers:
+  id: 19
+  name: SugarUsers
+  url: http://rhomobile.com/sugar/soap.php?wsdl
+  login: testuser
+  password: testuser
+  app_id: 1
+  adapter: SugarUsers
     
 SiebelServiceRequests:
   id: 4
