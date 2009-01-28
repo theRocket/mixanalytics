@@ -27,8 +27,9 @@ class SourcesController < ApplicationController
     if params[:client_id] and params[:id]
       @object_values=process_objects_for_client(@source, params[:client_id]) 
     else
-      @object_values=ObjectValue.find_all_by_update_type_and_source_id "query",params[:id],:order=>"object"
+      @object_values=ObjectValue.find :all,:conditions=>{:update_type=>"query",:source_id=>params[:id]},:order=>"object"
     end
+    @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
     respond_to do |format|
       format.html
       format.xml  { render :xml => @object_values}
