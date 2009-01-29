@@ -28,9 +28,12 @@ class Source < ActiveRecord::Base
     # not all endpoints require WSDL! dont do this if you dont see WSDL in the URL (a bit of a hack)
     @client = SOAP::WSDLDriverFactory.new(url).create_rpc_driver if url and url.size>0 and url=~/wsdl/
     
-    # also you can get user credentials from credential
-    usersub=app.memberships.find_by_user_id(current_user.id) if current_user
-    @credential=usersub.credential if usersub # this variable is available in your source adapter
+    # is there a global login? if so DONT use a credential
+    @credential=nil
+    if login.nil?
+      usersub=app.memberships.find_by_user_id(current_user.id) if current_user
+      @credential=usersub.credential if usersub # this variable is available in your source adapter
+    end
 
     source_adapter.client=@client if source_adapter
     # make sure to use @client and @session_id variable in your code that is edited into each source!
@@ -45,7 +48,7 @@ class Source < ActiveRecord::Base
     process_update_type('update',updatecall)
     process_update_type('delete',deletecall)      
 
-    clear_pending_records(current_user)
+    clear_pending_records(@credential)
     if source_adapter
       source_adapter.query
       source_adapter.sync
@@ -53,7 +56,7 @@ class Source < ActiveRecord::Base
       callbinding=eval(call+";binding",callbinding)
       callbinding=eval(sync+";binding",callbinding) if sync
     end 
-    finalize_query_records(current_user)
+    finalize_query_records(@credential)
     # now do the logoff
     if source_adapter
       source_adapter.logoff

@@ -26,15 +26,17 @@ module SourcesHelper
     result  # return true of false (nil)
   end
   
-  def clear_pending_records(current_user)
+  # presence or absence of credential determines whether we are using a "per user sandbox" or not
+  def clear_pending_records(credential)
     delete_cmd= "(update_type='pending' or update_type='' or update_type is null) and source_id="+id.to_s
-    (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
+    (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
   end
   
-  def remove_dupe_pendings(current_user)
+  # presence or absence of credential determines whether we are using a "per user sandbox" or not
+  def remove_dupe_pendings(credential)
     pendings_cmd = "select pending_id from object_values where update_type is null or update_type='pending' or update_type='' and source_id="+id.to_s
-    (pendings_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential  
+    (pendings_cmd << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
     objs=ObjectValue.find_by_sql pendings_cmd
     prev=nil
     objs.each do |obj|  # remove dupes
@@ -43,15 +45,16 @@ module SourcesHelper
     end
   end
 
-  def finalize_query_records(current_user)
+  # presence or absence of credential determines whether we are using a "per user sandbox" or not
+  def finalize_query_records(credential)
     # first delete the existing query records
     ActiveRecord::Base.transaction do
       delete_cmd = "(update_type='query') and source_id="+id.to_s
-      (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
+      (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
       ObjectValue.delete_all delete_cmd
-      remove_dupe_pendings(current_user)
+      remove_dupe_pendings(credential)
       pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type='' or update_type is null) and source_id="+id.to_s
-      (pending_to_query << " and user_id=" + current_user.id.to_s) if current_user 
+      (pending_to_query << " and user_id=" + credential.user.id.to_s) if credential
       ActiveRecord::Base.connection.execute(pending_to_query)
     end
     self.refreshtime=Time.new # timestamp    
