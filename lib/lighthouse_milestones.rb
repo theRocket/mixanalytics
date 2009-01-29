@@ -62,15 +62,15 @@ class LighthouseMilestones < SourceAdapter
     if @result
       log "LighthouseMilestones sync, with #{@result.length} results"
     else
-      log "LighthouseProjects sync, ERROR @result nil" and return
+      log "LighthouseMilestones sync, ERROR @result nil" and return
     end
         
-    @result.each do |user|
-      id = user["id"][0]["content"]
+    @result.each do |milestone|      
+      id = milestone["id"][0]["content"]
       
       # iterate over all possible values, if the value is not found we just pass "" in to rhosync
       %w(project-id title due-on).each do |key|
-        value = user[key] ? user[key][0] : ""
+        value = milestone[key] ? milestone[key][0] : ""
         add_triple(@source.id, id, key.gsub('-','_'), value, @source.current_user.id)
         # convert "-" to "_" because "-" is not valid in ruby variable names   
       end

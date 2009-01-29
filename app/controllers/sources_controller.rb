@@ -3,9 +3,6 @@ require 'yaml'
 require 'open-uri'
 require 'net/http'
 require 'net/https'
-require 'soap/wsdlDriver'
-require 'defaultDriver.rb'
-require 'soap/mapping'
 
 class SourcesController < ApplicationController
 
