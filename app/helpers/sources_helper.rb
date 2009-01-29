@@ -50,13 +50,15 @@ module SourcesHelper
 
   def finalize_query_records(current_user)
     # first delete the existing query records
-    delete_cmd = "(update_type='query') and source_id="+id.to_s
-    (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
-    ObjectValue.delete_all delete_cmd
-    # remove_dupe_pendings(current_user)
-    pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type is null) and source_id="+id.to_s
-    (pending_to_query << " and user_id=" + current_user.id.to_s) if current_user 
-    ActiveRecord::Base.connection.execute(pending_to_query)
+    ActiveRecord::Base.transaction do
+      delete_cmd = "(update_type='query') and source_id="+id.to_s
+      (delete_cmd << " and user_id="+ current_user.id.to_s) if current_user # if there is a credential then just do delete and update based upon the records with that credential
+      ObjectValue.delete_all delete_cmd
+      # remove_dupe_pendings(current_user)
+      pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type='' or update_type is null) and source_id="+id.to_s
+      (pending_to_query << " and user_id=" + current_user.id.to_s) if current_user 
+      ActiveRecord::Base.connection.execute(pending_to_query)
+    end
     self.refreshtime=Time.new # timestamp    
   end
 
