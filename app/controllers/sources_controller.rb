@@ -30,6 +30,7 @@ class SourcesController < ApplicationController
       @object_values=ObjectValue.find :all,:conditions=>{:update_type=>"query",:source_id=>params[:id]},:order=>"object"
     end
     @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
+    logger.info "Sending #{@object_values.length} records to #{params[:client_id]}" if params[:client_id] and @object_values
     respond_to do |format|
       format.html
       format.xml  { render :xml => @object_values}
