@@ -23,9 +23,12 @@ class SugarAdapter < SourceAdapter
   end
 
   def login
-    puts "SugarCRM #{@module_name} login"
+    p "@Source: " + @source.inspect.to_s
+
     
+    puts "SugarCRM #{@module_name} login"
     if @source.credential
+      p "Have credential!"
       u = @source.credential.login
       p = Digest::MD5.hexdigest(@source.credential.password)
     else

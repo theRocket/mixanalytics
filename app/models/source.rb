@@ -27,10 +27,10 @@ class Source < ActiveRecord::Base
     initadapter
     
     # is there a global login? if so DONT use a credential
-    @credential=nil
-    if login.nil?
+    self.credential=nil
+    if login.blank?
       usersub=app.memberships.find_by_user_id(current_user.id) if current_user
-      @credential=usersub.credential if usersub # this variable is available in your source adapter
+      self.credential=usersub.credential if usersub # this variable is available in your source adapter
     end
 
     # make sure to use @client and @session_id variable in your code that is edited into each source!

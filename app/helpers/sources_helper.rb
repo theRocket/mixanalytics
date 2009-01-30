@@ -6,10 +6,10 @@ module SourcesHelper
     matches_login=app.users.select{ |u| u.login==current_user.login}
     matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
     if matches_login.nil? or matches_login.size == 0
-      p "User: " + current_user.login + " not allowed access."
+      logger.info "User: " + current_user.login + " not allowed access."
       response.redirect  :action=>"noaccess",:login=>current_user.login
     end
-    p "User: " + current_user.login + " permitted access."
+    logger.info "User: " + current_user.login + " permitted access."
   end
   
   def needs_refresh
