@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090127020800) do
+ActiveRecord::Schema.define(:version => 20090130022441) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
@@ -30,6 +30,8 @@ ActiveRecord::Schema.define(:version => 20090127020800) do
     t.string   "object_value_value"
   end
 
+  add_index "client_maps", ["client_id", "object_value_id", "object_value_attrib", "object_value_value", "db_operation"], :name => "client_map"
+
   create_table "clients", :id => false, :force => true do |t|
     t.string   "client_id",  :limit => 36
     t.string   "session"
@@ -37,6 +39,8 @@ ActiveRecord::Schema.define(:version => 20090127020800) do
     t.datetime "updated_at"
     t.integer  "user_id"
   end
+
+  add_index "clients", ["client_id"], :name => "index_clients_on_client_id"
 
   create_table "credentials", :force => true do |t|
     t.string   "login"
@@ -75,6 +79,8 @@ ActiveRecord::Schema.define(:version => 20090127020800) do
     t.integer  "user_id"
   end
 
+  add_index "object_values", ["source_id", "user_id", "update_type"], :name => "by_source_user_type"
+
   create_table "sources", :force => true do |t|
     t.string   "name"
     t.string   "url"
@@ -96,13 +102,6 @@ ActiveRecord::Schema.define(:version => 20090127020800) do
     t.integer  "app_id"
     t.integer  "pollinterval"
     t.integer  "priority"
-  end
-
-  create_table "subscriptions", :force => true do |t|
-    t.integer  "app_id"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
   end
 
   create_table "users", :force => true do |t|

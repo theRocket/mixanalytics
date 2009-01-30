@@ -15,9 +15,17 @@ module SourcesHelper
   def needs_refresh
     result=nil
     # refresh if there are any updates to come
-    result=true if (ObjectValue.count_by_sql "select count(*) from object_values where update_type!='query' and source_id="+id.to_s) > 0
+    # INDEX: SHOULD USE BY_SOURCE_USER_TYPE 
+    count_updates = "select count(*) from object_values where update_type!='query' and source_id="+id.to_s
+    (count_updates << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
+    result=true if (ObjectValue.count_by_sql count_updates ) > 0
+
     # refresh if there is no data
-    result=true if (ObjectValue.count_by_sql "select count(*) from object_values where update_type='query' and source_id="+id.to_s) <= 0
+    # INDEX: SHOULD USE BY_SOURCE_USER_TYPE
+    count_query_objs="select count(*) from object_values where update_type='query' and source_id="+id.to_s
+    (count_query_objs << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
+    result=true if (ObjectValue.count_by_sql count_query_objs ) <= 0
+    
     # refresh is the data is old
     self.pollinterval||=300 # 5 minute default if there's no pollinterval or its a bad value
     if !self.refreshtime or ((Time.new - self.refreshtime)>pollinterval)
@@ -28,14 +36,14 @@ module SourcesHelper
   
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
   def clear_pending_records(credential)
-    delete_cmd= "(update_type='pending' or update_type='' or update_type is null) and source_id="+id.to_s
+    delete_cmd= "(update_type is null) and source_id="+id.to_s
     (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
     ObjectValue.delete_all delete_cmd
   end
   
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
   def remove_dupe_pendings(credential)
-    pendings_cmd = "select pending_id from object_values where update_type is null or update_type='pending' or update_type='' and source_id="+id.to_s
+    pendings_cmd = "select pending_id from object_values where update_type is null and source_id="+id.to_s
     (pendings_cmd << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
     objs=ObjectValue.find_by_sql pendings_cmd
     prev=nil
@@ -53,7 +61,7 @@ module SourcesHelper
       (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
       ObjectValue.delete_all delete_cmd
       remove_dupe_pendings(credential)
-      pending_to_query="update object_values set update_type='query',id=pending_id where (update_type='pending' or update_type='' or update_type is null) and source_id="+id.to_s
+      pending_to_query="update object_values set update_type='query',id=pending_id where update_type is null and source_id="+id.to_s
       (pending_to_query << " and user_id=" + credential.user.id.to_s) if credential
       ActiveRecord::Base.connection.execute(pending_to_query)
     end
@@ -117,6 +125,7 @@ module SourcesHelper
     # look for changes in the current object_values list, return only records
     # for the current user if required
     if current_user
+      # INDEX: BY_SOURCE_TYPE_USER
       @object_values = ObjectValue.find_all_by_source_id_and_update_type_and_user_id(source.id, 'query', current_user.id)
     end
     objs_to_return = []
@@ -140,6 +149,7 @@ module SourcesHelper
     if @object_values
       # find the new records
       @object_values.each do |ov|
+        # INDEX: CLIENT_MAP
         map = ClientMap.find_or_initialize_by_client_id_and_object_value_id_and_object_value_object_and_object_value_attrib_and_object_value_value(
                         {:client_id => client_id, 
                          :object_value_id => ov.id,
