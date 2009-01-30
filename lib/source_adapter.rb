@@ -1,6 +1,6 @@
 class SourceAdapter
   attr_accessor :client
-  def initialize(source=nil)
+  def initialize(source=nil,credential=nil)
     @source = source.nil? ? self : source
   end
 

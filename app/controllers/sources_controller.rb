@@ -43,7 +43,7 @@ class SourcesController < ApplicationController
   end
 
   # return the metadata for the specified source
-  # ONLY FOR SUBSCRIBERS/ADIN
+  # ONLY FOR SUBSCRIBERS/ADMIN
   def attributes
     @source=Source.find params[:id]
     check_access(@source.app)

@@ -13,10 +13,10 @@ class Source < ActiveRecord::Base
     self.priority||=3
   end
   
-  def initadapter
+  def initadapter(credential)
     #create a source adapter with methods on it if there is a source adapter class identified
     if self.adapter and self.adapter.size>0
-      @source_adapter=(Object.const_get(self.adapter)).new(self)
+      @source_adapter=(Object.const_get(self.adapter)).new(self,credential)
     else # if source_adapter is nil it will
       @source_adapter=nil
     end
@@ -24,8 +24,7 @@ class Source < ActiveRecord::Base
 
   def refresh(current_user)
     @current_user=current_user
-    initadapter
-    
+
     # is there a global login? if so DONT use a credential
     self.credential=nil
     if login.blank?
@@ -33,6 +32,8 @@ class Source < ActiveRecord::Base
       self.credential=usersub.credential if usersub # this variable is available in your source adapter
     end
 
+    initadapter(credential)
+    
     # make sure to use @client and @session_id variable in your code that is edited into each source!
     if source_adapter
       source_adapter.login  # should set up @session_id

@@ -9,7 +9,7 @@ class SugarAdapter < SourceAdapter
     
   attr_accessor :client
   
-  def initialize(source)
+  def initialize(source,credential)
     puts "SugarCRM initialize with #{source.inspect.to_s}"
     
     super(source)
