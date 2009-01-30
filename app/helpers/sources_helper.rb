@@ -124,43 +124,56 @@ module SourcesHelper
     
     # look for changes in the current object_values list, return only records
     # for the current user if required
-    if current_user
-      # INDEX: BY_SOURCE_TYPE_USER
-      @object_values = ObjectValue.find_all_by_source_id_and_update_type_and_user_id(source.id, 'query', current_user.id)
-    end
     objs_to_return = []
     
     # VERY IMPORTANT - delete records that don't exist in the cache table anymore
     # We MUST do this before the insert loop below to avoid ID collisions
-    maps_to_delete = ClientMap.find_all_by_client_id(client_id)
-    maps_to_delete.each do |map|
-      obj = map.object_value
-      if obj.nil? or obj.value != map.object_value_value
+    #maps_to_delete = ClientMap.find_all_by_client_id(client_id)
+    ActiveRecord::Base.transaction do
+      maps_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
+                                              cm.object_value_id = ov.id and \
+                                              cm.object_value_value = ov.value and \
+                                              cm.object_value_attrib = ov.attrib \
+                                              where cm.client_id='#{client_id}' and ov.id is NULL"
+      maps_to_delete.each do |map|
         objs_to_return << new_delete_obj(map.object_value_object,
-                                         map.object_value_attrib,
-                                         map.object_value_value)
-        ClientMap.delete_all(:client_id => map.client_id,
-                             :object_value_object => map.object_value_object,
-                             :object_value_attrib => map.object_value_attrib,
-                             :object_value_value => map.object_value_value)
+                                          map.object_value_attrib,
+                                          map.object_value_value)
+        ActiveRecord::Base.connection.execute "delete from client_maps where object_value_object='#{map.object_value_object}' \
+                                               and object_value_attrib='#{map.object_value_attrib}' \
+                                               and object_value_id='#{map.object_value_id}' \
+                                               and client_id='#{map.client_id}'"
       end
     end
     
+    if current_user
+      # INDEX: BY_SOURCE_TYPE_USER
+      #@object_values = ObjectValue.find_all_by_source_id_and_update_type_and_user_id(source.id, 'query', current_user.id)
+      @object_values = ObjectValue.find_by_sql "select * from object_values ov left join client_maps cm on \
+                                                  ov.id = cm.object_value_id and \
+                                                  ov.object = cm.object_value_object and \
+                                                  ov.attrib = cm.object_value_attrib and \
+                                                  ov.value = cm.object_value_value and \ 
+                                                  cm.client_id = '#{client_id}' \
+                                                where ov.update_type = 'query' and \
+                                                  ov.source_id = #{source.id} and \
+                                                  ov.user_id = #{current_user.id} and \
+                                                  cm.object_value_id is NULL"
+    end
+    
+    
     if @object_values
       # find the new records
-      @object_values.each do |ov|
-        # INDEX: CLIENT_MAP
-        map = ClientMap.find_or_initialize_by_client_id_and_object_value_id_and_object_value_object_and_object_value_attrib_and_object_value_value(
-                        {:client_id => client_id, 
-                         :object_value_id => ov.id,
-                         :object_value_object => ov.object,
-                         :object_value_attrib => ov.attrib,
-                         :object_value_value => ov.value,
-                         :db_operation => 'insert'})             
-                                                                              
-        if map and map.new_record?
-          map.object_value.db_operation = map.db_operation
-          objs_to_return << map.object_value
+      @object_values.each do |ov|         
+        map = ClientMap.create({:client_id => client_id, 
+                                :object_value_id => ov.id,
+                                :object_value_object => ov.object,
+                                :object_value_attrib => ov.attrib,
+                                :object_value_value => ov.value,
+                                :db_operation => 'insert'})                                                                     
+        if map
+          ov.db_operation = map.db_operation
+          objs_to_return << ov
           map.save
         end
       end
