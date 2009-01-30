@@ -29,10 +29,6 @@
 class LighthouseTickets < SourceAdapter
   
   include RestAPIHelpers
-    
-  def initialize(source)
-    super
-  end
   
   # login and logoff are left intentionally unimplemented (i.e. we use baseclass implementation) in REST
 

@@ -1,7 +1,7 @@
 class SugarProducts < SugarAdapter
 
-  def initialize(source)
-    super(source)
+  def initialize(source,credential)
+    super(source,credential)
     
     @module_name = 'Products'
     @select_fields = %w(

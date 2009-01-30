@@ -1,7 +1,7 @@
 class SugarMeetings < SugarAdapter
 
-  def initialize(source)
-    super(source)
+  def initialize(source,credential)
+    super(source,credential)
     
     @module_name = 'Meetings'
     @select_fields = %w(

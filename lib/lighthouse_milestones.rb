@@ -21,10 +21,6 @@
 class LighthouseMilestones < SourceAdapter
   
   include RestAPIHelpers
-  
-  def initialize(source)
-    super
-  end
 
   def query
     log "LighthouseMilestones query"

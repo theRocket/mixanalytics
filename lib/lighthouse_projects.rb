@@ -33,10 +33,6 @@
 class LighthouseProjects < SourceAdapter
   
   include RestAPIHelpers
-  
-  def initialize(source)
-    super(source)
-  end
 
   def query
     log "LighthouseProjects query"

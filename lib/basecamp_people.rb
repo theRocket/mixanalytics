@@ -4,10 +4,6 @@ class BasecampPeople
   attr_accessor :client
   
   include RestAPIHelpers
-  
-  def initialize(source)
-    @source=source
-  end
 
   def login
     #left intentionally blank

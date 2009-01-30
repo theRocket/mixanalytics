@@ -14,10 +14,6 @@ class LighthouseTicketVersions < SourceAdapter
   
   include RestAPIHelpers
   include ActiveSupport::Inflector
-  
-  def initialize(source)
-    super
-  end
 
   def query
     log "LighthouseTicketVersions query"
