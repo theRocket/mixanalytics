@@ -12,23 +12,20 @@ class SugarAdapter < SourceAdapter
   def initialize(source,credential)
     puts "SugarCRM initialize with #{source.inspect.to_s}"
     
-    super(source)
+    super(source,credential)
     
     @select_fields = [] # leave empty like this to get all fields
     @order_by = ''
     @query_filter = '' # you can also use SQL like 'accounts.name like '%company%''
     
-    @client = SOAP::WSDLDriverFactory.new(source.url).create_rpc_driver
+    url = (credential and !credential.url.blank?) ? credential.url : source.url
+    @client = SOAP::WSDLDriverFactory.new(url).create_rpc_driver
     @client.options['protocol.http.receive_timeout'] = 3600 
   end
 
   def login
-    p "@Source: " + @source.inspect.to_s
-
-    
     puts "SugarCRM #{@module_name} login"
     if @source.credential
-      p "Have credential!"
       u = @source.credential.login
       p = Digest::MD5.hexdigest(@source.credential.password)
     else
@@ -66,6 +63,7 @@ class SugarAdapter < SourceAdapter
   def sync
     puts "SugarCRM #{@module_name} sync with #{@result.entry_list.length}"
         
+    # TODO: cannot have fields named "type" or other reserved ruby keywords either for that matter
     user_id=@source.current_user.id
     @result.entry_list.each do |x|      
       x.name_value_list.each do |y|

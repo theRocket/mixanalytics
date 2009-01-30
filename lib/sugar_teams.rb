@@ -1,7 +1,7 @@
 class SugarTeams < SugarAdapter
 
-  def initialize(source)
-    super(source)
+  def initialize(source,credential)
+    super(source,credential)
     
     @module_name = 'Teams'
     @select_fields = %w(

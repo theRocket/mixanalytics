@@ -7,10 +7,6 @@ class LighthouseSettings < SourceAdapter
   
   include RestAPIHelpers
   
-  def initialize(source)
-    super
-  end
-  
   def query
     log "LighthouseSettings query"
     

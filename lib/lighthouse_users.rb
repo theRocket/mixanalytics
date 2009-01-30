@@ -14,10 +14,6 @@
 class LighthouseUsers < SourceAdapter
   
   include RestAPIHelpers
-  
-  def initialize(source)
-    super
-  end
 
   def query
     log "LighthouseUsers query"
