@@ -102,6 +102,7 @@ class SourcesController < ApplicationController
        o.value=x["value"]
        o.update_type="create"
        o.source=@source
+       o.user_id=current_user.id
        o.save
        # add the created ID + created_at time to the list
        objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects
@@ -142,6 +143,7 @@ class SourcesController < ApplicationController
        o.attrib=x["attrib"]
        o.value=x["value"]
        o.update_type="update"
+       o.user_id=current_user.id
        o.source=@source
        o.save
        # add the created ID + created_at time to the list
@@ -175,6 +177,7 @@ class SourcesController < ApplicationController
        o.value=x["value"] if x["value"]
        o.update_type="delete"
        o.source=@source
+       o.user_id=current_user.id
        o.save
        # add the created ID + created_at time to the list
        objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects

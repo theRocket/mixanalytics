@@ -15,7 +15,7 @@ class Source < ActiveRecord::Base
   
   def initadapter(credential)
     #create a source adapter with methods on it if there is a source adapter class identified
-    if self.adapter and self.adapter.size>0
+    if not self.adapter.blank?
       @source_adapter=(Object.const_get(self.adapter)).new(self,credential)
     else # if source_adapter is nil it will
       @source_adapter=nil
@@ -35,11 +35,7 @@ class Source < ActiveRecord::Base
     initadapter(credential)
     
     # make sure to use @client and @session_id variable in your code that is edited into each source!
-    if source_adapter
-      source_adapter.login  # should set up @session_id
-    else
-      callbinding=eval %"#{prolog};binding"
-    end
+    source_adapter.login  # should set up @session_id
 
     # perform core create, update and delete operations
     process_update_type('create',createcall)
@@ -47,22 +43,15 @@ class Source < ActiveRecord::Base
     process_update_type('delete',deletecall)      
 
     clear_pending_records(@credential)
-    if source_adapter
-      source_adapter.query
-      source_adapter.sync
-    else
-      callbinding=eval(call+";binding",callbinding)
-      callbinding=eval(sync+";binding",callbinding) if sync
-    end 
+
+    source_adapter.query
+    source_adapter.sync
+
     finalize_query_records(@credential)
     # now do the logoff
-    if source_adapter
-      source_adapter.logoff
-    else
-      if epilog and epilog.size>0
-        callbinding=eval(epilog+";binding",callbinding)
-      end
-    end
+
+    source_adapter.logoff
+
     save
   end
 
