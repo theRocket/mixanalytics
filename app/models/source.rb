@@ -24,34 +24,23 @@ class Source < ActiveRecord::Base
 
   def refresh(current_user)
     @current_user=current_user
-
     # is there a global login? if so DONT use a credential
     self.credential=nil
     if login.blank?
       usersub=app.memberships.find_by_user_id(current_user.id) if current_user
       self.credential=usersub.credential if usersub # this variable is available in your source adapter
     end
-
-    initadapter(credential)
-    
+    initadapter(credential)   
     # make sure to use @client and @session_id variable in your code that is edited into each source!
     source_adapter.login  # should set up @session_id
-
-    # perform core create, update and delete operations
-    process_update_type('create',createcall)
+   process_update_type('create',createcall)
     process_update_type('update',updatecall)
     process_update_type('delete',deletecall)      
-
     clear_pending_records(@credential)
-
     source_adapter.query
     source_adapter.sync
-
     finalize_query_records(@credential)
-    # now do the logoff
-
     source_adapter.logoff
-
     save
   end
 
