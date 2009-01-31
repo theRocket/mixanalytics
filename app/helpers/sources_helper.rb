@@ -7,7 +7,9 @@ module SourcesHelper
     matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
     if matches_login.nil? or matches_login.size == 0
       logger.info "User: " + current_user.login + " not allowed access."
-      response.redirect  :action=>"noaccess",:login=>current_user.login
+      username = current_user.login
+      username ||= "unknown"
+      redirect  :action=>"noaccess",:login=>username
     end
     logger.info "User: " + current_user.login + " permitted access."
   end
