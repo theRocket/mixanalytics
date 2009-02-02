@@ -22,7 +22,7 @@ class SourcesController < ApplicationController
     @source.refresh(@current_user) if @source.needs_refresh
     objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
     objectvalues_cmd << " and user_id=" + @current_user.id.to_s + " or user_id is null "
-    objectvalues_cmd << " order by object"
+    objectvalues_cmd << " order by object,attrib"
     # if client_id is provided, return only relevant object for that client
     if params[:client_id] and params[:id]
       @object_values=process_objects_for_client(@source, params[:client_id]) 
