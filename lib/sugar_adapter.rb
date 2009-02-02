@@ -57,6 +57,9 @@ class SugarAdapter < SourceAdapter
     # end
     # puts "============\n"
   
+    @count = @client.get_entries_count(@session_id,@module_name,@query_filter,deleted).result_count
+    puts "@count =#{@count}"
+    
     @result = @client.get_entry_list(@session_id,@module_name,@query_filter,@order_by,offset,@select_fields,max_results,deleted);
   end
 
@@ -73,7 +76,7 @@ class SugarAdapter < SourceAdapter
           o.object=x['id']
           o.attrib=y.name
           o.value=y.value
-          o.user_id=user_id 
+          o.user_id=user_id unless @source.credential
           o.save
         end
       end
