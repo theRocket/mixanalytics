@@ -76,7 +76,7 @@ class SugarAdapter < SourceAdapter
           o.object=x['id']
           o.attrib=y.name
           o.value=y.value
-          o.user_id=user_id unless @source.credential
+          o.user_id=user_id if @source.credential
           o.save
         end
       end
