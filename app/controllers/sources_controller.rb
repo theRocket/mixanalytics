@@ -20,11 +20,14 @@ class SourcesController < ApplicationController
     @app=@source.app
     check_access(@app)
     @source.refresh(@current_user) if @source.needs_refresh
+    objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
+    objectvalues_cmd << " and user_id=" + @current_user.id.to_s + " or user_id is null "
+    objectvalues_cmd << " order by object"
     # if client_id is provided, return only relevant object for that client
     if params[:client_id] and params[:id]
       @object_values=process_objects_for_client(@source, params[:client_id]) 
     else
-      @object_values=ObjectValue.find :all,:conditions=>{:update_type=>"query",:source_id=>params[:id]},:order=>"object"
+      @object_values=ObjectValue.find_by_sql objectvalues_cmd
     end
     @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
     logger.info "Sending #{@object_values.length} records to #{params[:client_id]}" if params[:client_id] and @object_values
