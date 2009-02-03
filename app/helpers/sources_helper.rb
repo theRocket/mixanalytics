@@ -59,6 +59,10 @@ module SourcesHelper
       prev=obj
     end
   end
+  
+  def find_dupes
+    result=nil
+  end
 
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
   def finalize_query_records(credential)
