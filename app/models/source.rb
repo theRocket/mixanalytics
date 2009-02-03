@@ -33,11 +33,14 @@ class Source < ActiveRecord::Base
     initadapter(credential)   
     # make sure to use @client and @session_id variable in your code that is edited into each source!
     source_adapter.login  # should set up @session_id
-   process_update_type('create',createcall)
+    process_update_type('create',createcall)
     process_update_type('update',updatecall)
     process_update_type('delete',deletecall)      
     clear_pending_records(@credential)
-    source_adapter.query
+    begin
+      source_adapter.query
+    rescue
+    end
     source_adapter.sync
     finalize_query_records(@credential)
     source_adapter.logoff
