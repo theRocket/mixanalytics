@@ -1,108 +1,72 @@
 SugarAccounts:
   id: 1
   name: SugarAccounts
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   adapter: SugarAccounts
   app_id: 1
 
 SugarCases:
   id: 2
   name: SugarCases
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarCases
 
 SugarEmployees:
   id: 3
   name: SugarEmployees
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarEmployees
   
 SugarContacts:
   id: 11
   name: SugarContacts
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarContacts
   
 SugarLeads:
   id: 12
   name: SugarLeads
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarLeads
   
 SugarOpportunities:
   id: 13
   name: SugarOpportunities
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarOpportunities
     
 SugarMeetings:
   id: 14
   name: SugarMeetings
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarMeetings
     
 SugarCalls:
   id: 15
   name: SugarCalls
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarCalls
 
 SugarCampaigns:
   id: 16
   name: SugarCampaigns
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarCampaigns
     
 SugarProducts:
   id: 17
   name: SugarProducts
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarProducts
       
 SugarTeams:
   id: 18
   name: SugarTeams
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarTeams
   
 SugarUsers:
   id: 19
   name: SugarUsers
-  url: http://rhomobile.com/sugar/soap.php?wsdl
-  login: testuser
-  password: testuser
   app_id: 1
   adapter: SugarUsers
     

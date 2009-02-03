@@ -134,67 +134,51 @@ module SourcesHelper
     #maps_to_delete = ClientMap.find_all_by_client_id(client_id)
     ActiveRecord::Base.transaction do
       maps_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
-                                              cm.object_value_id = ov.id and \
-                                              cm.object_value_value = ov.value and \
-                                              cm.object_value_attrib = ov.attrib \
+                                              cm.object_value_id = ov.id \
                                               where cm.client_id='#{client_id}' and ov.id is NULL"
       maps_to_delete.each do |map|
-        objs_to_return << new_delete_obj(map.object_value_object,
-                                          map.object_value_attrib,
-                                          map.object_value_value)
-        ActiveRecord::Base.connection.execute "delete from client_maps where object_value_object='#{map.object_value_object}' \
-                                               and object_value_attrib='#{map.object_value_attrib}' \
-                                               and object_value_id='#{map.object_value_id}' \
+        objs_to_return << new_delete_obj(map.object_value_id)
+        ActiveRecord::Base.connection.execute "delete from client_maps where object_value_id='#{map.object_value_id}' \
                                                and client_id='#{map.client_id}'"
       end
     end
     
+    object_value_conditions = "from object_values ov left join client_maps cm on \
+                                 ov.id = cm.object_value_id and \
+                                 cm.client_id = '#{client_id}' \
+                               where ov.update_type = 'query' and \
+                                 ov.source_id = #{source.id} and \
+                                 (ov.user_id = #{current_user.id} or ov.user_id is NULL) and \
+                                 cm.object_value_id is NULL"
+    object_value_query = "select * #{object_value_conditions}"
+ 
     if current_user
       # INDEX: BY_SOURCE_TYPE_USER
-      #@object_values = ObjectValue.find_all_by_source_id_and_update_type_and_user_id(source.id, 'query', current_user.id)
-      @object_values = ObjectValue.find_by_sql "select * from object_values ov left join client_maps cm on \
-                                                  ov.id = cm.object_value_id and \
-                                                  ov.object = cm.object_value_object and \
-                                                  ov.attrib = cm.object_value_attrib and \
-                                                  ov.value = cm.object_value_value and \ 
-                                                  cm.client_id = '#{client_id}' \
-                                                where ov.update_type = 'query' and \
-                                                  ov.source_id = #{source.id} and \
-                                                  ov.user_id = #{current_user.id} and \
-                                                  cm.object_value_id is NULL"
+      @object_values = ObjectValue.find_by_sql object_value_query
     end
     
+    object_insert_query = "select '#{client_id}' as a,id,'#{Time.now.to_s}','#{Time.now.to_s}' #{object_value_conditions}"
     
-    if @object_values
-      # find the new records
-      @object_values.each do |ov|         
-        map = ClientMap.create({:client_id => client_id, 
-                                :object_value_id => ov.id,
-                                :object_value_object => ov.object,
-                                :object_value_attrib => ov.attrib,
-                                :object_value_value => ov.value,
-                                :db_operation => 'insert'})                                                                     
-        if map
-          ov.db_operation = map.db_operation
-          objs_to_return << ov
-          map.save
-        end
-      end
+    ActiveRecord::Base.transaction do
+      ActiveRecord::Base.connection.execute "insert into client_maps (client_id,object_value_id,created_at,updated_at) \
+                                               #{object_insert_query}"                                      
     end
+    
     # Update the last updated time for this client
     @client.update_attribute(:updated_at, Time.now)
-    objs_to_return
+    @object_values.collect! {|x| x.db_operation = 'insert'; x}
+    objs_to_return.concat(@object_values)
   end
   
-  def new_delete_obj(object,attrib,value)
+  def new_delete_obj(obj_id)
     temp_obj = ObjectValue.new
-    temp_obj.object = object
-    temp_obj.db_operation = 'delete'
+    temp_obj.object = nil
+    temp_obj.db_operation = "delete"
     temp_obj.created_at = temp_obj.updated_at = Time.now.to_s
-    temp_obj.attrib = attrib
-    temp_obj.value = value
-    temp_obj.update_type = "delete"
-    temp_obj.id = 0
+    temp_obj.attrib = nil
+    temp_obj.value = '-'
+    temp_obj.update_type = 'delete'
+    temp_obj.id = obj_id
     temp_obj.source_id = 0
     temp_obj
   end
