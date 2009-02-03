@@ -9,7 +9,6 @@ class ObjectValue < ActiveRecord::Base
   attr_accessor :db_operation
 
   def before_validate
-    self.update_type="pending"
   end
   
   def before_save
