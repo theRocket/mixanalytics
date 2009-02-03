@@ -131,18 +131,18 @@ module SourcesHelper
     
     # VERY IMPORTANT - delete records that don't exist in the cache table anymore
     # We MUST do this before the insert loop below to avoid ID collisions
-    #maps_to_delete = ClientMap.find_all_by_client_id(client_id)
     ActiveRecord::Base.transaction do
-      maps_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
+      objs_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
                                               cm.object_value_id = ov.id \
                                               where cm.client_id='#{client_id}' and ov.id is NULL"
-      maps_to_delete.each do |map|
+      objs_to_delete.each do |map|
         objs_to_return << new_delete_obj(map.object_value_id)
         ActiveRecord::Base.connection.execute "delete from client_maps where object_value_id='#{map.object_value_id}' \
                                                and client_id='#{map.client_id}'"
       end
     end
     
+    # Setup the join conditions
     object_value_conditions = "from object_values ov left join client_maps cm on \
                                  ov.id = cm.object_value_id and \
                                  cm.client_id = '#{client_id}' \
@@ -150,26 +150,34 @@ module SourcesHelper
                                  ov.source_id = #{source.id} and \
                                  (ov.user_id = #{current_user.id} or ov.user_id is NULL) and \
                                  cm.object_value_id is NULL"
+                                 
     object_value_query = "select * #{object_value_conditions}"
- 
-    if current_user
-      # INDEX: BY_SOURCE_TYPE_USER
-      @object_values = ObjectValue.find_by_sql object_value_query
-    end
     
-    object_insert_query = "select '#{client_id}' as a,id,'#{Time.now.to_s}','#{Time.now.to_s}' #{object_value_conditions}"
+    # INDEX: BY_SOURCE_TYPE_USER
+    objs_to_insert = ObjectValue.find_by_sql object_value_query
+    last_sync_time = Time.now
     
+    object_insert_query = "select '#{client_id}' as a,id,'#{last_sync_time.to_s}', \
+                           '#{last_sync_time.to_s}' #{object_value_conditions}"
+    
+    # Add insert objects to client_maps based on 
+    # join query w/ object_values
     ActiveRecord::Base.transaction do
-      ActiveRecord::Base.connection.execute "insert into client_maps (client_id,object_value_id,created_at,updated_at) \
-                                               #{object_insert_query}"                                      
+      ActiveRecord::Base.connection.execute "insert into client_maps 
+                                             (client_id,object_value_id,created_at,updated_at) #{object_insert_query}"                                      
     end
     
     # Update the last updated time for this client
-    @client.update_attribute(:updated_at, Time.now)
-    @object_values.collect! {|x| x.db_operation = 'insert'; x}
-    objs_to_return.concat(@object_values)
+    # to track the last sync time
+    @client.update_attribute(:updated_at, last_sync_time)
+    
+    # Setup return list (inserts + deletes)
+    objs_to_insert.collect! {|x| x.db_operation = 'insert'; x}
+    objs_to_return.concat(objs_to_insert)
   end
   
+  # generates an object_value for the client
+  # to delete
   def new_delete_obj(obj_id)
     temp_obj = ObjectValue.new
     temp_obj.object = nil
