@@ -45,7 +45,7 @@ module SourcesHelper
   
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
   def remove_dupe_pendings(credential)
-    pendings_cmd = "select pending_id from object_values where update_type is null and source_id="+id.to_s
+    pendings_cmd = "select id,pending_id from object_values where update_type is null and source_id="+id.to_s
     (pendings_cmd << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
     pendings_cmd << " order by pending_id"
     p "Executing " + pendings_cmd
@@ -53,7 +53,7 @@ module SourcesHelper
     prev=nil
     objs.each do |obj|  # remove dupes
       if (prev and (obj.pending_id==prev.pending_id))
-        p "Deleting duplicate"+prev.inspect
+        p "Deleting duplicate"+prev.inspect.to_s
         ObjectValue.delete(prev.id)
       end
       prev=obj
