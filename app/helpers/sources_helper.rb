@@ -54,7 +54,7 @@ module SourcesHelper
     objs.each do |obj|  # remove dupes
       if (prev and (obj.pending_id==prev.pending_id))
         p "Deleting duplicate"
-        p.destroy
+        prev.destroy
       end
       prev=obj
     end
