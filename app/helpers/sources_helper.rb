@@ -20,17 +20,18 @@ module SourcesHelper
     # INDEX: SHOULD USE BY_SOURCE_USER_TYPE 
     count_updates = "select count(*) from object_values where update_type!='query' and source_id="+id.to_s
     (count_updates << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
-    result=true if (ObjectValue.count_by_sql count_updates ) > 0
+    (result=true and p "Refresh because there are updates" )if (ObjectValue.count_by_sql count_updates ) > 0
 
     # refresh if there is no data
     # INDEX: SHOULD USE BY_SOURCE_USER_TYPE
     count_query_objs="select count(*) from object_values where update_type='query' and source_id="+id.to_s
     (count_query_objs << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
-    result=true if (ObjectValue.count_by_sql count_query_objs ) <= 0
+    (result=true and p "Refresh because there is not data") if (ObjectValue.count_by_sql count_query_objs ) <= 0
     
     # refresh is the data is old
     self.pollinterval||=300 # 5 minute default if there's no pollinterval or its a bad value
     if !self.refreshtime or ((Time.new - self.refreshtime)>pollinterval)
+      p "Refresh because data is old"
       result=true
     end
     result  # return true of false (nil)
@@ -111,9 +112,6 @@ module SourcesHelper
       if source_adapter
         name_value_list=eval(nvlist)
         eval("source_adapter." +utype +"(name_value_list)")
-      else
-        (raise ArgumentError,"Need some code to execute for " + utype) if utypecall.nil?
-        callbinding=eval("name_value_list="+nvlist+";"+utypecall+";binding",callbinding)
       end
     end
   end

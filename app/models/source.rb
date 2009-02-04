@@ -22,7 +22,7 @@ class Source < ActiveRecord::Base
     end
   end
 
-  def refresh(current_user)
+  def do_refresh(current_user)
     @current_user=current_user
     # is there a global login? if so DONT use a credential
     self.credential=nil

@@ -19,7 +19,7 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     @app=@source.app
     check_access(@app)
-    @source.refresh(@current_user) if @source.needs_refresh
+    @source.do_refresh(@current_user) if params[:refresh] || @source.needs_refresh 
     objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
     objectvalues_cmd << " and user_id=" + @current_user.id.to_s + " or user_id is null "
     objectvalues_cmd << " order by object,attrib"
@@ -37,13 +37,7 @@ class SourcesController < ApplicationController
       format.json
     end
   end
-  
-  # this is effectively the "callback" or notify function that needs to be called from the backend app
-  # this is installed by the "set_callback" method that should be written for source adapters when appropriate
-  def refresh
-    @source=Source.find params[:id]
-    @source.refresh(@current_user) if @source
-  end
+
 
   # return the metadata for the specified source
   # ONLY FOR SUBSCRIBERS/ADMIN
@@ -246,22 +240,7 @@ class SourcesController < ApplicationController
   end
 
 
-  # this connects to the web service of the given source backend and:
-  # - does a login
-  # - does creating, updating, deleting of records as required
-  # - reads (queries) records from the backend
-  # - logs off
-  #
-  # It should be invoked on a schedcurrent_useruled basis by some admin process,
-  # for example by using CURL.  It should also be done with a separate instance
-  # than the one used to service create, update and delete calls from the client
-  # device.
-  def refresh
-    source=Source.find params[:id]
-    check_access(source.app)
-    source.refresh @current_user
-    redirect_to :action=>"show",:id=>source.id, :app_id=>source.app.id
-  end
+
   
   # GET /sources
   # GET /sources.xml
