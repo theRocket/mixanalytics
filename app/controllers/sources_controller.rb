@@ -19,7 +19,7 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     @app=@source.app
     check_access(@app)
-    @source.do_refresh(@current_user) if params[:refresh] || @source.needs_refresh 
+    @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
     objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
     objectvalues_cmd << " and user_id=" + @current_user.id.to_s + " or user_id is null "
     objectvalues_cmd << " order by object,attrib"
