@@ -68,10 +68,15 @@ module SourcesHelper
   def finalize_query_records(credential)
     # first delete the existing query records
     ActiveRecord::Base.transaction do
-      delete_cmd = "(update_type='query') and source_id="+id.to_s
-      (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
-      ObjectValue.delete_all delete_cmd
-=begin WE SHOULDN'T ACTUALLY NEED THIS ANYMORE IF WE DO OUR PROPER LOCKS
+      if (incremental.nil? or incremental<1)  # if its not incremental delete records
+        p "Delete existing records"
+        delete_cmd = "(update_type='query') and source_id="+id.to_s
+        (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
+        ObjectValue.delete_all delete_cmd
+      else
+        p "Don't delete records"
+      end
+=begin WE SHOULDN'T ACTUALLY NEED THIS ANYMORE IF LOCKING WORKS
       remove_dupe_pendings(credential)
       if (find_dupes)
         raise "There are duplicates here"
