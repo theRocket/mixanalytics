@@ -19,9 +19,11 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     @app=@source.app
     check_access(@app)
+    
+
     @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
     objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
-    objectvalues_cmd << " and user_id=" + credential.user.id.to_s if credential
+    objectvalues_cmd << " and user_id=" + @source.credential.user.id.to_s if @source.credential
     objectvalues_cmd << " order by object,attrib"
     # if client_id is provided, return only relevant object for that client
     if params[:client_id] and params[:id]
