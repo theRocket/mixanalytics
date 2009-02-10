@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090210014552) do
+ActiveRecord::Schema.define(:version => 20090210025130) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
@@ -69,7 +69,7 @@ ActiveRecord::Schema.define(:version => 20090210014552) do
     t.integer  "source_id"
     t.string   "attrib"
     t.string   "object"
-    t.string   "value"
+    t.text     "value",       :limit => 255
     t.string   "update_type"
     t.datetime "created_at"
     t.datetime "updated_at"
