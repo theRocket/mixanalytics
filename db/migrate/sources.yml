@@ -69,9 +69,15 @@ SugarUsers:
   name: SugarUsers
   app_id: 1
   adapter: SugarUsers
+  
+Wikipedia:
+  id: 20
+  name: Wikipedia
+  app_id: 8
+  adapter: Wikipedia
 
 SugarQuotes:
-  id: 20
+  id: 21
   name: SugarQuotes
   app_id: 1
   adapter: SugarQuotes
