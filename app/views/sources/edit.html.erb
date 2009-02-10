@@ -22,6 +22,7 @@
   <p>
       <%= f.label "Poll Interval (seconds)"%><%= f.text_field :pollinterval, :size=>10 %>&nbsp;
       <%= f.label :priority%><%=f.text_field :priority, :size=>10%>&nbsp;
+      <%= f.label :incremental%>(adds to records continuously)<%=f.check_box :incremental%>&nbsp;      
   </p>
 <p>
 <%= f.label "Source adapter classname (file should be in your RhoSync lib directory)" %><br/>

@@ -5,11 +5,11 @@ module SourcesHelper
   def check_access(app)
     matches_login=app.users.select{ |u| u.login==current_user.login}
     matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
-    if matches_login.nil? or matches_login.size == 0
+    if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      redirect  :action=>"noaccess",:login=>username
+      redirect_to  :action=>"noaccess",:login=>username
     end
     logger.info "User: " + current_user.login + " permitted access."
   end
@@ -45,13 +45,14 @@ module SourcesHelper
   
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
   def remove_dupe_pendings(credential)
-    pendings_cmd = "select id,pending_id from object_values where update_type is null and source_id="+id.to_s
+    pendings_cmd = "select id,pending_id,object,attrib,value from object_values where update_type is null and source_id="+id.to_s
     (pendings_cmd << " and user_id="+ credential.user.id.to_s) if credential# if there is a credential then just do delete and update based upon the records with that credential  
     pendings_cmd << " order by pending_id"
     objs=ObjectValue.find_by_sql pendings_cmd
     prev=nil
     objs.each do |obj|  # remove dupes
       if (prev and (obj.pending_id==prev.pending_id))
+        p "Deleting a duplicate: " + obj.pending_id.to_s + "(#{obj.object.to_s},#{obj.attrib},#{obj.value})"
         ObjectValue.delete(prev.id)
       end
       prev=obj
@@ -68,11 +69,14 @@ module SourcesHelper
   def finalize_query_records(credential)
     # first delete the existing query records
     ActiveRecord::Base.transaction do
-      delete_cmd = "(update_type='query') and source_id="+id.to_s
+      delete_cmd = "(update_type is not null) and source_id="+id.to_s
       (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
+      p "Deleting existing records: "+delete_cmd
       ObjectValue.delete_all delete_cmd
-=begin WE SHOULDN'T ACTUALLY NEED THIS ANYMORE IF WE DO OUR PROPER LOCKS
+      cnt=ObjectValue.count_by_sql "select count(*) from object_values where " + delete_cmd
+      p "Failed to delete " if cnt>0 
       remove_dupe_pendings(credential)
+=begin WE SHOULDN'T ACTUALLY NEED THIS ANYMORE IF LOCKING WORKS
       if (find_dupes)
         raise "There are duplicates here"
       end
