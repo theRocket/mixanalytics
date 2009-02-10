@@ -85,6 +85,15 @@ class AppsController < ApplicationController
     user=User.find_by_login params[:subscriber]
     @app=App.find(params[:id])
     @app.users << user
+    if (params[:url]) # we have a URL of a credential
+      @sub=Membership.find_by_user_id_and_app_id user.id,@app.id  # find the just created membership subscription
+      @sub.credential=Credential.new
+      @sub.credential.url=params[:url]
+      @sub.credential.login=params[:login]
+      @sub.credential.password=params[:password]
+      @sub.credential.save
+      @sub.save
+    end
     redirect_to :action=>:edit
   end
 

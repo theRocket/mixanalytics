@@ -29,7 +29,6 @@
 <b>Access Control</b><br/>
 Anonymous (Allow All Users) <%=f.check_box :anonymous%><br/>
 <%end%>
-
 Or Subscribe Individual Users:<br/>
 <table>
 <% @app.users.each do |sub| %>
@@ -43,9 +42,10 @@ Or Subscribe Individual Users:<br/>
 <option value="<%=user.login%>"><%=user.login%></option>
 <%end%>
 </select>
+<i>Optional Credential (URL <input name="url" size=40">&nbsp;Login <input name="login" size="12">&nbsp;Password <input name="password" size="12">)</i>
+<br>
 <%= f.submit "Subscribe User" %>
 <%end%>
-</p>
 <p>
 <%= link_to 'Back to applications list', apps_path %>
 </p>
