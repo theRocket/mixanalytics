@@ -39,6 +39,26 @@ class SourcesController < ApplicationController
       format.json
     end
   end
+  
+  # quick synchronous simple query that doesn't hit the database
+  # parameters:
+  #   question
+  def ask
+    @source=Source.find params[:id]
+    @app=@source.app
+    if params[:question]
+      @object_values=@source.ask :question=>params[:question] 
+      @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
+    else
+      raise "You need to provide a question to answer"
+    end
+
+    respond_to do |format|
+      format.html { render :action=>"show"}
+      format.xml  { render :action=>"show"}
+      format.json { render :action=>"show"}
+    end
+  end
 
 
   # return the metadata for the specified source

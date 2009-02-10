@@ -2,23 +2,10 @@
 
 <% form_for(@app) do |f| %>
   <%= f.error_messages %>
-
-  <p>
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
-  </p>
-
-  <p>
-    <%= f.label :description %><br />
-    <%=  f.text_area :description,:rows=>3,:cols=>40  %>
-  </p>
-  <p>
-    <%= f.submit "Update" %>
-  </p>
-<% end %>
-
-
-<h4>Sources</h4>
+<%= f.label :name %>&nbsp;<%= f.text_field :name %><br/>
+<%= f.label :description %><br/>
+<%=  f.text_area :description,:rows=>2,:cols=>40  %><br/>
+<b>Sources</b>&nbsp;<%=link_to "(Refresh All)",:controller=>"apps",:action=>"refresh",:id=>@app.id%><br/>
 <table>
 <tr><th>Name</th><th>Priority</th></tr>
 <% @app.sources.each do |source| %>
@@ -31,13 +18,19 @@
 <%end %>
 </table>
 <p>
-<%=link_to "Refresh All",:controller=>"apps",:action=>"refresh",:id=>@app.id%>
+
 </p>
 <p>
 <%=link_to 'Add Source',:controller=>"sources",:action=>"new",:app=>@app.id %>
 </p>
+<p>
+  <%= f.submit "Update Application Settings" %>
+</p>
+<b>Access Control</b><br/>
+Anonymous (Allow All Users) <%=f.check_box :anonymous%><br/>
+<%end%>
 
-<h4>Existing Subscribers</h4>
+Or Subscribe Individual Users:<br/>
 <table>
 <% @app.users.each do |sub| %>
 <tr><td><%= link_to sub.login + "(unsubscribe)",{:action=>:unsubscribe,:id=>@app.id,:subscriber=>sub.login}%></td></tr>

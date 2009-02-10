@@ -5,11 +5,11 @@ module SourcesHelper
   def check_access(app)
     matches_login=app.users.select{ |u| u.login==current_user.login}
     matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
-    if matches_login.nil? or matches_login.size == 0
+    if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      redirect  :action=>"noaccess",:login=>username
+      redirect_to  :action=>"noaccess",:login=>username
     end
     logger.info "User: " + current_user.login + " permitted access."
   end
