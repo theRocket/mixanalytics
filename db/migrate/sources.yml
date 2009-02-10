@@ -69,6 +69,12 @@ SugarUsers:
   name: SugarUsers
   app_id: 1
   adapter: SugarUsers
+
+SugarQuotes:
+  id: 20
+  name: SugarQuotes
+  app_id: 1
+  adapter: SugarQuotes
     
 SiebelServiceRequests:
   id: 4
