@@ -22,11 +22,11 @@ class Source < ActiveRecord::Base
     end
   end
   
-  def ask
+  def ask(current_user,question)
     usersub=app.memberships.find_by_user_id(current_user.id) if current_user
     self.credential=usersub.credential if usersub # this variable is available in your source adapter
     initadapter(self.credential)
-    source_adapter.ask
+    source_adapter.ask question
   end
 
   def refresh(current_user)
