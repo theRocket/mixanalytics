@@ -13,8 +13,7 @@ class SessionsController < ApplicationController
     logout_keeping_session!
     @app=App.find params[:app_id]
     if @app.anonymous==1 # everyone's allowed in!
-      user = User.new
-      user.login="anonymous"
+      user = User.find_or_create_by_login "anonymous"
     else
       user = User.authenticate(params[:login], params[:password])
     end

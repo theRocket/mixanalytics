@@ -65,8 +65,12 @@ module SourcesHelper
     conditions << " and user_id=#{credential.user.id}" if credential
     objs=ObjectValue.find :all, :conditions=>conditions, :order=> :pending_id
     objs.each do |obj|  
-      pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
-      ActiveRecord::Base.connection.execute(pending_to_query)
+      begin
+        pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
+        ActiveRecord::Base.connection.execute(pending_to_query)
+      rescue RuntimeError => e
+        p "Failed to finalize object value (due to duplicate):" + e.to_s
+      end
     end   
   end
 
