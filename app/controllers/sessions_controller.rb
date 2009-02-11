@@ -12,11 +12,7 @@ class SessionsController < ApplicationController
   def client_login
     logout_keeping_session!
     @app=App.find params[:app_id]
-    if @app.anonymous==1 # everyone's allowed in!
-      user = User.find_by_login "anonymous" if not user
-    else
-      user = User.authenticate(params[:login], params[:password])
-    end
+    user = User.authenticate(params[:login], params[:password])
     if user
       self.current_user = user
       new_cookie_flag = (params[:remember_me] == "1")

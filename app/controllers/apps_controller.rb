@@ -33,7 +33,7 @@ class AppsController < ApplicationController
       flash[:notice]="You have no existing apps"
     end
     apps=App.find :all
-    @subapps=apps.reject { |app| !current_user.apps.index(app) }
+    @subapps=apps.reject { |app| !app.anonymous and !current_user.apps.index(app) }
     
     respond_to do |format|
       format.html # index.html.erb
