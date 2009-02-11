@@ -26,13 +26,15 @@ class AppsController < ApplicationController
   # GET /apps
   # GET /apps.xml
   def index
-    login=current_user.login.downcase
+    login=@current_user.login.downcase 
+    
     @apps = App.find_all_by_admin login
     if @apps.nil?
       flash[:notice]="You have no existing apps"
     end
     apps=App.find :all
     @subapps=apps.reject { |app| !current_user.apps.index(app) }
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @apps }

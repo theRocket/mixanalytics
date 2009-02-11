@@ -1,0 +1,14 @@
+#  change these values below
+anonymous:
+  id: 1
+  login: anonymous
+  password:
+  email: anonymous@rhomobile.com
+
+admin:
+  id: 2
+  login: admin
+  password: password
+  email: admin@rhomobile.com
+
+ 

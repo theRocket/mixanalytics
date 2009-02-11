@@ -50,7 +50,7 @@
   <%end%>
 </table>
 <p/>
-<%if @current_user.nil? %><br/>
+<%if @current_user.nil? or @current_user.login=="anonymous" %><br/>
 <%= link_to 'Login',{:controller=>'sessions',:action=>'new'}%><br/>
 <%= link_to 'Register',{:controller=>'users',:action=>'new'}%><br/>
 <%else%>

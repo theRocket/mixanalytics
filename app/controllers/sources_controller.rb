@@ -21,8 +21,7 @@ class SourcesController < ApplicationController
   def show
     @source=Source.find params[:id]
     @app=@source.app
-    check_access(@app)
-    
+    check_access(@app)  
 
     @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
     objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
