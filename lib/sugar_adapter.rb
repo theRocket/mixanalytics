@@ -20,7 +20,11 @@ class SugarAdapter < SourceAdapter
     
     url = (credential and !credential.url.blank?) ? credential.url : source.url
     p "Creating adapter for "+ url
-    @client = SOAP::WSDLDriverFactory.new(url).create_rpc_driver
+    begin
+      @client = SOAP::WSDLDriverFactory.new(url).create_rpc_driver
+    rescue RuntimeError => e
+      logger.info "Failed to create WSDL driver: " + e.to_s
+    end
     @client.options['protocol.http.receive_timeout'] = 3600 
   end
 
