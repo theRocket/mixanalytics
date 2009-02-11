@@ -6,10 +6,11 @@ module SourcesHelper
     matches_login=app.users.select{ |u| u.login==current_user.login}
     matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
     if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
+      logger.info  "App is not anonymous and user was not found in subscriber list"
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      redirect_to  :action=>"noaccess",:login=>username
+      redirect  :action=>"noaccess",:login=>username
     end
     logger.info "User: " + current_user.login + " permitted access."
   end
@@ -59,10 +60,14 @@ module SourcesHelper
     end
   end
   
-  
-  # this is not actually implemented now or used
-  def find_dupes
-    result=nil
+  def update_pendings  
+    conditions="source_id=#{id}"
+    conditions << " and user_id=#{credential.user.id}" if credential
+    objs=ObjectValue.find :all, :conditions=>conditions, :order=> :pending_id
+    objs.each do |obj|  
+      pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
+      ActiveRecord::Base.connection.execute(pending_to_query)
+    end   
   end
 
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
@@ -71,19 +76,15 @@ module SourcesHelper
     ActiveRecord::Base.transaction do
       delete_cmd = "(update_type is not null) and source_id="+id.to_s
       (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
-      p "Deleting existing records: "+delete_cmd
+      p "Deleting existing query records: "+delete_cmd
       ObjectValue.delete_all delete_cmd
-      cnt=ObjectValue.count_by_sql "select count(*) from object_values where " + delete_cmd
-      p "Failed to delete " if cnt>0 
+=begin
       remove_dupe_pendings(credential)
-=begin WE SHOULDN'T ACTUALLY NEED THIS ANYMORE IF LOCKING WORKS
-      if (find_dupes)
-        raise "There are duplicates here"
-      end
-=end
       pending_to_query="update object_values set update_type='query',id=pending_id where update_type is null and source_id="+id.to_s
       (pending_to_query << " and user_id=" + credential.user.id.to_s) if credential
       ActiveRecord::Base.connection.execute(pending_to_query)
+=end
+      update_pendings
     end
     self.refreshtime=Time.new # timestamp    
   end

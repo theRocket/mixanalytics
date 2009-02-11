@@ -13,6 +13,9 @@ class SourcesController < ApplicationController
   # if a :last_update parameter is supplied then only show data that has been
   # refreshed (retrieved from the backend) since then
   protect_from_forgery :only => [:create, :delete, :update]
+  
+  def noaccess
+  end
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
@@ -47,7 +50,7 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     @app=@source.app
     if params[:question]
-      @object_values=@source.ask :question=>params[:question] 
+      @object_values=@source.ask(@current_user) :question=>params[:question] 
       @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
     else
       raise "You need to provide a question to answer"

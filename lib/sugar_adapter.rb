@@ -19,6 +19,7 @@ class SugarAdapter < SourceAdapter
     @query_filter = '' # you can also use SQL like 'accounts.name like '%company%''
     
     url = (credential and !credential.url.blank?) ? credential.url : source.url
+    p "Creating adapter for "+ url
     @client = SOAP::WSDLDriverFactory.new(url).create_rpc_driver
     @client.options['protocol.http.receive_timeout'] = 3600 
   end
