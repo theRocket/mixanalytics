@@ -120,3 +120,4 @@ class Wikipedia < SourceAdapter
     # links to other articles
     html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i,'href="/Wikipedia/WikipediaPage/{\1}/fetch" target="_top"')
   end
+end
