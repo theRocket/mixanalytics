@@ -55,6 +55,12 @@ class SourcesController < ApplicationController
       raise "You need to provide a question to answer"
     end
 
+    @object_values.collect! { |x|
+       x.id = x.hash_from_data(x.attrib,x.object,x.update_type,x.source_id,x.user_id,x.value)
+       x.db_operation = 'insert'
+       x.update_type = 'query'
+       x
+    }
     respond_to do |format|
       format.html { render :action=>"show"}
       format.xml  { render :action=>"show"}
