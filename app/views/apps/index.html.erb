@@ -36,12 +36,15 @@
   <td><%=link_to app.name, edit_app_path(app)%></td>
   <td><%=h app.description %></td>  
   <%if app.anonymous!=1 %>
-  <%sub=Membership.find_by_app_id_and_user_id app.id,@current_user.id%>
-    <%if sub and sub.credential %>
+  <%sub=Membership.find_by_app_id_and_user_id app.id,@current_user.id
+  %>
+    <%if sub  %>
       <td>
-      <%=link_to "Edit", {:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+      <% if sub.credential %>
+              <%=link_to "Edit", {:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
       <%else%>
-      <%=link_to "Create",{:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+              <%=link_to "Create",{:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+      <% end %>
       </td>
     <%end%>
   <%end%>

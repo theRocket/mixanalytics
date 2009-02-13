@@ -10,7 +10,7 @@ module SourcesHelper
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      redirect  :action=>"noaccess",:login=>username
+      render  :action=>"noaccess",:login=>username
     end
     logger.info "User: " + current_user.login + " permitted access."
   end
