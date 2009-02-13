@@ -14,13 +14,17 @@ class Wikipedia < SourceAdapter
   def ask(question)
     puts "Wikipedia ask with #{question.inspect.to_s}\n"
     
-    @search_query = question[:search]
-    
-    data = ask_wikipedia @search_query
+    data = ask_wikipedia question
     
     # return array of objects that correspond
-    [ ObjectValue.new(:source_id=>@source.id, :object => @search_query, :attrib => "data_length", :value => data.length.to_s),
-      ObjectValue.new(:source_id=>@source.id, :object => @search_query, :attrib => "data", :value => data) ]
+    [ ObjectValue.new(:source_id=>@source.id, 
+                      :object => question, 
+                      :attrib => "data_length", 
+                      :value => data.length.to_s),
+      ObjectValue.new(:source_id=>@source.id, 
+                      :object => question, 
+                      :attrib => "data", 
+                      :value => data) ]
   end
   
   ####### begin legacy interface #######
