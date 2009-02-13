@@ -32,26 +32,21 @@
     <th>Credentials</th>
   </tr>
 <%for app in @subapps %>
-
-<%if @current_user.login="anonymous" and app.anonymous %>
-  <td><%=link_to app.name, edit_app_path(app) %></td>
-  <td><%=h app.description %></td>
-<%end%>
-
-<%if @current_user.login!="anonymous" %>
 <tr>
   <td><%=link_to app.name, edit_app_path(app)%></td>
-  <td><%=h app.description %></td>
+  <td><%=h app.description %></td>  
+  <%if !app.anonymous %>
   <%sub=Membership.find_by_app_id_and_user_id app.id,@current_user.id%>
-  <%if sub and sub.credential%>
-  <td>
-    <%=link_to "Edit", {:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
-  <%else%>
-  <%=link_to "Create",{:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
-  </td>
+    <%if sub and sub.credential %>
+      <td>
+      <%=link_to "Edit", {:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+      <%else%>
+      <%=link_to "Create",{:action=>"getcred",:id=>app.id,:sub_id=>sub.id}%>
+      </td>
+    <%end%>
   <%end%>
 </tr>
-<%end%>
+
 <%end%>
 <%else%>
 You have no subscribed apps.
