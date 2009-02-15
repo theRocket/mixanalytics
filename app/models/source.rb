@@ -1,6 +1,7 @@
 class Source < ActiveRecord::Base
   include SourcesHelper
   has_many :object_values
+  has_many :source_logs
   belongs_to :app
   attr_accessor :source_adapter,:current_user,:credential
 
@@ -31,7 +32,7 @@ class Source < ActiveRecord::Base
 
   def refresh(current_user)
     @current_user=current_user
-    p "Logged in as: "+ current_user.login if current_user
+    logger.info "Logged in as: "+ current_user.login if current_user
     
     usersub=app.memberships.find_by_user_id(current_user.id) if current_user
     self.credential=usersub.credential if usersub # this variable is available in your source adapter

@@ -110,18 +110,24 @@ module SourcesHelper
   def process_update_type(utype,utypecall)
     objs=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
     objs.each do |x|
-      objvals=ObjectValue.find_all_by_object_and_update_type(x.object,utype)  # this has all the attribute value pairs now
-      attrvalues={}
-      attrvalues["id"]=x.object if utype!='create' # setting the ID allows it be an update or delete
-      objvals.each do |y|
-        attrvalues[y.attrib]=y.value
-        y.destroy
-      end
-      # now attrvalues has the attribute values needed for the createcall
-      nvlist=make_name_value_list(attrvalues)
-      if source_adapter
-        name_value_list=eval(nvlist)
-        eval("source_adapter." +utype +"(name_value_list)")
+      if x.object  
+        objvals=ObjectValue.find_all_by_object_and_update_type(x.object,utype)  # this has all the attribute value pairs now
+        attrvalues={}
+        attrvalues["id"]=x.object if utype!='create' # setting the ID allows it be an update or delete
+        objvals.each do |y|
+          attrvalues[y.attrib]=y.value
+          y.destroy
+        end
+        # now attrvalues has the attribute values needed for the createcall
+        nvlist=make_name_value_list(attrvalues)
+        if source_adapter
+          name_value_list=eval(nvlist)
+          eval("source_adapter." +utype +"(name_value_list)")
+        end
+      else
+        msg="Missing an object property on the objectvalue: " + x.id
+        raise msg
+        logger.info msg
       end
     end
   end

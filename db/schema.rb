@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090210025130) do
+ActiveRecord::Schema.define(:version => 20090214020726) do
 
   create_table "apps", :force => true do |t|
     t.string   "name"
@@ -79,6 +79,11 @@ ActiveRecord::Schema.define(:version => 20090210025130) do
 
   add_index "object_values", ["id"], :name => "by_ov_id"
   add_index "object_values", ["source_id", "user_id", "update_type"], :name => "by_source_user_type"
+
+  create_table "source_logs", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "sources", :force => true do |t|
     t.string   "name"
