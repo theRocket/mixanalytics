@@ -20,7 +20,7 @@ class AppsController < ApplicationController
     @sub.credential.save
     @sub.save
     flash[:notice]="Updated credential for membership"
-    redirect_to :action=>'index'
+    redirect_to :action=>'edit'
   end
 
   # GET /apps

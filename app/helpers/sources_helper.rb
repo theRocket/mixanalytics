@@ -1,4 +1,21 @@
 module SourcesHelper
+  
+  def slog(e,msg,source_id)
+    begin
+      l=SourceLog.new
+      l.source_id=source_id
+      l.error=e.inspect.to_s if not e.nil?
+      l.error||=""
+      l.message=msg
+      l.save
+    rescue
+    end
+  end
+  
+  def tlog(start,msg,source_id)
+    diff=(Time.new-start).round
+    slog(nil,msg+": "+diff.to_s+" seconds",source_id)
+  end
 
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
@@ -69,7 +86,7 @@ module SourcesHelper
         pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
         ActiveRecord::Base.connection.execute(pending_to_query)
       rescue RuntimeError => e
-        p "Failed to finalize object value (due to duplicate):" + e.to_s
+        slog(e,"Failed to finalize object value (due to duplicate)")
       end
     end   
   end

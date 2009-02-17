@@ -16,6 +16,11 @@ class SourcesController < ApplicationController
   
   def noaccess
   end
+  
+  def viewlog
+    p "Finding logs for source "+params[:id]
+    @logs=SourceLog.find_all_by_source_id params[:id],:order=>"updated_at desc"
+  end
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
