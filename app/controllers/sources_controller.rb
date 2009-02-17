@@ -27,6 +27,9 @@ class SourcesController < ApplicationController
     @source=Source.find params[:id]
     @app=@source.app
     check_access(@app)  
+    
+    usersub=@app.memberships.find_by_user_id(current_user.id) if current_user
+    @source.credential=usersub.credential if usersub # this variable is available in your source adapter
 
     @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
     objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
