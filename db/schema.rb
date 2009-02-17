@@ -69,7 +69,7 @@ ActiveRecord::Schema.define(:version => 20090214020726) do
     t.integer  "source_id"
     t.string   "attrib"
     t.string   "object"
-    t.text     "value",       :limit => 255
+    t.text     "value"
     t.string   "update_type"
     t.datetime "created_at"
     t.datetime "updated_at"
