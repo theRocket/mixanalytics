@@ -14,6 +14,9 @@ test:
   timeout: 5000
 
 production:
-  adapter: sqlite3
-  database: db/production.sqlite3
+  adapter: mysql
+  database: rhosync_production
   timeout: 15000
+  username: #{username}
+  password: #{password}
+  host: localhost
