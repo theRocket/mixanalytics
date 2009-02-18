@@ -52,11 +52,12 @@ class SiebelServiceRequests < SourceAdapter
       s=ServiceRequest.new
       s.LastUpdated=">= 01/01/2009 00:00:00"
       s.ServiceRequestId=""
-      # s.Subject=""
-      # s.CreatedDate=""
-      # s.AccountName=""
-      # s.Description=""
-      # s.Priority=""
+      s.Subject=""
+      s.CreatedDate=""
+      s.AccountName=""
+      s.Description=""
+      s.Priority=""
+      s.Type=""
       input.ListOfServiceRequest=[s]
       @result=@obj.serviceRequestQueryPage(input)
       puts "returning from query"
