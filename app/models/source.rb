@@ -1,6 +1,7 @@
 class Source < ActiveRecord::Base
   include SourcesHelper
   has_many :object_values
+  has_many :source_logs
   belongs_to :app
   attr_accessor :source_adapter,:current_user,:credential
 
@@ -31,23 +32,33 @@ class Source < ActiveRecord::Base
 
   def refresh(current_user)
     @current_user=current_user
-    p "Logged in as: "+ current_user.login if current_user
+    logger.info "Logged in as: "+ current_user.login if current_user
     
     usersub=app.memberships.find_by_user_id(current_user.id) if current_user
     self.credential=usersub.credential if usersub # this variable is available in your source adapter
     initadapter(self.credential)   
     # make sure to use @client and @session_id variable in your code that is edited into each source!
-    source_adapter.login  # should set up @session_id
+    begin
+      source_adapter.login  # should set up @session_id
+    rescue Exception=>e
+      p "Failed to login"
+      slog(e,"can't login",self.id)
+    end
     process_update_type('create',createcall)
     process_update_type('update',updatecall)
     process_update_type('delete',deletecall)      
     clear_pending_records(@credential)
     begin
+      p "Timing query"
+      start=Time.new
       source_adapter.query
-    rescue
+      tlog(start,"Query",self.id)
+    rescue Exception=>e
+      slog(e,"timed out on query",self.id)
     end
     source_adapter.sync
     finalize_query_records(@credential)
+
     source_adapter.logoff
     save
   end

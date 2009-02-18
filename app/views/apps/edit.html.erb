@@ -24,25 +24,27 @@
 <%=link_to 'Add Source',:controller=>"sources",:action=>"new",:app=>@app.id %>
 </p>
 <p>
-  <%= f.submit "Update Application Settings" %>
+  <%=f.submit "Update Application Settings"%>
 </p>
 <b>Access Control</b><br/>
 Anonymous (Allow All Users) <%=f.check_box :anonymous%><br/>
 <%end%>
-Or Subscribe Individual Users:<br/>
+Or Subscribe Individual Users:
 <table>
-<% @app.users.each do |sub| %>
-<tr><td><%= link_to sub.login + "(unsubscribe)",{:action=>:unsubscribe,:id=>@app.id,:subscriber=>sub.login}%></td></tr>
-<%end %>
+<% @app.users.each do |user| %>
+<%sub=Membership.find_by_app_id_and_user_id @app.id,user.id%>
+<tr><td><%=link_to user.login,{:action=>"getcred",:id=>@app.id,:sub_id=>sub.id}%></td><<td><%=link_to "(unsubscribe)",{:action=>:unsubscribe,:id=>@app.id,:subscriber=>user.login}%></td></tr>
+<%end%>
 </table>
 <p>
+Add Users<br/>
 <%form_for(:subscribe, @app,:url=>{:controller=>"apps",:action=>"subscribe",:id=>@app.id})  do |f|%>
 <select name="subscriber">
 <%@users.each do |user|%>
 <option value="<%=user.login%>"><%=user.login%></option>
 <%end%>
 </select>
-<i>Optional Credential (URL <input name="url" size=40">&nbsp;Login <input name="login" size="12">&nbsp;Password <input name="password" size="12">)</i>
+<i>Credential URL <input name="url" size=40">&nbsp;Login <input name="login" size="12">&nbsp;Password <input name="password" size="12">)</i>
 <br>
 <%= f.submit "Subscribe User" %>
 <%end%>

@@ -1,4 +1,21 @@
 module SourcesHelper
+  
+  def slog(e,msg,source_id)
+    begin
+      l=SourceLog.new
+      l.source_id=source_id
+      l.error=e.inspect.to_s if not e.nil?
+      l.error||=""
+      l.message=msg
+      l.save
+    rescue
+    end
+  end
+  
+  def tlog(start,msg,source_id)
+    diff=(Time.new-start).round
+    slog(nil,msg+": "+diff.to_s+" seconds",source_id)
+  end
 
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
@@ -10,7 +27,7 @@ module SourcesHelper
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      redirect  :action=>"noaccess",:login=>username
+      render  :action=>"noaccess",:login=>username
     end
     logger.info "User: " + current_user.login + " permitted access."
   end
@@ -69,7 +86,7 @@ module SourcesHelper
         pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
         ActiveRecord::Base.connection.execute(pending_to_query)
       rescue RuntimeError => e
-        p "Failed to finalize object value (due to duplicate):" + e.to_s
+        slog(e,"Failed to finalize object value (due to duplicate)")
       end
     end   
   end
@@ -110,18 +127,24 @@ module SourcesHelper
   def process_update_type(utype,utypecall)
     objs=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
     objs.each do |x|
-      objvals=ObjectValue.find_all_by_object_and_update_type(x.object,utype)  # this has all the attribute value pairs now
-      attrvalues={}
-      attrvalues["id"]=x.object if utype!='create' # setting the ID allows it be an update or delete
-      objvals.each do |y|
-        attrvalues[y.attrib]=y.value
-        y.destroy
-      end
-      # now attrvalues has the attribute values needed for the createcall
-      nvlist=make_name_value_list(attrvalues)
-      if source_adapter
-        name_value_list=eval(nvlist)
-        eval("source_adapter." +utype +"(name_value_list)")
+      if x.object  
+        objvals=ObjectValue.find_all_by_object_and_update_type(x.object,utype)  # this has all the attribute value pairs now
+        attrvalues={}
+        attrvalues["id"]=x.object if utype!='create' # setting the ID allows it be an update or delete
+        objvals.each do |y|
+          attrvalues[y.attrib]=y.value
+          y.destroy
+        end
+        # now attrvalues has the attribute values needed for the createcall
+        nvlist=make_name_value_list(attrvalues)
+        if source_adapter
+          name_value_list=eval(nvlist)
+          eval("source_adapter." +utype +"(name_value_list)")
+        end
+      else
+        msg="Missing an object property on the objectvalue: " + x.id
+        raise msg
+        logger.info msg
       end
     end
   end

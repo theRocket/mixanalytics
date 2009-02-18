@@ -42,6 +42,7 @@ class SugarAdapter < SourceAdapter
     ss = @client.login(ua,nil)
     if ss.error.number.to_i != 0
       p 'failed to login - #{ss.error.description}'
+      raise "Failed to login"
       return
     else
       @session_id = ss['id']

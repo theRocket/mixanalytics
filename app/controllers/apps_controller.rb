@@ -20,7 +20,7 @@ class AppsController < ApplicationController
     @sub.credential.save
     @sub.save
     flash[:notice]="Updated credential for membership"
-    redirect_to :action=>'index'
+    redirect_to :action=>'edit'
   end
 
   # GET /apps
@@ -33,7 +33,7 @@ class AppsController < ApplicationController
       flash[:notice]="You have no existing apps"
     end
     apps=App.find :all
-    @subapps=apps.reject { |app| !app.anonymous and !@current_user.apps.index(app) }
+    @subapps=apps.reject { |app| app.anonymous!=1 and !@current_user.apps.index(app) }
     
     respond_to do |format|
       format.html # index.html.erb
