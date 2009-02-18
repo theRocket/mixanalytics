@@ -1,5 +1,5 @@
 set :application, "rhosync"
-set :repository,  "git@github.com:rhomobile/rhosync.git"
+set :repository,  "git://github.com/rhomobile/rhosync.git"
 
 # If you aren't deploying to /u/apps/#{application} on the target
 # servers (which is the default), you can specify the actual location
