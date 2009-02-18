@@ -11,6 +11,7 @@ default_run_options[:pty] = true
 # If you aren't using Subversion to manage your source code, specify
 # your SCM below:
 set :scm, :git
+set :use_sudo, false
 
 server "rhohub.com", :app, :web, :db, :primary => true
 
