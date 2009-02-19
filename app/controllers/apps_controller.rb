@@ -28,7 +28,9 @@ class AppsController < ApplicationController
   def index
     login=@current_user.login.downcase 
     
-    @apps = App.find_all_by_admin login
+    admins = @current_user.administrations
+    p "admins" + admins.size.to_s
+    @apps=admins.map { |a| a.app}
     if @apps.nil?
       flash[:notice]="You have no existing apps"
     end
@@ -112,7 +114,9 @@ class AppsController < ApplicationController
   def create
     
     @app = App.new(params[:app])
-    @app.admin=current_user.login
+    admin=Administration.new
+    admin.user_id=current_user
+    admin.app_id=@app.id
     
     respond_to do |format|
       if @app.save

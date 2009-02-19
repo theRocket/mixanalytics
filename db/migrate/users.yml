@@ -3,14 +3,14 @@ anonymous:
   id: 1
   login: anonymous
   name: anonymous
-  password:
   email: anonymous@rhomobile.com
   crypted_password: 60f34fbfd74fd167441847fbf1972bb7618171b2
     
 admin:
   id: 2
   login: admin
-  password: password
   email: admin@rhomobile.com
+  crypted_password: 289fcd8b9d18df17458719a78ac325d0db44dd27
+  salt: 3792f1b046d084806a724f9e5c95feb4a5fff204
 
  
