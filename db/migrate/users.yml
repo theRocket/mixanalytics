@@ -7,10 +7,10 @@ anonymous:
   crypted_password: 60f34fbfd74fd167441847fbf1972bb7618171b2
     
 admin:
+  id: 2
   login: admin
   name: admin
   email: admin@rhohub.com
   crypted_password: 18e1109a1235ab40a65ae6486e33b091f2637f83
   salt: 0d47798bf1310dc6b629bcdf54e33bfbcd7d2bdf
-  state: active
  
