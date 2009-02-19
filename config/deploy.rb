@@ -1,3 +1,5 @@
+require 'erb'
+
 set :application, "rhosync"
 set :repository,  "git://github.com/rhomobile/rhosync.git"
 
@@ -30,11 +32,18 @@ namespace :deploy do
 
    run "touch #{current_path}/tmp/restart.txt"
  end
+ 
+ desc "Symlink the database config"
+ task :symlink_db_config do
+   run "ln -nfs #{shared_path}/config/database.yml #{latest_release}/config/database.yml"
+ end
 
  [:start, :stop].each do |t|
    desc "#{t} task is a no-op with mod_rails"
    task t, :roles => :app do ; end
  end
+ 
+ after "deploy:update_code", :symlink_db_config
 end
 
 namespace :rake do
