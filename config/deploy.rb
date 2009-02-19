@@ -43,7 +43,7 @@ namespace :deploy do
    task t, :roles => :app do ; end
  end
  
- after "deploy:update_code", :symlink_db_config
+ after "deploy:update_code", "deploy:symlink_db_config"
 end
 
 namespace :rake do
