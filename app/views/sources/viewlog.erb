@@ -1,0 +1,6 @@
+<table>
+<tr<th>Time</th><th>Error</th><th>Message</th></tr>
+<%@logs.each do |log|%>
+<tr><td><%=log.updated_at%></td><td><%=log.error%></td><td><%=log.message%></td></tr>
+<%end%>
+</table>
