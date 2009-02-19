@@ -49,7 +49,7 @@ end
 namespace :rake do
  desc "Load the sample data remotely"
  task :samples do
-   run("cd #{deploy_to}/current; /usr/bin/rake db:fixtures:samples")
+   run("cd #{deploy_to}/current; /usr/bin/rake db:fixtures:samples RAILS_ENV=production")
  end
  task :bootstrap do
    run("cd #{deploy_to}/current; /usr/bin/rake db:bootstrap RAILS_ENV=production")
