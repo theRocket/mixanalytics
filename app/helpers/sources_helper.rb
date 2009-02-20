@@ -20,16 +20,17 @@ module SourcesHelper
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
   def check_access(app)
-    matches_login=app.users.select{ |u| u.login==current_user.login}
-    matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
+    p "checking access for user "+@current_user.login
+    matches_login=app.users.select{ |u| u.login==@current_user.login}
+    matches_login << app.administrations.select { |a| a.user.login==@current_user.login } # let the administrators of the app in as well
     if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
       logger.info  "App is not anonymous and user was not found in subscriber list"
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      render  :action=>"noaccess",:login=>username
+      result=nil
     end
-    logger.info "User: " + current_user.login + " permitted access."
+    result=@current_user
   end
   
   def needs_refresh
@@ -86,7 +87,7 @@ module SourcesHelper
         pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
         ActiveRecord::Base.connection.execute(pending_to_query)
       rescue Exception => e
-        slog(e,"Failed to finalize object value (due to duplicate)")
+        slog(e,"Failed to finalize object value (due to duplicate)",id)
       end
     end   
   end
@@ -97,7 +98,6 @@ module SourcesHelper
     ActiveRecord::Base.transaction do
       delete_cmd = "(update_type is not null) and source_id="+id.to_s
       (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
-      p "Deleting existing query records: "+delete_cmd
       ObjectValue.delete_all delete_cmd
 =begin
       remove_dupe_pendings(credential)
