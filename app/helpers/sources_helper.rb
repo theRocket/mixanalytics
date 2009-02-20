@@ -85,7 +85,7 @@ module SourcesHelper
       begin
         pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
         ActiveRecord::Base.connection.execute(pending_to_query)
-      rescue RuntimeError => e
+      rescue Exception => e
         slog(e,"Failed to finalize object value (due to duplicate)")
       end
     end   
