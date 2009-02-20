@@ -29,7 +29,6 @@ class AppsController < ApplicationController
     login=@current_user.login.downcase 
     
     admins = @current_user.administrations
-    p "admins" + admins.size.to_s
     @apps=admins.map { |a| a.app}
     if @apps.nil?
       flash[:notice]="You have no existing apps"
@@ -47,6 +46,7 @@ class AppsController < ApplicationController
   # GET /apps/1.xml
   def show
     @app = App.find params[:id]
+    @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?
     @sources=@app.sources
     @users=User.find :all
     
@@ -82,6 +82,10 @@ class AppsController < ApplicationController
   def edit
     @app = App.find(params[:id]) 
     @users = User.find :all
+    @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?
+    if !@isadmin 
+      redirect_to :action=>"show"
+    end
   end
   
   # subscribe specified subscriber to specified app ID
@@ -108,7 +112,26 @@ class AppsController < ApplicationController
     @app.users.delete @user
     redirect_to :action=>:edit
   end
-
+  
+  # add specified user as administrator
+  def administer
+    user=User.find_by_login params[:administrator]
+    @app=App.find(params[:id])
+    admin=Administration.new
+    admin.user=user
+    admin.save
+    @app.administrations << admin
+    redirect_to :action=>:edit
+  end
+  
+  def unadminister
+    user=User.find_by_login params[:administrator]
+    @app=App.find params[:id]
+    @admin=Administrations.find_by_user_id_and_app_id user.id,@app.id  
+    @app.admins.delete @admin
+    redirect_to :action=>:edit
+  end
+  
   # POST /apps
   # POST /apps.xml
   def create

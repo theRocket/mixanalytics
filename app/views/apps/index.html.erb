@@ -1,5 +1,5 @@
-<h3>Your Owned Apps</h3>
-<%=@current_user.login%><%if @apps and @apps.size>0%>, below are your RhoSync applications.
+<h3>Your Administered Apps</h3>
+<%=@current_user.login%><%if @apps and @apps.size>0%>, below are the RhoSync applications that you are an administrator of.
 <table>
   <tr>
     <th>Name</th>
@@ -17,9 +17,9 @@
   <% end %>
 </table>
 <%else%>
-, you have no owned apps.
+, you have no administered apps.
 <%end%>
-
+<br/>
 <%= link_to 'Create new app', new_app_path %><p/>
 
 <p/>
