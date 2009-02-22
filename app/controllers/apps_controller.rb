@@ -46,7 +46,8 @@ class AppsController < ApplicationController
   # GET /apps/1.xml
   def show
     @app = App.find params[:id]
-    @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?
+    @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?  
+    @sub=Membership.find_by_app_id_and_user_id @app.id,@current_user.id
     @sources=@app.sources
     @users=User.find :all
     
@@ -99,6 +100,7 @@ class AppsController < ApplicationController
       @sub.credential.url=params[:url]
       @sub.credential.login=params[:login]
       @sub.credential.password=params[:password]
+      @sub.credential.token=params[:token]
       @sub.credential.save
       @sub.save
     end

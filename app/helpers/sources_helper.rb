@@ -1,20 +1,22 @@
 module SourcesHelper
   
-  def slog(e,msg,source_id)
+  def slog(e,msg,source_id,type=nil,time=nil)
     begin
       l=SourceLog.new
       l.source_id=source_id
       l.error=e.inspect.to_s if not e.nil?
       l.error||=""
       l.message=msg
+      l.type=type
+      l.time=time
       l.save
     rescue
     end
   end
   
-  def tlog(start,msg,source_id)
+  def tlog(start,type,source_id)
     diff=(Time.new-start).round
-    slog(nil,msg+": "+diff.to_s+" seconds",source_id)
+    slog(nil,"Timing: "+diff.to_s+" seconds",source_id,type,diff)
   end
 
   # determines if the logged in users is a subscriber of the current app or 

@@ -42,7 +42,7 @@ class Source < ActiveRecord::Base
       source_adapter.login  # should set up @session_id
     rescue Exception=>e
       p "Failed to login"
-      slog(e,"can't login",self.id)
+      slog(e,"can't login",self.id,"login")
     end
     process_update_type('create',createcall)
     process_update_type('update',updatecall)
@@ -52,11 +52,13 @@ class Source < ActiveRecord::Base
       p "Timing query"
       start=Time.new
       source_adapter.query
-      tlog(start,"Query",self.id)
+      tlog(start,"query",self.id)
     rescue Exception=>e
       slog(e,"timed out on query",self.id)
     end
+    start=Time.new
     source_adapter.sync
+    t.log(start,"sync",self.id)
     finalize_query_records(@credential)
 
     source_adapter.logoff
