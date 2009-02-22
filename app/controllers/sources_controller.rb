@@ -18,7 +18,7 @@ class SourcesController < ApplicationController
   end
   
   def viewlog
-    p "Finding logs for source "+params[:id]
+    @source=Source.find params[:id]
     @logs=SourceLog.find :all, :conditions=>{:source_id=>params[:id]},:order=>"updated_at desc"
   end
 
@@ -321,7 +321,7 @@ class SourcesController < ApplicationController
     end
     @source = Source.find(params[:id])
     @app=@source.app
-    @apps=App.find_all_by_admin(current_user.login) 
+    @apps=Administration.find_all_by_user_id(current_user.id) 
     render :action=>"edit"
   end
 

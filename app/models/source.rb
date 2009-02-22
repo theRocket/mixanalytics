@@ -58,7 +58,7 @@ class Source < ActiveRecord::Base
     end
     start=Time.new
     source_adapter.sync
-    t.log(start,"sync",self.id)
+    tlog(start,"sync",self.id)
     finalize_query_records(@credential)
 
     source_adapter.logoff

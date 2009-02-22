@@ -4,7 +4,7 @@ class CreateSourceLogs < ActiveRecord::Migration
       t.string :error
       t.string :message
       t.integer :time
-      t.string :type
+      t.string :operation
       t.integer :source_id
       t.timestamps
     end
