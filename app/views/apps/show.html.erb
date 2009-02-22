@@ -1,0 +1,28 @@
+
+<b>App Name</b><%= @app.name %><br/>
+<b>Description</b><%= @app.description %><br/>
+<b>Your Credential</b>
+<%if @app.anonymous!=1 %>
+  <%if @sub  %>
+    <% if @sub.credential %>
+            <%=link_to "Edit", {:action=>"getcred",:id=>@app.id,:sub_id=>@sub.id}%>
+    <%else%>
+            <%=link_to "Create",{:action=>"getcred",:id=>@app.id,:sub_id=>@sub.id}%>
+    <% end %>
+  <%end%>
+<%end%>
+<br/>
+<b>Sources</b><%=link_to "(Refresh All)",:controller=>"apps",:action=>"refresh",:id=>@app.id%><br/>
+<table>
+<tr><th>Name</th><th>Priority</th></tr>
+<% @app.sources.each do |source| %>
+<tr>
+<td><%=link_to source.name,:controller=>"sources",:action=>"show",:id=>source.id%></td>
+<td><%=source.priority%></td>
+<td><%= link_to "Refresh",:controller=>"sources",:action=>"refresh",:id=>source.id%></td>
+</tr>
+<%end %>
+</table>
+<p>
+<%= link_to 'Back to applications list', apps_path %>
+</p>
