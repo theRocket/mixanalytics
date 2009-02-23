@@ -90,111 +90,6 @@ SiebelServiceRequests:
   password: password1
   app_id: 2
 
-  prolog: |
-    https = Net::HTTP.new(url,"443")
-    https.use_ssl = true
-    https.verify_mode = OpenSSL::SSL::VERIFY_NONE
-    headers={"UserName"=>login,"Password"=>password}
-    @session_id=nil
-    https.start do |https|
-        req = Net::HTTP::Get.new("/Services/Integration?command=login", headers)
-        response = https.request(req)
-        resp = response.body
-        p "Response " + resp
-        @session_id=response['Set-Cookie']
-    end
-    session=@session_id.to_s
-    start=session.index('=')
-    finish=session.index(';')
-    session=session[start+1...finish] if start and finish
-    endpoint_url ='https://secure-ausomxbha.crmondemand.com/Services/Integration/ServiceRequest;jsessionid='+session
-    obj = Default_Binding_ServiceRequest.new(endpoint_url)
-    obj.wiredump_dev = STDERR
-    http=nil
-
-  call: |
-    input=ServiceRequestWS_ServiceRequestQueryPage_Input.new
-    input.startRowNum=0
-    s=ServiceRequest.new
-    s.serviceRequestId=""
-    s.subject=""
-    s.createdDate=""
-    s.accountName=""
-    s.description=""
-    s.priority=""
-    input.listOfServiceRequest=[s]
-    output=obj.serviceRequestQueryPage(input)
-
-  sync: |
-    output.listOfServiceRequest.each do |x|
-        # subject
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x.serviceRequestId
-        o.attrib="subject"
-        o.value=x.subject
-        o.save
-        #accountName
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x.serviceRequestId
-        o.attrib="accountName"
-        o.value=x.accountName
-        o.save
-        #description
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x.serviceRequestId
-        o.attrib="description"
-        o.value=x.description
-        o.update_type="pending"
-        o.save
-        #priority
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x.serviceRequestId
-        o.attrib="priority"
-        o.value=x.priority
-        o.save
-        #createdDate attribute
-        o=ObjectValue.new
-        o.source_id=id
-        o.object=x.serviceRequestId
-        o.attrib="createdDate"
-        o.value=x.createdDate
-        o.save
-    end
-
-  createcall: |
-      ServiceRequestWS_ServiceRequestInsert_Input.new
-      s=ServiceRequest.new
-      s.serviceRequestId=""
-      s.accountName=name_value_list[0]["value"] # account name
-      s.description=name_value_list[1]["value"] # description
-      s.priority=name_value_list[2]["value"] # priority
-      s.subject=name_value_list[3]["value"] # subject
-      input.listOfServiceRequest=[s]
-      output=obj.serviceRequestInsert(input)
-
-  deletecall: |
-    input=ServiceRequestWS_ServiceRequestDelete_Input.new
-    s=ServiceRequest.new
-    s.serviceRequestId=name_value_list[0]["value"] # ID
-    input.listOfServiceRequest=[s]
-    output=obj.serviceRequestDelete(input)
-
-  updatecall: |
-    input=ServiceRequestWS_ServiceRequestUpdate_Input.new
-    s=ServiceRequest.new
-    s.accountName=name_value_list[0]["value"] # account name
-    s.description=name_value_list[1]["value"] # description
-    s.priority=name_value_list[2]["value"] # priority
-    s.serviceRequestId=name_value_list[3]["value"] # subject
-    input.listOfServiceRequest=[s]
-    output=obj.serviceRequestUpdate(input)
-
-  epilog:
-
 LighthouseProjects:
   id: 5
   app_id: 4
@@ -203,11 +98,7 @@ LighthouseProjects:
   url: "http://rhomobile.lighthouseapp.com"
   login: 
   password: 
-  prolog: ""
-  deletecall: ""
-  sync: ""
-  updatecall: ""
-  call: ""
+
   
 LighthouseMilestones:
   id: 6
@@ -217,11 +108,6 @@ LighthouseMilestones:
   url: "http://rhomobile.lighthouseapp.com"
   login: 
   password: 
-  prolog: ""
-  deletecall: ""
-  sync: ""
-  updatecall: ""
-  call: ""
   
 LighthouseTickets:
   id: 7
@@ -231,11 +117,6 @@ LighthouseTickets:
   url: "http://rhomobile.lighthouseapp.com"
   login: 
   password: 
-  prolog: ""
-  deletecall: ""
-  sync: ""
-  updatecall: ""
-  call: ""
 
 LighthouseUsers:
   id: 8
@@ -245,11 +126,6 @@ LighthouseUsers:
   url: "http://rhomobile.lighthouseapp.com"
   login: 
   password: 
-  prolog: ""
-  deletecall: ""
-  sync: ""
-  updatecall: ""
-  call: ""
   
 LighthouseTicketVersions:
   id: 9
@@ -259,11 +135,6 @@ LighthouseTicketVersions:
   url: "http://rhomobile.lighthouseapp.com"
   login: 
   password: 
-  prolog: ""
-  deletecall: ""
-  sync: ""
-  updatecall: ""
-  call: ""
   
 LighthouseSettings:
   id: 10
@@ -273,9 +144,4 @@ LighthouseSettings:
   url: "http://rhomobile.lighthouseapp.com"
   login: 
   password: 
-  prolog: ""
-  deletecall: ""
-  sync: ""
-  updatecall: ""
-  call: ""
       
