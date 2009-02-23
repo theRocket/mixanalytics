@@ -6,11 +6,11 @@
     <%= f.label "Application" %> 
     <select id="source_app_id" name="source[app_id]">
       <%@apps.each do |a| %>
-        <option value="<%=a.id%>"
-<%if @source.app_id==a.id%>
+        <option value="<%=a.app.id%>"
+<%if @source.app_id==a.app.id%>
  selected
 <%end%>
-><%=a.name%></option>
+><%=a.app.name%></option>
       <%end%>
     </select>
   </p>

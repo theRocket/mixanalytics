@@ -18,7 +18,7 @@ class SourcesController < ApplicationController
   end
   
   def viewlog
-    p "Finding logs for source "+params[:id]
+    @source=Source.find params[:id]
     @logs=SourceLog.find :all, :conditions=>{:source_id=>params[:id]},:order=>"updated_at desc"
   end
 
@@ -26,27 +26,29 @@ class SourcesController < ApplicationController
   def show
     @source=Source.find params[:id]
     @app=@source.app
-    check_access(@app)  
-    
-    usersub=@app.memberships.find_by_user_id(current_user.id) if current_user
-    @source.credential=usersub.credential if usersub # this variable is available in your source adapter
+    if !check_access(@app)  
+      render :action=>"noaccess"
+    else 
+      usersub=@app.memberships.find_by_user_id(current_user.id) if current_user
+      @source.credential=usersub.credential if usersub # this variable is available in your source adapter
+      @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
+      objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
+      objectvalues_cmd << " and user_id=" + @source.credential.user.id.to_s if @source.credential
+      objectvalues_cmd << " order by object,attrib"
 
-    @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
-    objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
-    objectvalues_cmd << " and user_id=" + @source.credential.user.id.to_s if @source.credential
-    objectvalues_cmd << " order by object,attrib"
-    # if client_id is provided, return only relevant object for that client
-    if params[:client_id] and params[:id]
-      @object_values=process_objects_for_client(@source, params[:client_id]) 
-    else
-      @object_values=ObjectValue.find_by_sql objectvalues_cmd
-    end
-    @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
-    p "Sending #{@object_values.length} records to #{params[:client_id]}" if params[:client_id] and @object_values
-    respond_to do |format|
-      format.html 
-      format.xml  { render :xml => @object_values}
-      format.json
+      # if client_id is provided, return only relevant object for that client
+      if params[:client_id] and params[:id]
+        @object_values=process_objects_for_client(@source, params[:client_id]) 
+      else
+        @object_values=ObjectValue.find_by_sql objectvalues_cmd
+      end
+      @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
+      p "Sending #{@object_values.length} records to #{params[:client_id]}" if params[:client_id] and @object_values
+      respond_to do |format|
+        format.html 
+        format.xml  { render :xml => @object_values}
+        format.json
+      end
     end
   end
   
@@ -319,7 +321,7 @@ class SourcesController < ApplicationController
     end
     @source = Source.find(params[:id])
     @app=@source.app
-    @apps=App.find_all_by_admin(current_user.login) 
+    @apps=Administration.find_all_by_user_id(current_user.id) 
     render :action=>"edit"
   end
 

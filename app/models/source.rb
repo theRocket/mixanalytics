@@ -16,6 +16,11 @@ class Source < ActiveRecord::Base
   
   def initadapter(credential)
     #create a source adapter with methods on it if there is a source adapter class identified
+    if (credential and credential.url.blank?) or (!credential and self.url.blank?)
+      msg= "Need to to have a URL for the source in either a user credential or globally"
+      slog(nil,msg,self.id)
+      raise msg
+    end
     if not self.adapter.blank? 
       @source_adapter=(Object.const_get(self.adapter)).new(self,credential)
     else # if source_adapter is nil it will
@@ -42,21 +47,23 @@ class Source < ActiveRecord::Base
       source_adapter.login  # should set up @session_id
     rescue Exception=>e
       p "Failed to login"
-      slog(e,"can't login",self.id)
+      slog(e,"can't login",self.id,"login")
     end
-    process_update_type('create',createcall)
-    process_update_type('update',updatecall)
-    process_update_type('delete',deletecall)      
+    process_update_type('create')
+    process_update_type('update')
+    process_update_type('delete')      
     clear_pending_records(@credential)
     begin
       p "Timing query"
       start=Time.new
       source_adapter.query
-      tlog(start,"Query",self.id)
+      tlog(start,"query",self.id)
     rescue Exception=>e
       slog(e,"timed out on query",self.id)
     end
+    start=Time.new
     source_adapter.sync
+    tlog(start,"sync",self.id)
     finalize_query_records(@credential)
 
     source_adapter.logoff

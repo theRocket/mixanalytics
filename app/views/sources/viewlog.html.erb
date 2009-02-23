@@ -1,0 +1,10 @@
+<h3>Source <%=@source.name%>Logging</h4>
+<table border=1>
+<tr<th>Timestamp</th><th>Error</th><th>Message</th><th>Operation</th><th>Timing</th></tr>
+<%@logs.each do |log|%>
+<tr>
+<td><%=log.updated_at%></td><td><%=log.error%></td><td><%=log.message%></td><td><%=log.operation%></td>
+<td><%=log.time%></td>
+</th></tr>
+<%end%>
+</table>

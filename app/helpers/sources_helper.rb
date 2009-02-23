@@ -1,35 +1,40 @@
 module SourcesHelper
   
-  def slog(e,msg,source_id)
+  def slog(e,msg,source_id,operation=nil,time=nil)
     begin
+      p "Logging "+msg+ " for "+ source_id.to_s
       l=SourceLog.new
       l.source_id=source_id
       l.error=e.inspect.to_s if not e.nil?
       l.error||=""
       l.message=msg
+      l.operation=operation
+      l.time=time
       l.save
     rescue
+      p "Failed to save source log message"
     end
   end
   
-  def tlog(start,msg,source_id)
+  def tlog(start,operation,source_id)
     diff=(Time.new-start).round
-    slog(nil,msg+": "+diff.to_s+" seconds",source_id)
+    slog(nil,"Timing: "+diff.to_s+" seconds",source_id,operation,diff)
   end
 
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
   def check_access(app)
-    matches_login=app.users.select{ |u| u.login==current_user.login}
-    matches_login << app.admin if app.admin==current_user.login  # let the administrator of the app in as well
+    p "checking access for user "+@current_user.login
+    matches_login=app.users.select{ |u| u.login==@current_user.login}
+    matches_login << app.administrations.select { |a| a.user.login==@current_user.login } # let the administrators of the app in as well
     if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
       logger.info  "App is not anonymous and user was not found in subscriber list"
       logger.info "User: " + current_user.login + " not allowed access."
       username = current_user.login
       username ||= "unknown"
-      render  :action=>"noaccess",:login=>username
+      result=nil
     end
-    logger.info "User: " + current_user.login + " permitted access."
+    result=@current_user
   end
   
   def needs_refresh
@@ -86,7 +91,7 @@ module SourcesHelper
         pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
         ActiveRecord::Base.connection.execute(pending_to_query)
       rescue Exception => e
-        slog(e,"Failed to finalize object value (due to duplicate)")
+        slog(e,"Failed to finalize object value (due to duplicate)",id)
       end
     end   
   end
@@ -97,7 +102,6 @@ module SourcesHelper
     ActiveRecord::Base.transaction do
       delete_cmd = "(update_type is not null) and source_id="+id.to_s
       (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
-      p "Deleting existing query records: "+delete_cmd
       ObjectValue.delete_all delete_cmd
 =begin
       remove_dupe_pendings(credential)
@@ -124,7 +128,7 @@ module SourcesHelper
     end
   end
     
-  def process_update_type(utype,utypecall)
+  def process_update_type(utype)
     objs=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
     objs.each do |x|
       if x.object  
