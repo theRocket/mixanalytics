@@ -16,7 +16,7 @@ class Source < ActiveRecord::Base
   
   def initadapter(credential)
     #create a source adapter with methods on it if there is a source adapter class identified
-    if (credential and credential.url.blank?) or (!credential and self.url.blank?)
+    if (credential and credential.url.blank?) and (!credential and self.url.blank?)
       msg= "Need to to have a URL for the source in either a user credential or globally"
       slog(nil,msg,self.id)
       raise msg
@@ -32,7 +32,9 @@ class Source < ActiveRecord::Base
     usersub=app.memberships.find_by_user_id(current_user.id) if current_user
     self.credential=usersub.credential if usersub # this variable is available in your source adapter
     initadapter(self.credential)
+    start=Time.new
     source_adapter.ask question
+    tlog(start,"ask",self.id)
   end
 
   def refresh(current_user)

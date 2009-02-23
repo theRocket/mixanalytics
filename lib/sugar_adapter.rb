@@ -30,18 +30,19 @@ class SugarAdapter < SourceAdapter
 
   def login
     puts "SugarCRM #{@module_name} login"
-    if @source.credential
+    if @source.credential and !@source.credential.login.blank?
       u = @source.credential.login
       p = Digest::MD5.hexdigest(@source.credential.password)
     else
       u = @source.login
+      p "Login "+u
       p = Digest::MD5.hexdigest(@source.password)
     end
   
     ua = {'user_name' => u,'password' => p}
     ss = @client.login(ua,nil)
     if ss.error.number.to_i != 0
-      p 'failed to login - #{ss.error.description}'
+      p "failed to login - #{ss.error.description} with #{u},#{p}"
       raise "Failed to login"
       return
     else
