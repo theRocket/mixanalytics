@@ -128,7 +128,7 @@ module SourcesHelper
     end
   end
     
-  def process_update_type(utype,utypecall)
+  def process_update_type(utype)
     objs=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
     objs.each do |x|
       if x.object  
