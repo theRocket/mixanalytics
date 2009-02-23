@@ -2,15 +2,17 @@ module SourcesHelper
   
   def slog(e,msg,source_id,operation=nil,time=nil)
     begin
+      p "Logging "+msg+ " for "+ source_id.to_s
       l=SourceLog.new
       l.source_id=source_id
       l.error=e.inspect.to_s if not e.nil?
       l.error||=""
       l.message=msg
-      l.operating=operating
+      l.operation=operation
       l.time=time
       l.save
     rescue
+      p "Failed to save source log message"
     end
   end
   

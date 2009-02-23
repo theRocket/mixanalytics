@@ -16,6 +16,11 @@ class Source < ActiveRecord::Base
   
   def initadapter(credential)
     #create a source adapter with methods on it if there is a source adapter class identified
+    if (credential and credential.url.blank?) or (!credential and self.url.blank?)
+      msg= "Need to to have a URL for the source in either a user credential or globally"
+      slog(nil,msg,self.id)
+      raise msg
+    end
     if not self.adapter.blank? 
       @source_adapter=(Object.const_get(self.adapter)).new(self,credential)
     else # if source_adapter is nil it will
