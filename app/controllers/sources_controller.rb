@@ -47,7 +47,7 @@ class SourcesController < ApplicationController
       respond_to do |format|
         format.html 
         format.xml  { render :xml => @object_values}
-        format.json { render :xml => @object_values}
+        format.json
       end
     end
   end
