@@ -11,6 +11,13 @@
 
 ActiveRecord::Schema.define(:version => 20090219230647) do
 
+  create_table "administrations", :force => true do |t|
+    t.integer  "app_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "apps", :force => true do |t|
     t.string   "name"
     t.string   "admin"
@@ -22,7 +29,7 @@ ActiveRecord::Schema.define(:version => 20090219230647) do
 
   create_table "client_maps", :id => false, :force => true do |t|
     t.string   "client_id",       :limit => 36
-    t.integer  "object_value_id"
+    t.integer  "object_value_id", :limit => 255
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -44,18 +51,10 @@ ActiveRecord::Schema.define(:version => 20090219230647) do
     t.string   "login"
     t.string   "password"
     t.string   "token"
-    t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "membership_id"
-    t.string   "url"
-  end
-
-  create_table "credentials_sources", :force => true do |t|
-    t.integer  "credential_id"
-    t.integer  "source_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "url"
   end
 
   create_table "memberships", :force => true do |t|
@@ -69,18 +68,21 @@ ActiveRecord::Schema.define(:version => 20090219230647) do
     t.integer  "source_id"
     t.string   "attrib"
     t.string   "object"
-    t.text     "value"
+    t.text     "value",       :limit => 255
     t.string   "update_type"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "pending_id"
     t.integer  "user_id"
   end
 
-  add_index "object_values", ["id"], :name => "by_ov_id"
   add_index "object_values", ["source_id", "user_id", "update_type"], :name => "by_source_user_type"
 
   create_table "source_logs", :force => true do |t|
+    t.string   "error"
+    t.string   "message"
+    t.integer  "time"
+    t.string   "operation"
+    t.integer  "source_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -88,19 +90,10 @@ ActiveRecord::Schema.define(:version => 20090219230647) do
   create_table "sources", :force => true do |t|
     t.string   "name"
     t.string   "url"
-    t.string   "method"
     t.string   "login"
     t.string   "password"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.text     "prolog"
-    t.text     "epilog"
-    t.text     "call"
-    t.text     "sync"
-    t.string   "type"
-    t.text     "createcall"
-    t.text     "updatecall"
-    t.text     "deletecall"
     t.datetime "refreshtime"
     t.string   "adapter"
     t.integer  "app_id"
