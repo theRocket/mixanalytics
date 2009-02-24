@@ -33,8 +33,9 @@ class Source < ActiveRecord::Base
     self.credential=usersub.credential if usersub # this variable is available in your source adapter
     initadapter(self.credential)
     start=Time.new
-    source_adapter.ask question
+    result=source_adapter.ask question
     tlog(start,"ask",self.id)
+    result
   end
 
   def refresh(current_user)

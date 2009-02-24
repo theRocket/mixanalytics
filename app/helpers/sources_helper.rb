@@ -11,8 +11,8 @@ module SourcesHelper
       l.operation=operation
       l.time=time
       l.save
-    rescue
-      p "Failed to save source log message"
+    rescue Exception=>e
+      p "Failed to save source log message: " + e
     end
   end
   
