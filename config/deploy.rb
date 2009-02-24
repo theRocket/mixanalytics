@@ -3,10 +3,30 @@ require 'erb'
 set :application, "rhosync"
 set :repository,  "git://github.com/rhomobile/rhosync.git"
 
+########################################################################
+
+STAGES = %w(staging production) 
+
+STAGES.each do |name| 
+  desc "Set the target stage to `#{name}'." 
+  task(name) do 
+    set :stage, name.to_sym
+    set :rails_env, name.to_sym 
+    load "config/deploy/#{stage}" 
+  end 
+end 
+
+on :start, :except => STAGES do 
+  if !exists?(:stage) 
+    abort "no stage specified, please choose one of #{STAGES.join(", ")}" 
+  end 
+end
+ 
+########################################################################
+
 # If you aren't deploying to /u/apps/#{application} on the target
 # servers (which is the default), you can specify the actual location
 # via the :deploy_to variable:
-set :deploy_to, "/var/www/apps/prod/#{application}"
 
 default_run_options[:pty] = true
 
@@ -15,7 +35,6 @@ default_run_options[:pty] = true
 set :scm, :git
 set :use_sudo, false
 
-server "rhohub.com", :app, :web, :db, :primary => true
 
 set :user, "www-data"
 
