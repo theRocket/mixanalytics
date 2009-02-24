@@ -63,7 +63,7 @@ class Wikipedia < SourceAdapter
   protected
   
   def wiki_name(raw_string)
-    ERB::Util.url_encode(raw_string.gsub(" ", "_"))
+    raw_string == "::Home" ? raw_string : ERB::Util.url_encode(raw_string.gsub(" ", "_"))
   end
   
   def ask_wikipedia(search)
