@@ -129,6 +129,8 @@ class Wikipedia < SourceAdapter
   def rewrite_urls(html)
     # images
     html = html.gsub('<img src="/images/logo-en.png" />', '<img src="http://en.m.wikipedia.org/images/logo-en.png" />')
+    html = html.gsub(%Q(src='/images/w.gif'), %Q(src='http://en.m.wikipedia.org/images/w.gif'))
+    
     # javascripts
     html = html.gsub('window.location', 'top.location')
     html = html.gsub('/wiki/::Random', '/Wikipedia/WikipediaPage/{::Random}/fetch')
