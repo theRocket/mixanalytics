@@ -73,7 +73,6 @@ class SugarAdapter < SourceAdapter
   def sync
     puts "SugarCRM #{@module_name} sync with #{@result.entry_list.length}"
         
-    # TODO: cannot have fields named "type" or other reserved ruby keywords either for that matter
     user_id=@source.current_user.id
     @result.entry_list.each do |x|      
       x.name_value_list.each do |y|

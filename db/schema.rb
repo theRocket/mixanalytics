@@ -73,6 +73,7 @@ ActiveRecord::Schema.define(:version => 20090219230647) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
+    t.integer  "pending_id"
   end
 
   add_index "object_values", ["source_id", "user_id", "update_type"], :name => "by_source_user_type"
