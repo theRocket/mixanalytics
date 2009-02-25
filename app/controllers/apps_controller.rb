@@ -83,6 +83,7 @@ class AppsController < ApplicationController
   def edit
     @app = App.find(params[:id]) 
     @users = User.find :all
+    @admins= Administration.find_all_by_app_id @app.id
     @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?
     if !@isadmin 
       redirect_to :action=>"show"
@@ -127,10 +128,11 @@ class AppsController < ApplicationController
   end
   
   def unadminister
-    user=User.find_by_login params[:administrator]
+    admin=User.find_by_login params[:administrator]
     @app=App.find params[:id]
-    @admin=Administrations.find_by_user_id_and_app_id user.id,@app.id  
-    @app.admins.delete @admin
+    administration=Administration.find_by_user_id_and_app_id admin.id,@app.id  
+    p "Deleting administration " + administration.app_id.to_s + ":" + administration.user_id.to_s
+    administration.delete
     redirect_to :action=>:edit
   end
   

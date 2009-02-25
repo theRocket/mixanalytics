@@ -1,6 +1,6 @@
 
-<b>App Name</b><%= @app.name %><br/>
-<b>Description</b><%= @app.description %><br/>
+<b>App Name</b>&nbsp;<%= @app.name %><br/>
+<b>Description</b>&nbsp;<%= @app.description %><br/>
 <b>Your Credential</b>
 <%if @app.anonymous!=1 %>
   <%if @sub  %>
@@ -12,14 +12,14 @@
   <%end%>
 <%end%>
 <br/>
-<b>Sources</b><%=link_to "(Refresh All)",:controller=>"apps",:action=>"refresh",:id=>@app.id%><br/>
+<b>Sources</b>&nbsp;<%=link_to "(Refresh All)",:controller=>"apps",:action=>"refresh",:id=>@app.id%><br/>
 <table>
 <tr><th>Name</th><th>Priority</th></tr>
 <% @app.sources.each do |source| %>
 <tr>
 <td><%=link_to source.name,:controller=>"sources",:action=>"show",:id=>source.id%></td>
 <td><%=source.priority%></td>
-<td><%= link_to "Refresh",:controller=>"sources",:action=>"refresh",:id=>source.id%></td>
+<td><%= link_to "Refresh",:controller=>"sources",:action=>"show",:id=>source.id,:refresh=>1%></td>
 </tr>
 <%end %>
 </table>
