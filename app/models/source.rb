@@ -14,6 +14,14 @@ class Source < ActiveRecord::Base
     self.priority||=3
   end
   
+  def to_param
+    name.gsub(/[^a-z0-9]+/i, '-') unless new_record?
+  end
+  
+  def self.find_by_permalink(link)
+    Source.find(:first, :conditions => ["id =:link or name =:link", {:link=> link}])
+  end
+  
   def initadapter(credential)
     #create a source adapter with methods on it if there is a source adapter class identified
     if (credential and credential.url.blank?) and (!credential and self.url.blank?)
