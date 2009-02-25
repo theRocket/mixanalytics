@@ -7,6 +7,7 @@ require 'net/https'
 class SourcesController < ApplicationController
 
   before_filter :login_required, :except => :clientcreate
+  before_filter :find_source
   
   include SourcesHelper
   # shows all object values in XML structure given a supplied source
@@ -18,13 +19,11 @@ class SourcesController < ApplicationController
   end
   
   def viewlog
-    @source=Source.find params[:id]
     @logs=SourceLog.find :all, :conditions=>{:source_id=>params[:id]},:order=>"updated_at desc"
   end
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
-    @source=Source.find params[:id]
     @app=@source.app
     if !check_access(@app)  
       render :action=>"noaccess"
@@ -56,7 +55,6 @@ class SourcesController < ApplicationController
   # parameters:
   #   question
   def ask
-    @source=Source.find params[:id]
     @app=@source.app
     if params[:question]
       @object_values=@source.ask(@current_user,params[:question])
@@ -82,7 +80,6 @@ class SourcesController < ApplicationController
   # return the metadata for the specified source
   # ONLY FOR SUBSCRIBERS/ADMIN
   def attributes
-    @source=Source.find params[:id]
     check_access(@source.app)
     # get the distinct list of attributes that is available
     @attributes=ObjectValue.find_by_sql "select distinct(attrib) from object_values where source_id="+params[:id]
@@ -127,7 +124,6 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def createobjects
-    @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
     @client = Client.find_by_client_id(params[:client_id]) if params[:client_id]
@@ -171,7 +167,6 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def updateobjects
-    @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
     params[:attrvals].each do |x|  # for each hash in the array
@@ -204,7 +199,6 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def deleteobjects
-    @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
     params[:attrvals].each do |x|
@@ -236,9 +230,7 @@ class SourcesController < ApplicationController
   end
 
   def newobject
-    @source=Source.find params[:id]
   end
-
 
   def pick_load
     # go to the view to pick the file to load
@@ -278,9 +270,6 @@ class SourcesController < ApplicationController
     flash[:notice]="Saved sources"
     redirect_to :action=>"index"
   end
-
-
-
   
   # GET /sources
   # GET /sources.xml
@@ -346,7 +335,6 @@ class SourcesController < ApplicationController
   # PUT /sources/1
   # PUT /sources/1.xml
   def update
-    @source = Source.find(params[:id])
     @app=App.find params["source"]["app_id"]
 
     respond_to do |format|
@@ -374,7 +362,6 @@ class SourcesController < ApplicationController
   # DELETE /sources/1
   # DELETE /sources/1.xml
   def destroy
-    @source=Source.find(params[:id])
     @source.destroy
     @app=App.find params[:app_id]
     respond_to do |format|
@@ -383,4 +370,8 @@ class SourcesController < ApplicationController
     end
   end
 
+protected
+  def find_source
+    @source=Source.find(params[:id]) if params[:id]
+  end
 end
