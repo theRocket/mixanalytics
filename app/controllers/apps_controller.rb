@@ -115,7 +115,7 @@ class AppsController < ApplicationController
   # add specified user as administrator
   def administer
     user=User.find_by_login params[:administrator]
-    @app=App.find(params[:id])
+    @app=App.find_by_permalink(params[:id])
     admin=Administration.new
     admin.user=user
     admin.save
@@ -125,7 +125,7 @@ class AppsController < ApplicationController
   
   def unadminister
     admin=User.find_by_login params[:administrator]
-    @app=App.find params[:id]
+    @app=App.find_by_permalink params[:id]
     administration=Administration.find_by_user_id_and_app_id admin.id,@app.id  
     p "Deleting administration " + administration.app_id.to_s + ":" + administration.user_id.to_s
     administration.delete
@@ -181,6 +181,6 @@ class AppsController < ApplicationController
   protected
   
   def find_app
-    @app = App.find(params[:id]) if params[:id]
+    @app = App.find_by_permalink(params[:id]) if params[:id]
   end
 end

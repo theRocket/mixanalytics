@@ -34,6 +34,6 @@
   <%= f.submit "Create Source" %>
 <% end %>
 
-<%=link_to "Back to application",{:controller=>"apps",:action=>"edit",:id=>@source.app_id} %>&nbsp;
+<%=link_to "Back to application", edit_app_path(@source.app) %>&nbsp;
 
 
