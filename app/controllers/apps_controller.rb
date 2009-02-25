@@ -141,9 +141,11 @@ class AppsController < ApplicationController
   def create
     
     @app = App.new(params[:app])
+    @app.save
     admin=Administration.new
-    admin.user_id=current_user
+    admin.user_id=@current_user.id
     admin.app_id=@app.id
+    admin.save
     
     respond_to do |format|
       if @app.save
