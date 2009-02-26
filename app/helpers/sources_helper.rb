@@ -175,7 +175,8 @@ module SourcesHelper
   # only delete and insert are required
   def process_objects_for_client(source,client,token,p_size=nil,repeat=false)
     
-    page_size = p_size.nil? ? 50 : p_size.to_i
+    # default page size of 10000
+    page_size = p_size.nil? ? 10000 : p_size.to_i
     last_sync_time = Time.now
     
     # Setup the join conditions
