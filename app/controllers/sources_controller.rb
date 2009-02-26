@@ -38,7 +38,15 @@ class SourcesController < ApplicationController
 
       # if client_id is provided, return only relevant object for that client
       if params[:client_id] and params[:id]
-        @object_values=process_objects_for_client(@source, params[:client_id]) 
+        @client = setup_client(params[:client_id])
+        if params[:token]
+          @token=params[:token] == 'last' ? @client.last_sync_token : params[:token].to_i
+          @object_values=process_objects_for_client(@source,@client,@token,true)
+        else
+          @token=rand(10000000000).to_i
+          @object_values=process_objects_for_client(@source,@client,@token)
+        end
+        @token=nil if @object_values.nil? or @object_values.length == 0
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end

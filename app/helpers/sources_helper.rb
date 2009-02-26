@@ -152,14 +152,8 @@ module SourcesHelper
       end
     end
   end
-
-  # creates an object_value list for a given client
-  # based on that client's client_map records
-  # and the current state of the object_values table
-  # since we do a delete_all in rhosync refresh, 
-  # only delete and insert are required
-  def process_objects_for_client(source,client_id)
-    
+  
+  def setup_client(client_id)
     # setup client & user association if it doesn't exist
     if client_id and client_id != 'client_id'
       @client = Client.find_by_client_id(client_id)
@@ -170,57 +164,102 @@ module SourcesHelper
       @client.user ||= current_user
       @client.save
     end
+    @client
+  end
+
+  
+  # creates an object_value list for a given client
+  # based on that client's client_map records
+  # and the current state of the object_values table
+  # since we do a delete_all in rhosync refresh, 
+  # only delete and insert are required
+  def process_objects_for_client(source,client,token,repeat=false)
     
+    page_size = 50
+    last_sync_time = Time.now
+    
+    # Setup the join conditions
+    object_value_join_conditions = "from object_values ov left join client_maps cm on \
+                                    ov.id = cm.object_value_id and \
+                                    cm.client_id = '#{client.id}'"
+    object_value_conditions = "#{object_value_join_conditions} \
+                               where ov.update_type = 'query' and \
+                                 ov.source_id = #{source.id} and \
+                                 (ov.user_id = #{current_user.id} or ov.user_id is NULL) and \
+                                 cm.object_value_id is NULL order by ov.object limit #{page_size}"                  
+    object_value_query = "select * #{object_value_conditions}"
+    
+    # setup fields to insert in client_maps table
+    object_insert_query = "select '#{client.id}' as a,id,'insert',#{token},'#{last_sync_time.to_s}', \
+                           '#{last_sync_time.to_s}' #{object_value_conditions}"
+                    
+    # received token: if we're repeating the show,
+    # quickly return the results (inserts + deletes)
+    if token and repeat
+      objs_to_return = get_delete_objs_by_token(token,page_size)
+      client.update_attributes({:updated_at => last_sync_time, :last_sync_token => token})
+      return objs_to_return.concat( get_insert_objs_by_token(object_value_join_conditions,token,page_size) )
+    end
+    
+    # no token, continue with processing
     # look for changes in the current object_values list, return only records
     # for the current user if required
     objs_to_return = []
-    
-    # VERY IMPORTANT - delete records that don't exist in the cache table anymore
-    # We MUST do this before the insert loop below to avoid ID collisions
     ActiveRecord::Base.transaction do
       objs_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
                                               cm.object_value_id = ov.id \
-                                              where cm.client_id='#{client_id}' and ov.id is NULL"
+                                              where cm.client_id='#{client.id}' and ov.id is NULL \
+                                              and cm.dirty = 'f' order by ov.object limit #{page_size}"
       objs_to_delete.each do |map|
         objs_to_return << new_delete_obj(map.object_value_id)
-        ActiveRecord::Base.connection.execute "delete from client_maps where object_value_id='#{map.object_value_id}' \
+        # update this client_map record with a dirty flag and the token, 
+        # so we don't send it more than once
+        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token=#{token},dirty='t' where \
+                                               object_value_id='#{map.object_value_id}' \
                                                and client_id='#{map.client_id}'"
       end
     end
     
-    # Setup the join conditions
-    object_value_conditions = "from object_values ov left join client_maps cm on \
-                                 ov.id = cm.object_value_id and \
-                                 cm.client_id = '#{client_id}' \
-                               where ov.update_type = 'query' and \
-                                 ov.source_id = #{source.id} and \
-                                 (ov.user_id = #{current_user.id} or ov.user_id is NULL) and \
-                                 cm.object_value_id is NULL"
-                                 
-    object_value_query = "select * #{object_value_conditions}"
-    
     # INDEX: BY_SOURCE_TYPE_USER
     objs_to_insert = ObjectValue.find_by_sql object_value_query
-    last_sync_time = Time.now
-    
-    object_insert_query = "select '#{client_id}' as a,id,'#{last_sync_time.to_s}', \
-                           '#{last_sync_time.to_s}' #{object_value_conditions}"
     
     # Add insert objects to client_maps based on 
     # join query w/ object_values
     ActiveRecord::Base.transaction do
       ActiveRecord::Base.connection.execute "insert into client_maps 
-                                             (client_id,object_value_id,created_at,updated_at) #{object_insert_query}"                                      
+                                             (client_id,object_value_id,db_operation,token,created_at,updated_at) \
+                                             #{object_insert_query}"                                      
     end
     
     # Update the last updated time for this client
     # to track the last sync time
-    @client.update_attribute(:updated_at, last_sync_time)
+    client.update_attributes({:updated_at => last_sync_time, :last_sync_token => token})
     
     # Setup return list (inserts + deletes)
     objs_to_insert.collect! {|x| x.db_operation = 'insert'; x}
     objs_to_return.concat(objs_to_insert)
   end
+  
+  
+  # helper methods to get objects referencing sync token
+  def get_insert_objs_by_token(join_conditions,token,page_size)
+    objs_to_return = ObjectValue.find_by_sql "select * #{join_conditions} where cm.token = #{token} \
+                                              and cm.object_value_id is not NULL \
+                                              and cm.db_operation != 'delete' \
+                                              order by ov.object"
+    return objs_to_return.collect! {|x| x.db_operation = 'insert'; x}
+  end
+  
+  def get_delete_objs_by_token(token,page_size)
+    objs_to_return = []
+    objs_to_delete = ClientMap.find_by_sql "select * from client_maps where token = #{token} \
+                                            and db_operation = 'delete'"
+    objs_to_delete.each do |map|
+      objs_to_return << new_delete_obj(map.object_value_id)
+    end
+    objs_to_return
+  end
+  
   
   # generates an object_value for the client
   # to delete
@@ -235,12 +274,5 @@ module SourcesHelper
     temp_obj.id = obj_id
     temp_obj.source_id = 0
     temp_obj
-  end
-  
-  # useful to be able to have the source adapter code available for viewing in YAML files
-  def save_to_yaml
-    File.open(name+'.yml','w') do |out|
-      out.puts to_yaml
-    end
   end
 end
