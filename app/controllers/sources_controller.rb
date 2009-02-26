@@ -40,10 +40,10 @@ class SourcesController < ApplicationController
         @client = setup_client(params[:client_id])
         if params[:token]
           @token=params[:token] == 'last' ? @client.last_sync_token : params[:token].to_i
-          @object_values=process_objects_for_client(@source,@client,@token,true)
+          @object_values=process_objects_for_client(@source,@client,@token,params[:p_size],true)
         else
           @token=rand(10000000000).to_i
-          @object_values=process_objects_for_client(@source,@client,@token)
+          @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
         end
         @token=nil if @object_values.nil? or @object_values.length == 0
       else

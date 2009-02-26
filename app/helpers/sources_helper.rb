@@ -173,9 +173,9 @@ module SourcesHelper
   # and the current state of the object_values table
   # since we do a delete_all in rhosync refresh, 
   # only delete and insert are required
-  def process_objects_for_client(source,client,token,repeat=false)
+  def process_objects_for_client(source,client,token,p_size=nil,repeat=false)
     
-    page_size = 50
+    page_size = p_size.nil? ? 50 : p_size.to_i
     last_sync_time = Time.now
     
     # Setup the join conditions
