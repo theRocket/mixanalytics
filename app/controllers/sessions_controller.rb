@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
   
   def client_login
     logout_keeping_session!
-    @app=App.find params[:app_id]
+    @app=App.find_by_permalink params[:app_id]
     user = User.authenticate(params[:login], params[:password])
     if user
       self.current_user = user
