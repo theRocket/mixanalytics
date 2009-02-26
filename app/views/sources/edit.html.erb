@@ -31,14 +31,14 @@
 <p>
 <%= f.submit "Update source adapter code" %>
 <%end%>
-<%=link_to 'Show records',{:action=>'show',:id=>@source.id,:app_id=>@source.app.id}%>&nbsp;
+<%=link_to 'Show records', app_source_path(@app, @source) %>&nbsp;
 <%=link_to 'Force refresh',{:action=>'show',:id=>@source.id,:app_id=>@source.app.id,:refresh=>1}%>&nbsp;
-<%=link_to 'View Log',{:action=>'viewlog',:id=>@source.id}%>
+<%=link_to 'View Log',{:action=>'viewlog',:id=>@source}%>
 <p>
 <form action="<%=url_for(:controller=>"sources",:action=>"ask",:id=>@source.id)%>">
 Question for Source Adapter <input name="question" size="50">&nbsp;<input type="submit" value="Ask!"/>
 </form>
 </p>
 <p>
-<%=link_to "Back to application",{:controller=>"apps",:action=>"edit",:id=>@source.app_id} %>&nbsp;
+<%=link_to "Back to application", edit_app_path(@source.app) %>&nbsp;
 </p>

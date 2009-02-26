@@ -17,7 +17,7 @@
 <tr><th>Name</th><th>Priority</th></tr>
 <% @app.sources.each do |source| %>
 <tr>
-<td><%=link_to source.name,:controller=>"sources",:action=>"show",:id=>source.id%></td>
+<td><%=link_to source.name, source_path(source) %></td>
 <td><%=source.priority%></td>
 <td><%= link_to "Refresh",:controller=>"sources",:action=>"show",:id=>source.id,:refresh=>1%></td>
 </tr>

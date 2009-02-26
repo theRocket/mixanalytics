@@ -7,6 +7,7 @@ require 'net/https'
 class SourcesController < ApplicationController
 
   before_filter :login_required, :except => :clientcreate
+  before_filter :find_source
   
   include SourcesHelper
   # shows all object values in XML structure given a supplied source
@@ -18,13 +19,11 @@ class SourcesController < ApplicationController
   end
   
   def viewlog
-    @source=Source.find params[:id]
-    @logs=SourceLog.find :all, :conditions=>{:source_id=>params[:id]},:order=>"updated_at desc"
+    @logs=SourceLog.find :all, :conditions=>{:source_id=>@source.id},:order=>"updated_at desc"
   end
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
-    @source=Source.find params[:id]
     @app=@source.app
     if !check_access(@app)  
       render :action=>"noaccess"
@@ -32,12 +31,12 @@ class SourcesController < ApplicationController
       usersub=@app.memberships.find_by_user_id(current_user.id) if current_user
       @source.credential=usersub.credential if usersub # this variable is available in your source adapter
       @source.refresh(@current_user) if params[:refresh] || @source.needs_refresh 
-      objectvalues_cmd="select * from object_values where update_type='query' and source_id="+params[:id]
+      objectvalues_cmd="select * from object_values where update_type='query' and source_id=#{@source.id}"
       objectvalues_cmd << " and user_id=" + @source.credential.user.id.to_s if @source.credential
       objectvalues_cmd << " order by object,attrib"
 
       # if client_id is provided, return only relevant object for that client
-      if params[:client_id] and params[:id]
+      if params[:client_id]
         @client = setup_client(params[:client_id])
         if params[:token]
           @token=params[:token] == 'last' ? @client.last_sync_token : params[:token].to_i
@@ -64,7 +63,6 @@ class SourcesController < ApplicationController
   # parameters:
   #   question
   def ask
-    @source=Source.find params[:id]
     @app=@source.app
     if params[:question]
       @object_values=@source.ask(@current_user,params[:question])
@@ -90,10 +88,9 @@ class SourcesController < ApplicationController
   # return the metadata for the specified source
   # ONLY FOR SUBSCRIBERS/ADMIN
   def attributes
-    @source=Source.find params[:id]
     check_access(@source.app)
     # get the distinct list of attributes that is available
-    @attributes=ObjectValue.find_by_sql "select distinct(attrib) from object_values where source_id="+params[:id]
+    @attributes=ObjectValue.find_by_sql "select distinct(attrib) from object_values where source_id="+@source.id
 
     respond_to do |format|
       format.html
@@ -135,7 +132,6 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def createobjects
-    @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
     @client = Client.find_by_client_id(params[:client_id]) if params[:client_id]
@@ -179,7 +175,6 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def updateobjects
-    @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
     params[:attrvals].each do |x|  # for each hash in the array
@@ -212,7 +207,6 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def deleteobjects
-    @source=Source.find params[:id]
     check_access(@source.app)
     objects={}
     params[:attrvals].each do |x|
@@ -240,13 +234,11 @@ class SourcesController < ApplicationController
 
   def editobject
     # bring up an editing form for
-    @object=ObjectValue.find_by_source_id_and_object_and_attrib params[:id],params[:object],params[:attrib]
+    @object=ObjectValue.find_by_source_id_and_object_and_attrib @source.id,params[:object],params[:attrib]
   end
 
   def newobject
-    @source=Source.find params[:id]
   end
-
 
   def pick_load
     # go to the view to pick the file to load
@@ -268,14 +260,14 @@ class SourcesController < ApplicationController
 
   def pick_save
     # go to the view to pick the file
-    @app=App.find params[:app_id] if params[:app_id]
+    @app=App.find_by_permalink params[:app_id] if params[:app_id]
   end
 
   def save_all
     if params[:app_id].nil?
       @app=App.find_by_admin request.headers['login']
     else
-      @app=App.find params[:app_id] 
+      @app=App.find_by_permalink params[:app_id] 
       @sources=@app.sources if @app
     end
     File.open(params[:yaml_file],'w') do |out|
@@ -286,9 +278,6 @@ class SourcesController < ApplicationController
     flash[:notice]="Saved sources"
     redirect_to :action=>"index"
   end
-
-
-
   
   # GET /sources
   # GET /sources.xml
@@ -298,7 +287,7 @@ class SourcesController < ApplicationController
     if params[:app_id].nil?
       @app=App.find_by_admin login
     else
-      @app=App.find params[:app_id] 
+      @app=App.find_by_permalink params[:app_id] 
     end
     @sources=@app.sources if @app
         
@@ -312,7 +301,7 @@ class SourcesController < ApplicationController
   # GET /sources/new.xml
   def new
     @source = Source.new
-    @source.app=App.find params[:app] if params[:app]
+    @source.app=App.find_by_permalink params[:app_id] if params[:app_id]
     @apps=App.find_all_by_admin(current_user.login)
     respond_to do |format|
       format.html # new.html.erb
@@ -327,7 +316,6 @@ class SourcesController < ApplicationController
     else
       p "Current user: " + current_user.login
     end
-    @source = Source.find(params[:id])
     @app=@source.app
     @apps=Administration.find_all_by_user_id(current_user.id) 
     render :action=>"edit"
@@ -337,7 +325,7 @@ class SourcesController < ApplicationController
   # POST /sources.xml
   def create
     @source = Source.new(params[:source])
-    @app=App.find params["source"]["app_id"]
+    @app=App.find_by_permalink params["source"]["app_id"]
     
     respond_to do |format|
       if @source.save
@@ -354,8 +342,7 @@ class SourcesController < ApplicationController
   # PUT /sources/1
   # PUT /sources/1.xml
   def update
-    @source = Source.find(params[:id])
-    @app=App.find params["source"]["app_id"]
+    @app=App.find_by_permalink params["source"]["app_id"]
 
     respond_to do |format|
       begin
@@ -382,13 +369,16 @@ class SourcesController < ApplicationController
   # DELETE /sources/1
   # DELETE /sources/1.xml
   def destroy
-    @source=Source.find(params[:id])
     @source.destroy
-    @app=App.find params[:app_id]
+    @app=App.find_by_permalink params[:app_id]
     respond_to do |format|
       format.html { redirect_to :controller=>"apps",:action=>"edit",:id=>@app.id }
       format.xml  { head :ok }
     end
   end
 
+protected
+  def find_source
+    @source=Source.find_by_permalink(params[:id]) if params[:id]
+  end
 end

@@ -1,6 +1,7 @@
 class AppsController < ApplicationController
   
   before_filter :login_required
+  before_filter :find_app
   
   def getcred
     @sub=Membership.find params[:sub_id]
@@ -45,7 +46,6 @@ class AppsController < ApplicationController
   # GET /apps/1
   # GET /apps/1.xml
   def show
-    @app = App.find params[:id]
     @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?  
     @sub=Membership.find_by_app_id_and_user_id @app.id,@current_user.id
     @sources=@app.sources
@@ -58,7 +58,6 @@ class AppsController < ApplicationController
   end
   
   def refresh # execute a refresh on all sources associated with an app 
-    @app=App.find params[:id]
     @sources=Source.find_all_by_app_id @app.id,:order=>:priority
     @sources.each do |src|
       p "Refreshing " + src.name
@@ -81,7 +80,6 @@ class AppsController < ApplicationController
 
   # GET /apps/1/edit
   def edit
-    @app = App.find(params[:id]) 
     @users = User.find :all
     @admins= Administration.find_all_by_app_id @app.id
     @isadmin=Administration.find_by_user_id_and_app_id @current_user.id,@app.id  # is the current user an admin?
@@ -93,7 +91,6 @@ class AppsController < ApplicationController
   # subscribe specified subscriber to specified app ID
   def subscribe
     user=User.find_by_login params[:subscriber]
-    @app=App.find(params[:id])
     @app.users << user
     if (params[:url]) # we have a URL of a credential
       @sub=Membership.find_by_user_id_and_app_id user.id,@app.id  # find the just created membership subscription
@@ -110,7 +107,6 @@ class AppsController < ApplicationController
 
   # unsubscribe subscriber to specified app ID 
   def unsubscribe
-    @app=App.find params[:id]
     @user=User.find_by_login params[:subscriber]    
     @app.users.delete @user
     redirect_to :action=>:edit
@@ -119,7 +115,7 @@ class AppsController < ApplicationController
   # add specified user as administrator
   def administer
     user=User.find_by_login params[:administrator]
-    @app=App.find(params[:id])
+    @app=App.find_by_permalink(params[:id])
     admin=Administration.new
     admin.user=user
     admin.save
@@ -129,7 +125,7 @@ class AppsController < ApplicationController
   
   def unadminister
     admin=User.find_by_login params[:administrator]
-    @app=App.find params[:id]
+    @app=App.find_by_permalink params[:id]
     administration=Administration.find_by_user_id_and_app_id admin.id,@app.id  
     p "Deleting administration " + administration.app_id.to_s + ":" + administration.user_id.to_s
     administration.delete
@@ -139,11 +135,12 @@ class AppsController < ApplicationController
   # POST /apps
   # POST /apps.xml
   def create
-    
     @app = App.new(params[:app])
+    @app.save
     admin=Administration.new
-    admin.user_id=current_user
+    admin.user_id=@current_user.id
     admin.app_id=@app.id
+    admin.save
     
     respond_to do |format|
       if @app.save
@@ -160,8 +157,6 @@ class AppsController < ApplicationController
   # PUT /apps/1
   # PUT /apps/1.xml
   def update
-    @app = App.find(params[:id])
-
     respond_to do |format|
       if @app.update_attributes(params[:app])
         flash[:notice] = 'App was successfully updated.'
@@ -177,12 +172,17 @@ class AppsController < ApplicationController
   # DELETE /apps/1
   # DELETE /apps/1.xml
   def destroy
-    @app = App.find(params[:id])
     @app.destroy
 
     respond_to do |format|
       format.html { redirect_to(apps_url) }
       format.xml  { head :ok }
     end
+  end
+  
+  protected
+  
+  def find_app
+    @app = App.find_by_permalink(params[:id]) if params[:id]
   end
 end
