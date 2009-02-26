@@ -191,7 +191,7 @@ module SourcesHelper
     object_value_query = "select * #{object_value_conditions}"
     
     # setup fields to insert in client_maps table
-    object_insert_query = "select '#{client.id}' as a,id,'insert',#{token},'#{last_sync_time.to_s}', \
+    object_insert_query = "select '#{client.id}' as a,id,'insert','#{token}','#{last_sync_time.to_s}', \
                            '#{last_sync_time.to_s}' #{object_value_conditions}"
                     
     # received token: if we're repeating the show,
@@ -215,7 +215,7 @@ module SourcesHelper
         objs_to_return << new_delete_obj(map.object_value_id)
         # update this client_map record with a dirty flag and the token, 
         # so we don't send it more than once
-        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token=#{token},dirty='t' where \
+        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token='#{token}',dirty='t' where \
                                                object_value_id='#{map.object_value_id}' \
                                                and client_id='#{map.client_id}'"
       end
@@ -242,18 +242,19 @@ module SourcesHelper
   end
   
   
-  # helper methods to get objects referencing sync token
+  # get insert objects based on token
   def get_insert_objs_by_token(join_conditions,token,page_size)
-    objs_to_return = ObjectValue.find_by_sql "select * #{join_conditions} where cm.token = #{token} \
+    objs_to_return = ObjectValue.find_by_sql "select * #{join_conditions} where cm.token = '#{token}' \
                                               and cm.object_value_id is not NULL \
                                               and cm.db_operation != 'delete' \
                                               order by ov.object"
     return objs_to_return.collect! {|x| x.db_operation = 'insert'; x}
   end
   
+  # get delete objects based on token
   def get_delete_objs_by_token(token,page_size)
     objs_to_return = []
-    objs_to_delete = ClientMap.find_by_sql "select * from client_maps where token = #{token} \
+    objs_to_delete = ClientMap.find_by_sql "select * from client_maps where token = '#{token}' \
                                             and db_operation = 'delete'"
     objs_to_delete.each do |map|
       objs_to_return << new_delete_obj(map.object_value_id)
