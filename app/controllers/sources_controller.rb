@@ -42,10 +42,12 @@ class SourcesController < ApplicationController
           @token=params[:token] == 'last' ? @client.last_sync_token : params[:token].to_s
           @object_values=process_objects_for_client(@source,@client,@token,params[:p_size],true)
         else
-          @token=rand(10000000000).to_s
+          # return num milliseconds since Jan 1 2009
+          @token= ((Time.now.to_f - Time.mktime(2009,"jan",1,0,0,0,0).to_f) * 10**6).to_i
           @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
         end
         @token=nil if @object_values.nil? or @object_values.length == 0
+        @client.update_attribute(:last_sync_token, @token) if @token
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end

@@ -234,7 +234,7 @@ module SourcesHelper
     
     # Update the last updated time for this client
     # to track the last sync time
-    client.update_attributes({:updated_at => last_sync_time, :last_sync_token => token})
+    client.update_attribute(:updated_at, last_sync_time)
     
     # Setup return list (inserts + deletes)
     objs_to_insert.collect! {|x| x.db_operation = 'insert'; x}
