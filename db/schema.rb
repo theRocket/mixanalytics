@@ -46,7 +46,7 @@ ActiveRecord::Schema.define(:version => 20090226165152) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "user_id"
-    t.integer  "last_sync_token"
+    t.string  "last_sync_token"
   end
 
   add_index "clients", ["client_id"], :name => "index_clients_on_client_id"
