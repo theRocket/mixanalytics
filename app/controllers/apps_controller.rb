@@ -1,6 +1,6 @@
 class AppsController < ApplicationController
   
-  before_filter :login_required
+  before_filter :login_required,:except=>"index"
   before_filter :find_app
   
   def getcred
@@ -27,16 +27,21 @@ class AppsController < ApplicationController
   # GET /apps
   # GET /apps.xml
   def index
-    login=@current_user.login.downcase 
-    
-    admins = @current_user.administrations
-    @apps=admins.map { |a| a.app}
+    if @current_user
+      login=@current_user.login.downcase 
+      admins = @current_user.administrations
+      ß@apps=admins.map { |a| a.app}
+    else
+      login="anonymous"
+      @current_user=User.find 1
+    end
+
     if @apps.nil?
       flash[:notice]="You have no existing apps"
     end
-    apps=App.find :all
-    @subapps=apps.reject { |app| app.anonymous!=1 and !@current_user.apps.index(app) }
-    
+    @allapps=App.find :all
+    @subapps=@allapps.reject { |app| app.anonymous!=1 and !@current_user.apps.index(app) }
+  
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @apps }

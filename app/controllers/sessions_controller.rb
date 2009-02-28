@@ -18,13 +18,17 @@ class SessionsController < ApplicationController
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
     else
-      render :status => 401
+      if @app.autoregister  # if its a "autoregistering" app just go ahead and create the user
+        user=User.new("login"=>params[:login],"password"=>params[:password])
+      else
+        render :status => 401
+      end
     end
   end
 
   def create
     logout_keeping_session!
-
+    @app=App.find params[:app_id]
     user = User.authenticate(params[:login], params[:password])
     if user
       # Protects against session fixation attacks, causes request forgery
@@ -38,13 +42,17 @@ class SessionsController < ApplicationController
       redirect_back_or_default('/')
       flash[:notice] = "Logged in successfully"
     else
-      note_failed_signin
-      @login       = params[:login]
-      @remember_me = params[:remember_me]
-      msg="Failed to login (bad password?)"
-      flash[:notice] = msg
-      @error=msg
-      render :action => 'new'
+      if @app.autoregister
+        user=User.new("login"=>params[:login],"password"=>params[:password])
+      else
+        note_failed_signin
+        @login       = params[:login]
+        @remember_me = params[:remember_me]
+        msg="Failed to login (bad password?)"
+        flash[:notice] = msg
+        @error=msg
+        render :action => 'new'
+      end
     end
 
   end
