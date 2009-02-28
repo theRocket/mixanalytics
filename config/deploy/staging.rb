@@ -1,6 +1,6 @@
-set :deploy_to, "/var/www/apps/#{application}"
-server "rhosyncdev.rhohub.com", :app, :web, :db, :primary => true
+set :deploy_to, "/var/www/apps/staging/#{application}"
+server "staging.rhohub.com", :app, :web, :db, :primary => true
 
-set :tag  'whatever'
+#set :tag  'whatever'
 
 run "echo 'Setting staging environment'"
