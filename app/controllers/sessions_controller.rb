@@ -1,6 +1,7 @@
 # This controller handles the login/logout function of the site.  
 class SessionsController < ApplicationController
-
+  include UsersHelper
+  
   # disable forgery protection for login
   # TODO: Only do this for json requests!
   protect_from_forgery :except => :client_login
@@ -11,15 +12,16 @@ class SessionsController < ApplicationController
   
   def client_login
     logout_keeping_session!
-    @app=App.find_by_permalink params[:app_id]
+    @app=App.find_by_permalink params[:app_id] if params[:app_id]
     user = User.authenticate(params[:login], params[:password])
     if user
       self.current_user = user
       new_cookie_flag = (params[:remember_me] == "1")
       handle_remember_cookie! new_cookie_flag
     else
-      if @app.autoregister  # if its a "autoregistering" app just go ahead and create the user
-        user=User.new("login"=>params[:login],"password"=>params[:password])
+      if @app and @app.autoregister  # if its a "autoregistering" app just go ahead and create the user
+        create_user params[:login],params[:password],params[:email]
+        redirect_back_or_default('/')
       else
         render :status => 401
       end
@@ -27,8 +29,9 @@ class SessionsController < ApplicationController
   end
 
   def create
+    p "create params: " + params.inspect.to_s
     logout_keeping_session!
-    @app=App.find params[:app_id]
+    @app=App.find_by_permalink params[:app_id] if params[:app_id]
     user = User.authenticate(params[:login], params[:password])
     if user
       # Protects against session fixation attacks, causes request forgery
@@ -42,8 +45,9 @@ class SessionsController < ApplicationController
       redirect_back_or_default('/')
       flash[:notice] = "Logged in successfully"
     else
-      if @app.autoregister
-        user=User.new("login"=>params[:login],"password"=>params[:password])
+      if @app and @app.autoregister
+        create_user params[:login],params[:password],params[:email]
+        redirect_back_or_default('/')
       else
         note_failed_signin
         @login       = params[:login]

@@ -1,5 +1,22 @@
 module UsersHelper
   
+  def create_user(login,password,email)
+    logout_keeping_session!
+    user={}
+    user[:login]=login
+    user[:name]=login
+    user[:password]=password
+    user[:password_confirmation]=password
+    user[:email]=email
+    @user = User.new(user)
+    begin
+      success = @user && @user.save
+      self.current_user=@user
+    rescue Exception
+      puts "Error: #{$!}"
+    end
+  end
+  
   #
   # Use this to wrap view elements that the user can't access.
   # !! Note: this is an *interface*, not *security* feature !!
