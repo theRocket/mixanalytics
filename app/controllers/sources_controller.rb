@@ -36,8 +36,18 @@ class SourcesController < ApplicationController
       objectvalues_cmd << " order by object,attrib"
 
       # if client_id is provided, return only relevant object for that client
-      if params[:client_id] # and params[:id] // if we dont have ID how do we get here?
-        @object_values=process_objects_for_client(@source, params[:client_id]) 
+      if params[:client_id]
+        @client = setup_client(params[:client_id])
+        if params[:token]
+          @token=params[:token] == 'last' ? @client.last_sync_token : params[:token].to_s
+          @object_values=process_objects_for_client(@source,@client,@token,params[:p_size],true)
+        else
+          # return num microseconds since Jan 1 2009
+          @token= ((Time.now.to_f - Time.mktime(2009,"jan",1,0,0,0,0).to_f) * 10**6).to_i
+          @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
+        end
+        @token=nil if @object_values.nil? or @object_values.length == 0
+        @client.update_attribute(:last_sync_token, @token) if @token
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end
