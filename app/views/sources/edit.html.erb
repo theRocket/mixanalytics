@@ -3,16 +3,7 @@
 <% form_for(@source,:url=>{:action=>:update}) do |f| %>
   <p>
     <%= f.label "Source Name" %> <%=f.text_field :name,:size=>20 %>&nbsp;
-    <%= f.label "Application" %> 
-    <select id="source_app_id" name="source[app_id]">
-      <%@apps.each do |a| %>
-        <option value="<%=a.app.id%>"
-<%if @source.app_id==a.app.id%>
- selected
-<%end%>
-><%=a.app.name%></option>
-      <%end%>
-    </select>
+    Application <%=a.app.name%><
   </p>
   <p>
     <%= f.label :url %><%= f.text_field "url", :size=>80%><br/>
