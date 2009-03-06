@@ -20,8 +20,9 @@ class SessionsController < ApplicationController
       handle_remember_cookie! new_cookie_flag
     else
       if @app and @app.autoregister  # if its a "autoregistering" app just go ahead and create the user
-        create_user params[:login],params[:password],params[:email]
-        redirect_back_or_default('/')
+        user=create_user params[:login],params[:password],params[:email]
+        @app.users << user
+        @app.save
       else
         render :status => 401
       end
@@ -46,7 +47,9 @@ class SessionsController < ApplicationController
       flash[:notice] = "Logged in successfully"
     else
       if @app and @app.autoregister
-        create_user params[:login],params[:password],params[:email]
+        user=create_user params[:login],params[:password],params[:email]
+        @app.users << user
+        @app.save        
         redirect_back_or_default('/')
       else
         note_failed_signin

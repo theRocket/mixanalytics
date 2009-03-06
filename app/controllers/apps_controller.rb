@@ -96,8 +96,7 @@ class AppsController < ApplicationController
   
   def add_user_to_app(login,app)
     user=User.find_by_login login
-    app.users << user
-    p "Adding user " + user.id.to_s + " to app " + app.id.to_s
+    app.users << user  if user
     app.save
     if (params[:url]) # we have a URL of a credential
       @sub=Membership.find_by_user_id_and_app_id user.id,app.id  # find the just created membership subscription
@@ -116,17 +115,15 @@ class AppsController < ApplicationController
     @app=App.find_by_permalink(params[:app_id]) if @app.nil?
     
     if params[:subscriber]
-      user=User.find_by_login params[:subscriber] 
+      @current_user=User.find_by_login params[:subscriber] 
+      user=@current_user
     else
-      if @current_user.nil? or @current_user.login=="anonymous"
+      if @current_user.nil? or @current_user.login=="anonymous" # create the new user on the fly
         redirect_to :controller=>"sessions/create",:login=>params[:login],:password=>params[:password],:email=>params[:email],:app_id=>params[:app_id]
-        add_user_to_app(params[:login],@app)
         return
       end
-      user=@current_user
     end
-    add_user_to_app(params[:login],@app)
-    
+    add_user_to_app(user.login,@app)
     redirect_to :action=>:edit
   end
 
