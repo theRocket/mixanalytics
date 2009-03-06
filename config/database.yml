@@ -13,10 +13,11 @@ test:
   database: db/test.sqlite3
   timeout: 5000
 
-production:
-  adapter: mysql
-  database: rhosync_production
-  timeout: 15000
-  username: #{username}
-  password: #{password}
-  host: localhost
+  production:
+    adapter: ibm_db
+    database: mix_prod
+    timeout: 15000
+    username: db2inst1
+    password: g00berf1sh
+    host: 174.129.252.229
+    port: 50001
