@@ -134,11 +134,11 @@ class Wikipedia < SourceAdapter
     
     # javascripts
     html = html.gsub('window.location', 'top.location')
-    html = html.gsub('/wiki/::Random', '/Wikipedia/WikipediaPage/{::Random}/fetch')
+    html = html.gsub('/wiki/::Random', '/app/WikipediaPage/{::Random}/fetch')
     #stylesheets
     html = html.gsub('<link href=\'/stylesheets/application.css\'', '<link href=\'http://m.wikipedia.org/stylesheets/application.css\'')
     # links to other articles
-    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i,'href="/Wikipedia/WikipediaPage/{\1}/fetch" target="_top"')
+    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i,'href="/app/WikipediaPage/{\1}/fetch" target="_top"')
     # redlinks
     html.gsub(%Q(href="/w/index.php?), %Q(target="_top" href="http://en.wikipedia.org/w/index.php?))
   end
