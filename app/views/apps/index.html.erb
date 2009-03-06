@@ -57,6 +57,20 @@
 You have no subscribed apps.
 <%end%>
 </table>
+<h3>Subscribe to an App</h3>
+
+<form action='<%=url_for(:controller=>"apps",:action=>"subscribe",:id=>1)%>'/>
+<select name="app_id">
+<%@allapps.each do |app|%>
+<option value="<%=app.id%>"><%=app.name%></option>
+<%end%>
+</select>
+<% if @current_user.login=="anonymous"%>
+Login&nbsp;<input name="login"/>Password&nbsp;<input name="password"/>Email&nbsp;<input name="email"/>
+
+<%end%>
+<input type="submit" value="Subscribe">
+</form>
 <p/>
 <%if @current_user.nil? or @current_user.login=="anonymous" %><br/>
 <%= link_to 'Login',{:controller=>'sessions',:action=>'new'}%><br/>

@@ -27,16 +27,22 @@ class AppsController < ApplicationController
   # GET /apps
   # GET /apps.xml
   def index
-    login=@current_user.login.downcase 
-    
-    admins = @current_user.administrations
-    @apps=admins.map { |a| a.app}
+    p 'current user: ' + @current_user.inspect.to_s
+    if @current_user
+      login=@current_user.login.downcase 
+      admins = @current_user.administrations
+      @apps=admins.map { |a| a.app}
+    else
+      login="anonymous"
+      @current_user=User.find 1
+    end
+
     if @apps.nil?
       flash[:notice]="You have no existing apps"
     end
-    apps=App.find :all
-    @subapps=apps.reject { |app| app.anonymous!=1 and !@current_user.apps.index(app) }
-    
+    @allapps=App.find :all
+    @subapps=@allapps.reject { |app| app.anonymous!=1 and !@current_user.apps.index(app) }
+  
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @apps }
@@ -88,12 +94,13 @@ class AppsController < ApplicationController
     end
   end
   
-  # subscribe specified subscriber to specified app ID
-  def subscribe
-    user=User.find_by_login params[:subscriber]
-    @app.users << user
+  def add_user_to_app(login,app)
+    user=User.find_by_login login
+    app.users << user
+    p "Adding user " + user.id.to_s + " to app " + app.id.to_s
+    app.save
     if (params[:url]) # we have a URL of a credential
-      @sub=Membership.find_by_user_id_and_app_id user.id,@app.id  # find the just created membership subscription
+      @sub=Membership.find_by_user_id_and_app_id user.id,app.id  # find the just created membership subscription
       @sub.credential=Credential.new
       @sub.credential.url=params[:url]
       @sub.credential.login=params[:login]
@@ -102,6 +109,24 @@ class AppsController < ApplicationController
       @sub.credential.save
       @sub.save
     end
+  end
+  
+  # subscribe specified subscriber to specified app ID
+  def subscribe
+    @app=App.find_by_permalink(params[:app_id]) if @app.nil?
+    
+    if params[:subscriber]
+      user=User.find_by_login params[:subscriber] 
+    else
+      if @current_user.nil? or @current_user.login=="anonymous"
+        redirect_to :controller=>"sessions/create",:login=>params[:login],:password=>params[:password],:email=>params[:email],:app_id=>params[:app_id]
+        add_user_to_app(params[:login],@app)
+        return
+      end
+      user=@current_user
+    end
+    add_user_to_app(params[:login],@app)
+    
     redirect_to :action=>:edit
   end
 

@@ -64,6 +64,7 @@ describe SessionsController do
                 it 'kills user token'        do @user.should_receive(:forget_me);         do_create end 
               end
             end
+
           end # inner describe
         end
       end

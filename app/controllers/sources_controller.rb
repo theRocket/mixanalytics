@@ -7,7 +7,7 @@ require 'net/https'
 class SourcesController < ApplicationController
 
   before_filter :login_required, :except => :clientcreate
-  before_filter :find_source
+  before_filter :find_source, :except => :clientcreate
   
   include SourcesHelper
   # shows all object values in XML structure given a supplied source
@@ -134,23 +134,44 @@ class SourcesController < ApplicationController
   # RETURNS:
   #   a hash of the object_values table ID columns as keys and the updated_at times as values
   def createobjects
-    check_access(@source.app)
-    objects={}
-    @client = Client.find_by_client_id(params[:client_id]) if params[:client_id]
-    params[:attrvals].each do |x| # for each hash in the array
-       # note that there should NOT be an object value for new records
-       o=ObjectValue.new
-       o.object=x["object"]
-       o.attrib=x["attrib"]
-       o.value=x["value"]
-       o.update_type="create"
-       o.source=@source
-       o.user_id=current_user.id
-       o.save
-       # add the created ID + created_at time to the list
-       objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects
-    end
+    @app=App.find_by_permalink(params[:app_id]) if params[:app_id]
+    if params[:id]=="rho_credential" # its trying to create a credential on the fly
+      @sub=Membership.find_or_create_by_user_id_and_app_id @currentuser.id,@app.id  # find the just created membership subscription
+      urlattribs=params[:attrvals].select {|av| av["attrib"]=="url"}
+      @sub.credential.url=urlattribs[0]["value"] if urlattribs
+    
+      loginattribs=params[:attrvals].select {|av| av["attrib"]=="login"}
+      @sub.credential.login=loginattribs[0]["value"] if loginattribs
+          
+      passwordattribs=params[:attrvals].select {|av| av["attrib"]=="password"}
+      @sub.credential.password=passwordattribs[0]["value"] if passwordattribs
 
+      tokenattribs=params[:attrvals].select {|av| av["attrib"]=="token"}      
+      @sub.credential.token=params[:token]
+    
+      @sub.credential.save
+      @sub.save
+    else  # just put the (noncredential) data into ObjectValues to get picked up by the backend source adapter
+      @source=Source.find_by_permalink(params[:id]) if params[:id]
+      check_access(@source.app)
+      objects={}
+      @client = Client.find_by_client_id(params[:client_id]) if params[:client_id]
+
+      params[:attrvals].each do |x| # for each hash in the array
+        # note that there should NOT be an object value for new records
+        o=ObjectValue.new
+        o.object=x["object"]
+        o.attrib=x["attrib"]
+        o.value=x["value"]
+        o.update_type="create"
+        o.source=@source
+        o.user_id=current_user.id
+        o.save
+        # add the created ID + created_at time to the list
+        objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects
+      end
+
+    end
     respond_to do |format|
       format.html { 
         flash[:notice]="Created objects"
