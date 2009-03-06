@@ -325,6 +325,7 @@ class SourcesController < ApplicationController
   def new
     @source = Source.new
     @source.app=App.find_by_permalink params[:app_id] if params[:app_id]
+    @app=@source.app
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @source }
