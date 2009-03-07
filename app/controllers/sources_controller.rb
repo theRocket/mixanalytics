@@ -43,7 +43,7 @@ class SourcesController < ApplicationController
           @object_values=process_objects_for_client(@source,@client,@token,params[:p_size],true)
         else
           # return num microseconds since Jan 1 2009
-          @token= ((Time.now.to_f - Time.mktime(2009,"jan",1,0,0,0,0).to_f) * 10**6).to_i
+          @token=get_new_token
           @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
         end
         @token=nil if @object_values.nil? or @object_values.length == 0
@@ -66,6 +66,7 @@ class SourcesController < ApplicationController
   #   question
   def ask
     @app=@source.app
+    @token=get_new_token
     if params[:question]
       @object_values=@source.ask(@current_user,params[:question])
       @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
@@ -401,6 +402,9 @@ class SourcesController < ApplicationController
   end
 
 protected
+  def get_new_token
+    ((Time.now.to_f - Time.mktime(2009,"jan",1,0,0,0,0).to_f) * 10**6).to_i
+  end
   def find_source
     @source=Source.find_by_permalink(params[:id]) if params[:id]
   end
