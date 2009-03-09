@@ -325,8 +325,10 @@ class SourcesController < ApplicationController
   # GET /sources/new.xml
   def new
     @source = Source.new
-    @source.app=App.find_by_permalink params[:app_id] if params[:app_id]
-    @app=@source.app
+    
+    @app=App.find_by_permalink params[:app_id] if params[:app_id]
+    @source.app=@app
+
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @source }
@@ -340,6 +342,7 @@ class SourcesController < ApplicationController
     else
       p "Current user: " + current_user.login
     end
+    @source=Source.find_by_permalink params[:id]
     @app=@source.app
     @apps=Administration.find_all_by_user_id(current_user.id) 
     render :action=>"edit"
@@ -349,7 +352,9 @@ class SourcesController < ApplicationController
   # POST /sources.xml
   def create
     @source = Source.new(params[:source])
+    
     @app=App.find_by_permalink params["source"]["app_id"]
+    @source.app=@app
     
     respond_to do |format|
       if @source.save
