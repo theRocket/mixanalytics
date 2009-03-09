@@ -24,6 +24,10 @@ class SourcesController < ApplicationController
 
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
+    if params["id"] == "rho_credential"
+      render :nothing => true and return
+    end
+    
     @app=@source.app
     if !check_access(@app)  
       render :action=>"noaccess"
@@ -137,21 +141,29 @@ class SourcesController < ApplicationController
   def createobjects
     @app=App.find_by_permalink(params[:app_id]) if params[:app_id]
     if params[:id]=="rho_credential" # its trying to create a credential on the fly
-      @sub=Membership.find_or_create_by_user_id_and_app_id @currentuser.id,@app.id  # find the just created membership subscription
+      @sub=Membership.find_or_create_by_user_id_and_app_id current_user.id,@app.id  # find the just created membership subscription
+      
+      # create new credential
+      unless @sub.credential
+        @sub.credential = Credential.create 
+      end
+      
       urlattribs=params[:attrvals].select {|av| av["attrib"]=="url"}
-      @sub.credential.url=urlattribs[0]["value"] if urlattribs
+      @sub.credential.url=urlattribs[0]["value"] if urlattribs.present?
     
       loginattribs=params[:attrvals].select {|av| av["attrib"]=="login"}
-      @sub.credential.login=loginattribs[0]["value"] if loginattribs
+      @sub.credential.login=loginattribs[0]["value"] if loginattribs.present?
           
       passwordattribs=params[:attrvals].select {|av| av["attrib"]=="password"}
-      @sub.credential.password=passwordattribs[0]["value"] if passwordattribs
+      @sub.credential.password=passwordattribs[0]["value"] if passwordattribs.present?
 
       tokenattribs=params[:attrvals].select {|av| av["attrib"]=="token"}      
-      @sub.credential.token=params[:token]
+      @sub.credential.token=tokenattribs[0]["value"] if tokenattribs.present?
     
       @sub.credential.save
       @sub.save
+      
+      objects = []
     else  # just put the (noncredential) data into ObjectValues to get picked up by the backend source adapter
       @source=Source.find_by_permalink(params[:id]) if params[:id]
       check_access(@source.app)

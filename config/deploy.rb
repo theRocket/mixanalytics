@@ -1,7 +1,7 @@
 require 'erb'
 
-set :application, "rhohub"
-set :repository,  "git://github.com/rhomobile/rhohub.git"
+set :application, "rhosync"
+set :repository,  "git://github.com/rhomobile/rhosync.git"
 
 ########################################################################
 

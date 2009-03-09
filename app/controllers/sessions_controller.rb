@@ -20,7 +20,8 @@ class SessionsController < ApplicationController
       handle_remember_cookie! new_cookie_flag
     else
       if @app and @app.autoregister  # if its a "autoregistering" app just go ahead and create the user
-        user=create_user params[:login],params[:password],params[:email]
+        user=create_user params[:login],params[:password]
+        self.current_user = user
         @app.users << user
         @app.save
       else
