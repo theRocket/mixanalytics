@@ -1,6 +1,6 @@
 class AddIndexToClientMap < ActiveRecord::Migration
   def self.up
-    add_index :client_maps,[:client_id,:object_value_id,:object_value_attrib,:object_value_value,:db_operation],:name=>'client_map'
+    add_index "client_maps", ["client_id", "object_value_id"], :name => "client_map_c_id_ov_id"
     add_index :clients,:client_id
   end
 
