@@ -25,7 +25,7 @@ class SourcesController < ApplicationController
   # ONLY SUBSCRIBERS MAY ACCESS THIS!
   def show
     if params["id"] == "rho_credential"
-      render :nothing => true and return
+      render :text => "[]" and return
     end
     
     @app=@source.app
