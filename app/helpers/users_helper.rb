@@ -1,20 +1,19 @@
 module UsersHelper
   
-  def create_user(login,password,email)
+  def create_user(login,password)
     logout_keeping_session!
     user={}
     user[:login]=login
     user[:name]=login
     user[:password]=password
     user[:password_confirmation]=password
-    user[:email]=email
     @user = User.new(user)
     begin
-      success = @user && @user.save
-      self.current_user=@user
+      @user.save!
     rescue Exception
       puts "Error: #{$!}"
     end
+    @user
   end
   
   #

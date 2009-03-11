@@ -9,12 +9,12 @@ class UsersController < ApplicationController
     logout_keeping_session!
     @user = User.new(params[:user])
     begin
-      success = @user && @user.save
+      success = @user && @user.save!
     rescue Exception
       puts "Error: #{$!}"
     end
     if success && @user.errors.empty?
-            # Protects against session fixation attacks, causes request forgery
+      # Protects against session fixation attacks, causes request forgery
       # protection if visitor resubmits an earlier form using back
       # button. Uncomment if you understand the tradeoffs.
       # reset session
