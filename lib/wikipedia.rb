@@ -20,16 +20,11 @@ class Wikipedia < SourceAdapter
   # we split this in 2 becasue the data portions are large and we only want
   # to load them selectively for pages to conserve RAM usage on device
   #
-  def ask(question_from_device)
-    puts "Wikipedia ask with #{question_from_device.inspect.to_s}\n"
+  def ask(params)
+    puts "Wikipedia ask with #{params.inspect.to_s}\n"
     
-    ask_params = CGI::parse(question_from_device)
-    puts "ask_params = #{ask_params.inspect.to_s}"
-    
-    question = ask_params['article'][0]
-    refresh = ask_params['refresh'][0]
-    
-    puts "question=#{question}\nrefresh=#{refresh}\n"
+    question = params['question']
+    refresh = params['refresh']
     
     data = ask_wikipedia question
     
