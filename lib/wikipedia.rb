@@ -20,14 +20,28 @@ class Wikipedia < SourceAdapter
   # we split this in 2 becasue the data portions are large and we only want
   # to load them selectively for pages to conserve RAM usage on device
   #
-  def ask(question)
-    puts "Wikipedia ask with #{question.inspect.to_s}\n"
+  def ask(question_from_device)
+    ask_params = CGI::parse(question_from_device)
+    
+    question = ask_params['article'][0]
+    refresh = ask_params['refresh'][0]
+    
+    puts "Wikipedia ask with #{ask_params.inspect.to_s}\n"
     
     data = ask_wikipedia question
     
     header_id = "header_#{question}"
     data_id = "data_#{question}"
     
+    # if we are asking to refresh an existing page we have to give it a new object id
+    # that is different that the existing object ID or we will get duplicates on the device
+    # here we append "_refresh". Device should delete "_refresh" version and overwrite existing
+    # TODO: what if there is a device error and there is already a _refresh on device
+    if refresh
+      header_id += "_refresh"
+      data_id += "_refresh"
+    end
+      
     # return array of objects that correspond
     [ 
       ObjectValue.new(:source_id=>@source.id, :object => header_id, 
