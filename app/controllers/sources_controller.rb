@@ -384,7 +384,7 @@ class SourcesController < ApplicationController
   # PUT /sources/1.xml
   def update
     @app=App.find_by_permalink params["source"]["app_id"]
-
+    p "Application is: "+ @app.name
     respond_to do |format|
       begin
         if @source.update_attributes(params[:source])
@@ -399,7 +399,7 @@ class SourcesController < ApplicationController
             flash[:notice] = $!
           end
 
-          format.html { render :action => "edit" }
+          format.html { render :action => "edit",:id=>@app.id }
           format.xml  { render :xml => @source.errors, :status => :unprocessable_entity }
         end
       end
