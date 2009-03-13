@@ -179,6 +179,15 @@ class SourcesController < ApplicationController
         o.update_type="create"
         o.source=@source
         o.user_id=current_user.id
+        
+        if x["type"] and x["type"] == 'blob'
+          
+          o.blob = request.body if request.body
+          o.blob.instance_write(:content_type, "image/png")
+          o.blob.instance_write(:file_name, x["blob_file_name"])
+          puts "BLOB: #{o.blob.inspect}"
+          puts "BLOB URL: #{o.blob.url}"
+        end
         o.save
         # add the created ID + created_at time to the list
         objects[o.id]=o.created_at if not objects.keys.index(o.id)  # add to list of objects

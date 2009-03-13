@@ -5,6 +5,7 @@ class ObjectValue < ActiveRecord::Base
   belongs_to :source
   has_many :clients, :through => :client_maps
   has_many :client_maps
+  has_attached_file :blob
   
   attr_accessor :db_operation
 
