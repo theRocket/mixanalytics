@@ -72,7 +72,7 @@ class SourcesController < ApplicationController
     @app=@source.app
     @token=get_new_token
     if params[:question]
-      @object_values=@source.ask(@current_user,params[:question])
+      @object_values=@source.ask(@current_user,params)
       @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples
     else
       raise "You need to provide a question to answer"
