@@ -53,6 +53,7 @@ class LighthouseTicketVersions < SourceAdapter
       # and number itself is not unique, here we also append the timestamp since there willl always be more 
       # than 1 version for same project_id-number
       id = "#{version['project-id'][0]['content']}-#{version['number'][0]['content']}-#{version['updated-at'][0]['content']}"
+      puts "LighthouseTicketVersions id=#{id}"
       
       # here we just want to know who made the change and when, other fields we dont save to DB
       %w(updated-at user-id).each do |key|
