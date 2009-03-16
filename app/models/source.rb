@@ -61,7 +61,7 @@ class Source < ActiveRecord::Base
       slog(e,"can't login",self.id,"login")
     end
     begin 
-      process_update_type('create',self.id)
+      process_update_type('create')
     rescue Exception=>e
       slog(e, "Failed to create",self.id)
     end 

@@ -146,7 +146,7 @@ module SourcesHelper
           eval("source_adapter." +utype +"(name_value_list)")
         end
       else
-        msg="Missing an object property on the objectvalue: " + x.id
+        msg="Missing an object property on the objectvalue: " + x.id.to_s
         raise msg
         logger.info msg
       end
