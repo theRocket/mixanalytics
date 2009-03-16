@@ -60,11 +60,27 @@ class Source < ActiveRecord::Base
       p "Failed to login"
       slog(e,"can't login",self.id,"login")
     end
-    process_update_type('create')
-    process_update_type('update')
-    process_update_type('delete')      
-    clear_pending_records(@credential)
+    begin 
+      process_update_type('create',self.id)
+    rescue Exception=>e
+      slog(e, "Failed to create",self.id)
+    end 
     begin
+      process_update_type('update')
+    rescue Exception=>e
+      slog(e, "Failed to update",self.id)
+    end
+    begin
+      process_update_type('delete')
+    rescue Exception=>e
+      slog(e, "Failed to delete",self.id)
+    end
+    begin
+      clear_pending_records(@credential)
+    rescue Exception=>e
+      slog(e, "Failed to clear pending records",self.id)
+    end
+    begin  
       p "Timing query"
       start=Time.new
       source_adapter.query
