@@ -207,17 +207,15 @@ module SourcesHelper
     # for the current user if required
     objs_to_return = []
     ActiveRecord::Base.transaction do
-      dirty_flag = is_sqlite? ? "'f'" : 0
       objs_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
                                               cm.object_value_id = ov.id \
                                               where cm.client_id='#{client.id}' and ov.id is NULL \
-                                              and cm.dirty =#{dirty_flag} order by ov.object limit #{page_size}"
+                                              and cm.dirty =0 order by ov.object limit #{page_size}"
       objs_to_delete.each do |map|
         objs_to_return << ObjectValue.new_delete_obj(map.object_value_id)
         # update this client_map record with a dirty flag and the token, 
         # so we don't send it more than once
-        dirty_flag = is_sqlite? ? "'t'" : 1
-        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token='#{token}',dirty=#{dirty_flag} where \
+        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token='#{token}',dirty=1 where \
                                                object_value_id='#{map.object_value_id}' \
                                                and client_id='#{map.client_id}'"
       end
@@ -241,10 +239,5 @@ module SourcesHelper
     # Setup return list (inserts + deletes)
     objs_to_insert.collect! {|x| x.db_operation = 'insert'; x}
     objs_to_return.concat(objs_to_insert)
-  end
-  
-  private
-  def is_sqlite?
-    ActiveRecord::Base.connection.class.to_s =~ /SQLite3Adapter/
   end
 end
