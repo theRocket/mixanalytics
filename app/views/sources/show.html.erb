@@ -5,7 +5,7 @@
 <%=link_to 'Create object-value record',{:action=>'newobject',:id=>@source.id}%><br>
 <%prevobj=""%>
 <table>
-  <tr><th>Object</th><th>Attribute</th><th>Value</th><th>Delete Objects</th></tr>
+  <tr><th>Object</th><th>Attribute</th><th>Value</th><th>Delete Objects</th><th>Blob?</th></tr>
   <%if @object_values%>
 <%  @object_values.each do |x|%>
 <%if x.object!=prevobj and prevobj!=""%>
@@ -21,6 +21,7 @@
 
 </td><td><%=x.value%></td>
   <td><%=link_to "X",{:action=>"deleteobjects",:id=>@source.id,:attrvals=>[{"object"=>x.object}]}%></td>
+  <%if x.blob%><td><%= image_tag x.blob.url %></td><%end%>
   </tr>
 <%
   prevobj=x.object
