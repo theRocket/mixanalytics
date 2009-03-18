@@ -44,19 +44,29 @@ class LighthouseTickets < SourceAdapter
     projects = ObjectValue.find(:all, :conditions => ["source_id = ? and update_type = 'query' and attrib = 'name'", 
       projectSource.id])
       
-    projects.each do |project|  
+    projects.each do |project|
+      puts "project = #{project.value}"  
       uri = URI.parse(base_url)
-      req = Net::HTTP::Get.new("/projects/#{project.object}/tickets.xml?q=all", 'Accept' => 'application/xml')
-      req.basic_auth @source.credential.token, "x"
-      response = Net::HTTP.start(uri.host,uri.port) do |http|
-        http.request(req)
-      end
-      xml_data = XmlSimple.xml_in(response.body); 
+      
+      # up to 20 pages at 30 tickets per page = 600 tickets
+      1.upto(20) do |page|
+        req = Net::HTTP::Get.new("/projects/#{project.object}/tickets.xml?q=state:open&page=#{page}", 'Accept' => 'application/xml')
+        req.basic_auth @source.credential.token, "x"
+        response = Net::HTTP.start(uri.host,uri.port) do |http|
+          http.set_debug_output $stderr
+          http.request(req)
+        end
+        xml_data = XmlSimple.xml_in(response.body); 
 
-      # if there are no tickets for a project this will be nil
-      if xml_data["ticket"]
-        @result = @result + xml_data["ticket"]
+        # if there are no tickets this will be nil
+        if xml_data["ticket"]
+          @result = @result + xml_data["ticket"]
+        else
+          break
+        end
       end
+      
+      
     end
   end
 
