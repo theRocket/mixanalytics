@@ -187,11 +187,8 @@ class SourcesController < ApplicationController
         o.user_id=current_user.id
         
         if x["attrib_type"] and x["attrib_type"] == 'blob'
-          puts "INSIDE BLOB SAVE"
           o.blob = params[:blob]
-          o.blob.instance_write(:content_type, "image/png")
           o.blob.instance_write(:file_name, x["value"])
-          puts "BLOB IS: #{o.blob.inspect}"
         end
         o.save
         # add the created ID + created_at time to the list
