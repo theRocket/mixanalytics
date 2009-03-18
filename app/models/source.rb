@@ -77,11 +77,9 @@ class Source < ActiveRecord::Base
     rescue Exception=>e
       slog(e, "Failed to delete",self.id)
     end
-    begin
-      clear_pending_records(@credential)
-    rescue Exception=>e
-      slog(e, "Failed to clear pending records",self.id)
-    end
+    
+    clear_pending_records(@credential)
+
     begin  
       start=Time.new
       source_adapter.query

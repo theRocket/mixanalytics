@@ -11,7 +11,7 @@ module SourcesHelper
       l.time=time
       l.save
     rescue Exception=>e
-      logger.info "Failed to save source log message: " + e
+      p "Failed to save source log message: " + e
     end
   end
   
@@ -23,7 +23,7 @@ module SourcesHelper
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
   def check_access(app)
-    logger.debug "checking access for user "+@current_user.login
+    p "checking access for user "+@current_user.login
     matches_login=app.users.select{ |u| u.login==@current_user.login}
     matches_login << app.administrations.select { |a| a.user.login==@current_user.login } # let the administrators of the app in as well
     if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
@@ -65,7 +65,7 @@ module SourcesHelper
     begin
       start=Time.new
       ObjectValue.delete_all delete_cmd
-      tlog(start,delete,self.id)
+      tlog(start,"delete",self.id)
     rescue Exception=>e
       slog(e, "Failed to delete existing records for user "+credential.user.id.to_s,self.id)
     end
