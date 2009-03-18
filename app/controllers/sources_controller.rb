@@ -58,6 +58,7 @@ class SourcesController < ApplicationController
         end
         @token='end' if @object_values.nil? or @object_values.length == 0
         @client.update_attribute(:last_sync_token, @token) if @token
+        @token=nil if @token == 'end'
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end
