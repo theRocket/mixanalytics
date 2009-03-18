@@ -210,12 +210,12 @@ module SourcesHelper
       objs_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
                                               cm.object_value_id = ov.id \
                                               where cm.client_id='#{client.id}' and ov.id is NULL \
-                                              and cm.dirty = 'f' order by ov.object limit #{page_size}"
+                                              and cm.dirty =0 order by ov.object limit #{page_size}"
       objs_to_delete.each do |map|
         objs_to_return << ObjectValue.new_delete_obj(map.object_value_id)
         # update this client_map record with a dirty flag and the token, 
         # so we don't send it more than once
-        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token='#{token}',dirty='t' where \
+        ActiveRecord::Base.connection.execute "update client_maps set db_operation='delete',token='#{token}',dirty=1 where \
                                                object_value_id='#{map.object_value_id}' \
                                                and client_id='#{map.client_id}'"
       end

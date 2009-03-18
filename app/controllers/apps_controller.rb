@@ -27,7 +27,6 @@ class AppsController < ApplicationController
   # GET /apps
   # GET /apps.xml
   def index
-    p 'current user: ' + @current_user.inspect.to_s
     if @current_user
       login=@current_user.login.downcase 
       admins = @current_user.administrations
@@ -66,7 +65,6 @@ class AppsController < ApplicationController
   def refresh # execute a refresh on all sources associated with an app 
     @sources=Source.find_all_by_app_id @app.id,:order=>:priority
     @sources.each do |src|
-      p "Refreshing " + src.name
       src.refresh(@current_user)
     end
     flash[:notice]="Refreshed all sources"
@@ -113,7 +111,7 @@ class AppsController < ApplicationController
   # subscribe specified subscriber to specified app ID
   def subscribe
     @app=App.find_by_permalink(params[:app_id]) if @app.nil?
-    
+    user=@current_user
     if params[:subscriber]
       @current_user=User.find_by_login params[:subscriber] 
       user=@current_user
@@ -149,7 +147,6 @@ class AppsController < ApplicationController
     admin=User.find_by_login params[:administrator]
     @app=App.find_by_permalink params[:id]
     administration=Administration.find_by_user_id_and_app_id admin.id,@app.id  
-    p "Deleting administration " + administration.app_id.to_s + ":" + administration.user_id.to_s
     administration.delete
     redirect_to :action=>:edit
   end
