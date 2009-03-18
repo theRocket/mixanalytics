@@ -41,8 +41,9 @@ class LighthouseTickets < SourceAdapter
     # iterate over all projects and get the tickets for for each
     # we use the IDs of the projects already synced in LighthouseProjects adapter
     projectSource = Source.find_by_adapter("LighthouseProjects")
-    projects = ObjectValue.find(:all, :conditions => ["source_id = ? and update_type = 'query' and attrib = 'name'", 
-      projectSource.id])
+    projects = ObjectValue.find(:all, :conditions => {
+      :source_id => projectSource.id, :update_type => 'query',
+      :attrib => 'name', :user_id=>@source.current_user.id})
       
     projects.each do |project|
       puts "project = #{project.value}"  
@@ -74,7 +75,8 @@ class LighthouseTickets < SourceAdapter
     if @result
       log "LighthouseTickets sync, with #{@result.length} results"
     else
-      log "LighthouseTickets sync, ERROR @result nil" and return
+      log "LighthouseTickets sync, ERROR @result nil"
+      return
     end
     
     @result.each do |ticket|
