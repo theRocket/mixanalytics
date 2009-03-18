@@ -56,7 +56,7 @@ class SourcesController < ApplicationController
           @token=get_new_token
           @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
         end
-        @token=nil if @object_values.nil? or @object_values.length == 0
+        @token='end' if @object_values.nil? or @object_values.length == 0
         @client.update_attribute(:last_sync_token, @token) if @token
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd

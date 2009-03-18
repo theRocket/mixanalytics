@@ -197,9 +197,13 @@ module SourcesHelper
     # received token: if we're repeating the show,
     # quickly return the results (inserts + deletes)
     if token and repeat
-      objs_to_return = ObjectValue.get_delete_objs_by_token(token,page_size)
-      client.update_attributes({:updated_at => last_sync_time, :last_sync_token => token})
-      return objs_to_return.concat( ObjectValue.get_insert_objs_by_token(object_value_join_conditions,token,page_size) )
+      if token == 'end'
+        return nil
+      else
+        objs_to_return = ObjectValue.get_delete_objs_by_token(token,page_size)
+        client.update_attributes({:updated_at => last_sync_time, :last_sync_token => token})
+        return objs_to_return.concat( ObjectValue.get_insert_objs_by_token(object_value_join_conditions,token,page_size) )
+      end
     end
     
     # no token, continue with processing
