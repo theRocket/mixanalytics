@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090312233936) do
+ActiveRecord::Schema.define(:version => 20090317223510) do
 
   create_table "administrations", :force => true do |t|
     t.integer  "app_id"
@@ -35,7 +35,7 @@ ActiveRecord::Schema.define(:version => 20090312233936) do
     t.datetime "updated_at"
     t.string   "db_operation"
     t.string   "token"
-    t.boolean  "dirty",                          :default => false
+    t.integer  "dirty",           :limit => 1,   :default => 0
   end
 
   add_index "client_maps", ["client_id", "object_value_id"], :name => "client_map_c_id_ov_id"

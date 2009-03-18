@@ -3,7 +3,7 @@ require 'erb'
 # load the common tasks
 load "config/deploy/base"
 
-STAGES = %w(staging production) 
+STAGES = %w(development staging production) 
 STAGES.each do |name| 
   desc "Set the target stage to `#{name}'." 
   task(name) do 
