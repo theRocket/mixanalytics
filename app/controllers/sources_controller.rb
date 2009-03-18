@@ -56,8 +56,9 @@ class SourcesController < ApplicationController
           @token=get_new_token
           @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
         end
-        @token=nil if @object_values.nil? or @object_values.length == 0
+        @token='end' if @object_values.nil? or @object_values.length == 0
         @client.update_attribute(:last_sync_token, @token) if @token
+        @token=nil if @token == 'end'
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end
@@ -187,11 +188,8 @@ class SourcesController < ApplicationController
         o.user_id=current_user.id
         
         if x["attrib_type"] and x["attrib_type"] == 'blob'
-          puts "INSIDE BLOB SAVE"
           o.blob = params[:blob]
-          o.blob.instance_write(:content_type, "image/png")
           o.blob.instance_write(:file_name, x["value"])
-          puts "BLOB IS: #{o.blob.inspect}"
         end
         o.save
         # add the created ID + created_at time to the list
