@@ -198,7 +198,7 @@ module SourcesHelper
     # quickly return the results (inserts + deletes)
     if token and repeat
       if token == 'end'
-        return nil
+        return []
       else
         objs_to_return = ObjectValue.get_delete_objs_by_token(token,page_size)
         client.update_attributes({:updated_at => last_sync_time, :last_sync_token => token})
