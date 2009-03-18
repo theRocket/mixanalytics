@@ -55,9 +55,11 @@ class Source < ActiveRecord::Base
     initadapter(self.credential)   
     # make sure to use @client and @session_id variable in your code that is edited into each source!
     begin
+      start=Time.new
       source_adapter.login  # should set up @session_id
+      tlog(start,"login",self.id)  # log how long it takes to do the login
     rescue Exception=>e
-      p "Failed to login"
+      logger.info "Failed to login"
       slog(e,"can't login",self.id,"login")
     end
     begin 
@@ -81,7 +83,6 @@ class Source < ActiveRecord::Base
       slog(e, "Failed to clear pending records",self.id)
     end
     begin  
-      p "Timing query"
       start=Time.new
       source_adapter.query
       tlog(start,"query",self.id)
@@ -91,8 +92,9 @@ class Source < ActiveRecord::Base
     start=Time.new
     source_adapter.sync
     tlog(start,"sync",self.id)
+    start=Time.new
     finalize_query_records(@credential)
-
+    tlog(start,"finalize",self.id)
     source_adapter.logoff
     save
   end

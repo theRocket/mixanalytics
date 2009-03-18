@@ -2,7 +2,6 @@ module SourcesHelper
   
   def slog(e,msg,source_id,operation=nil,time=nil)
     begin
-      p "Logging "+msg+ " for "+ source_id.to_s
       l=SourceLog.new
       l.source_id=source_id
       l.error=e.inspect.to_s if not e.nil?
@@ -12,7 +11,7 @@ module SourcesHelper
       l.time=time
       l.save
     rescue Exception=>e
-      p "Failed to save source log message: " + e
+      logger.info "Failed to save source log message: " + e
     end
   end
   
@@ -24,7 +23,7 @@ module SourcesHelper
   # determines if the logged in users is a subscriber of the current app or 
   # admin of the current app
   def check_access(app)
-    p "checking access for user "+@current_user.login
+    logger.debug "checking access for user "+@current_user.login
     matches_login=app.users.select{ |u| u.login==@current_user.login}
     matches_login << app.administrations.select { |a| a.user.login==@current_user.login } # let the administrators of the app in as well
     if !(app.anonymous==1) and (matches_login.nil? or matches_login.size == 0)
@@ -63,7 +62,13 @@ module SourcesHelper
   def clear_pending_records(credential)
     delete_cmd= "(update_type is null) and source_id="+id.to_s
     (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
-    ObjectValue.delete_all delete_cmd
+    begin
+      start=Time.new
+      ObjectValue.delete_all delete_cmd
+      tlog(start,delete,self.id)
+    rescue Exception=>e
+      slog(e, "Failed to delete existing records for user "+credential.user.id.to_s,self.id)
+    end
   end
   
   # presence or absence of credential determines whether we are using a "per user sandbox" or not
@@ -91,7 +96,7 @@ module SourcesHelper
         pending_to_query="update object_values set update_type='query',id=pending_id where id="+obj.id.to_s
         ActiveRecord::Base.connection.execute(pending_to_query)
       rescue Exception => e
-        slog(e,"Failed to finalize object value (due to duplicate)",id)
+        slog(e,"Failed to finalize object value (due to duplicate) for object "+obj.id.to_s,id)
       end
     end   
   end
@@ -129,6 +134,7 @@ module SourcesHelper
   end
     
   def process_update_type(utype)
+    start=Time.new  # start timing the operation
     objs=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
     objs.each do |x|
       if x.object  
@@ -151,6 +157,7 @@ module SourcesHelper
         logger.info msg
       end
     end
+    tlog(start,utype,self.id) # log the time to perform the particular type of operation
   end
   
   def setup_client(client_id)

@@ -31,7 +31,6 @@ class SessionsController < ApplicationController
   end
 
   def create
-    p "create params: " + params.inspect.to_s
     logout_keeping_session!
     @app=App.find_by_permalink params[:app_id] if params[:app_id]
     user = User.authenticate(params[:login], params[:password])
