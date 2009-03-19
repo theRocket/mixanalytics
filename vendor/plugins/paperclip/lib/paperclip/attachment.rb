@@ -285,7 +285,7 @@ module Paperclip
     end
 
     def log message #:nodoc:
-      logger.info("[paperclip] #{message}") if logging?
+      logger.debug("[paperclip] #{message}") if logging?
     end
 
     def logging? #:nodoc:
