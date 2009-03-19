@@ -1,6 +1,6 @@
 module SourcesHelper
   
-  def slog(e,msg,source_id,operation=nil,time=nil)
+  def slog(e,msg,source_id,operation=nil,timing=nil)
     begin
       l=SourceLog.new
       l.source_id=source_id
@@ -8,7 +8,7 @@ module SourcesHelper
       l.error||=""
       l.message=msg
       l.operation=operation
-      l.time=time
+      l.timing=timing
       l.save
     rescue Exception=>e
       p "Failed to save source log message: " + e
@@ -16,7 +16,8 @@ module SourcesHelper
   end
   
   def tlog(start,operation,source_id)
-    diff=(Time.new-start).round
+    diff=(Time.new-start)
+    p "Timing "+diff.to_s
     slog(nil,"Timing: "+diff.to_s+" seconds",source_id,operation,diff)
   end
 
@@ -67,7 +68,7 @@ module SourcesHelper
       ObjectValue.delete_all delete_cmd
       tlog(start,"delete",self.id)
     rescue Exception=>e
-      slog(e, "Failed to delete existing records for user "+credential.user.id.to_s,self.id)
+      slog(e, "Failed to delete existing records ",self.id)
     end
   end
   
@@ -108,8 +109,8 @@ module SourcesHelper
       delete_cmd = "(update_type is not null) and source_id="+id.to_s
       (delete_cmd << " and user_id="+ credential.user.id.to_s) if credential # if there is a credential then just do delete and update based upon the records with that credential
       ObjectValue.delete_all delete_cmd
-=begin
       remove_dupe_pendings(credential)
+=begin
       pending_to_query="update object_values set update_type='query',id=pending_id where update_type is null and source_id="+id.to_s
       (pending_to_query << " and user_id=" + credential.user.id.to_s) if credential
       ActiveRecord::Base.connection.execute(pending_to_query)
