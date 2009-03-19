@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20090317223510) do
+ActiveRecord::Schema.define(:version => 20090319192254) do
 
   create_table "administrations", :force => true do |t|
     t.integer  "app_id"
@@ -29,13 +29,12 @@ ActiveRecord::Schema.define(:version => 20090317223510) do
   end
 
   create_table "client_maps", :id => false, :force => true do |t|
-    t.string   "client_id",       :limit => 36
-    t.integer  "object_value_id", :limit => 255
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "db_operation"
-    t.string   "token"
-    t.integer  "dirty",           :limit => 1,   :default => 0
+    t.string  "client_id",       :limit => 36
+    t.integer "object_value_id", :limit => 255
+    t.string  "db_operation"
+    t.string  "token"
+    t.integer "dirty",           :limit => 1,   :default => 0
+    t.integer "ack_token",       :limit => 1,   :default => 0
   end
 
   add_index "client_maps", ["client_id", "object_value_id"], :name => "client_map_c_id_ov_id"
@@ -89,12 +88,12 @@ ActiveRecord::Schema.define(:version => 20090317223510) do
   create_table "source_logs", :force => true do |t|
     t.string   "error"
     t.string   "message"
-    t.integer "time"
-    t.float  "timing"
+    t.integer  "time"
     t.string   "operation"
     t.integer  "source_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "timing"
   end
 
   create_table "sources", :force => true do |t|

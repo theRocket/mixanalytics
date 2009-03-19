@@ -48,17 +48,20 @@ class SourcesController < ApplicationController
       # if client_id is provided, return only relevant object for that client
       if params[:client_id]
         @client = setup_client(params[:client_id])
-        if params[:token]
-          @token=params[:token] == 'last' ? @client.last_sync_token : params[:token].to_s
-          @object_values=process_objects_for_client(@source,@client,@token,params[:p_size],true)
+        @ack_token = @token = params[:ack_token]
+        if @ack_token
+          @ack_token = @ack_token.to_s
+          @object_values=process_objects_for_client(@source,@client,nil,@ack_token,params[:p_size],true)
         else
           # return num microseconds since Jan 1 2009
           @token=get_new_token
-          @object_values=process_objects_for_client(@source,@client,@token,params[:p_size])
+          @object_values=process_objects_for_client(@source,@client,@token,nil,params[:p_size])
         end
-        @token='end' if @object_values.nil? or @object_values.length == 0
+        # set token depending on records returned
+        # if we sent zero records, we need to keep track so the client 
+        # doesn't receive the last page again
+        @token=nil if @object_values.nil? or @object_values.length == 0
         @client.update_attribute(:last_sync_token, @token) if @token
-        @token=nil if @token == 'end'
       else
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end
