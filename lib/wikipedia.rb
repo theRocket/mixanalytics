@@ -23,8 +23,11 @@ class Wikipedia < SourceAdapter
   def ask(params)
     puts "Wikipedia ask with #{params.inspect.to_s}\n"
     
-    question = params['question']
-    refresh = params['refresh']
+    # currently device cannot pass multiple params via ask so we split apart the params here
+    device_params = CGI::parse("question="+params['question'])
+    
+    question = device_params['question']
+    refresh = device_params['refresh']
     
     data = ask_wikipedia question
     
