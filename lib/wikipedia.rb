@@ -30,7 +30,7 @@ class Wikipedia < SourceAdapter
     
     question = device_params['question']
     question = question[0] if question.class == Array
-    refresh = device_params['refresh']
+    refresh = device_params['refresh'].present?
     
     data = ask_wikipedia question
     
