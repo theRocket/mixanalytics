@@ -26,13 +26,16 @@ class Wikipedia < SourceAdapter
     # currently device cannot pass multiple params via ask so we split apart the params here
     device_params = CGI::parse("question="+params['question'])
     
+    puts "device params = #{device_params.inspect.to_s}"
+    
     question = device_params['question']
+    question = question[0] if question.class == Array
     refresh = device_params['refresh']
     
     data = ask_wikipedia question
     
-    header_id = "header_#{question}"
-    data_id = "data_#{question}"
+    header_id = "header_#{CGI::escape(question)}"
+    data_id = "data_#{CGI::escape(question)}"
     
     # if we are asking to refresh an existing page we have to give it a new object id
     # that is different that the existing object ID or we will get duplicates on the device
@@ -158,7 +161,9 @@ class Wikipedia < SourceAdapter
     # html = html.gsub('<link href=\'/stylesheets/application.css\'', '<link href=\'http://m.wikipedia.org/stylesheets/application.css\'')
     
     # links to other articles
-    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i,'href="/app/WikipediaPage/{\1}/fetch" target="_top"')
+    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i) do |s|
+      %Q(href="/app/WikipediaPage/{#{s}}/fetch" target="_top")
+    end
     
     # redlinks
     html.gsub(%Q(href="/w/index.php?), %Q(target="_top" href="http://en.wikipedia.org/w/index.php?))
