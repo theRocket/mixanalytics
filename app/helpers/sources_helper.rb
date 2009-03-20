@@ -181,7 +181,7 @@ module SourcesHelper
   # and the current state of the object_values table
   # since we do a delete_all in rhosync refresh, 
   # only delete and insert are required
-  def process_objects_for_client(source,client,token,ack_token,p_size=nil,repeat=false)
+  def process_objects_for_client(source,client,token,ack_token,resend_token,p_size=nil,first_request=false)
     
     # default page size of 10000
     page_size = p_size.nil? ? 10000 : p_size.to_i
@@ -202,12 +202,15 @@ module SourcesHelper
     # setup fields to insert in client_maps table
     object_insert_query = "select '#{client.id}' as a,id,'insert','#{token}' #{object_value_conditions}"
                     
-    # if we're repeating the show, quickly return the results (inserts + deletes)
-    if !ack_token and repeat
+    # if we're resending the token, quickly return the results (inserts + deletes)
+    if resend_token
+      logger.debug "[sources_helper] resending token, resend_token: #{resend_token.inspect}"
       objs_to_return = ClientMap.get_delete_objs_by_token_status(client.id)
-      client.update_attributes({:updated_at => last_sync_time})
-      objs_to_return.concat( ClientMap.get_insert_objs_by_token_status(object_value_join_conditions,client.id,source.id) )
+      client.update_attributes({:updated_at => last_sync_time, :last_sync_token => resend_token})
+      objs_to_return.concat( ClientMap.get_insert_objs_by_token_status(object_value_join_conditions,client.id,resend_token) )
     else
+      logger.debug "[sources_helper] ack_token: #{ack_token.inspect}, using new token: #{token.inspect}"
+      
       # mark acknowledged token so we don't send it again
       ClientMap.mark_objs_by_ack_token(ack_token)
       
@@ -223,6 +226,12 @@ module SourcesHelper
       # to track the last sync time
       client.update_attribute(:updated_at, last_sync_time)
       objs_to_return.concat(objs_to_insert)
+      
+      if token and objs_to_return.length > 0
+        client.update_attribute(:last_sync_token, token)
+      else
+        client.update_attribute(:last_sync_token, nil)
+      end
     end
     objs_to_return
   end

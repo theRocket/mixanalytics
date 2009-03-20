@@ -45,24 +45,43 @@ class SourcesController < ApplicationController
       objectvalues_cmd << " and user_id=" + @source.credential.user.id.to_s if @source.credential
       objectvalues_cmd << " order by object,attrib"
 
-      # if client_id is provided, return only relevant object for that client
+      # if client_id is provided, return only relevant objects for that client
       if params[:client_id]
         @client = setup_client(params[:client_id])
-        @ack_token = @token = params[:ack_token]
-        # return num microseconds since Jan 1 2009
-        @token=get_new_token
+        @ack_token = params[:ack_token]
+        @first_request=false
+        @resend_token=nil
+        
+        # setup the conditions to handle the client request
         if @ack_token
-          @ack_token = @ack_token.to_s
-          @object_values=process_objects_for_client(@source,@client,@token,@ack_token,params[:p_size],true)
+          logger.debug "[sources_controller] Received ack_token,
+                          ack_token: #{@ack_token.inspect}, new token: #{@token.inspect}"
         else
-          @object_values=process_objects_for_client(@source,@client,@token,nil,params[:p_size])
-        end
+          # get last token if available, otherwise it's the first request
+          # for a given source
+          @resend_token=@client.last_sync_token
+          if @resend_token.nil?
+            @first_request=true
+          end
+          logger.debug "[sources_controller] Didn't receive ack_token,
+                          token: #{@token.inspect}, first_request: #{@first_request.inspect}, ack_token: #{@ack_token.inspect}"
+        end 
+        
+        # generate new token for the next set of data
+        @token=get_new_token
+        # get the list of objects
+        @object_values=process_objects_for_client(@source,@client,@token,@ack_token,@resend_token,params[:p_size],@first_request)
+        
         # set token depending on records returned
         # if we sent zero records, we need to keep track so the client 
         # doesn't receive the last page again
         @token=nil if @object_values.nil? or @object_values.length == 0
-        @client.update_attribute(:last_sync_token, @token) if @token
+        
+        logger.debug "[sources_controller] Finished processing objects for client, \n
+                        token: #{@token.inspect}, last_sync_token: #{@client.last_sync_token.inspect}, \n
+                        updated_at: #{@client.updated_at}, object_values count: #{@object_values.length}"
       else
+        # no client_id, just show everything
         @object_values=ObjectValue.find_by_sql objectvalues_cmd
       end
       @object_values.delete_if {|o| o.value.nil? || o.value.size<1 }  # don't send back blank or nil OAV triples

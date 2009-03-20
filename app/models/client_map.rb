@@ -12,12 +12,12 @@ class ClientMap < ActiveRecord::Base
   end
   
   # get insert objects based on token status
-  def self.get_insert_objs_by_token_status(join_conditions,client_id,source_id)
+  def self.get_insert_objs_by_token_status(join_conditions,client_id,resend_token)
     objs_to_return = ObjectValue.find_by_sql "select * #{join_conditions} where cm.ack_token = 0 \
                                               and cm.object_value_id is not NULL \
                                               and cm.db_operation != 'delete' \
                                               and cm.client_id = '#{client_id}' \
-                                              and ov.source_id = #{source_id} \
+                                              and cm.token = #{resend_token} \
                                               order by ov.object"
     return objs_to_return.collect! {|x| x.db_operation = 'insert'; x}
   end
@@ -41,7 +41,7 @@ class ClientMap < ActiveRecord::Base
       objs_to_delete = ClientMap.find_by_sql "select * from client_maps cm left join object_values ov on \
                                               cm.object_value_id = ov.id \
                                               where cm.client_id='#{client_id}' and ov.id is NULL \
-                                              and cm.dirty =0 order by ov.object limit #{page_size}"
+                                              and cm.dirty=0 order by ov.object limit #{page_size}"
       objs_to_delete.each do |map|
         objs_to_return << new_delete_obj(map.object_value_id)
         # update this client_map record with a dirty flag and the token, 
