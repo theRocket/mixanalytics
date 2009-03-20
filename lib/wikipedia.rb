@@ -83,12 +83,16 @@ class Wikipedia < SourceAdapter
     
   protected
   
-  def wiki_name(raw_string)
-    raw_string == "::Home" ? raw_string : ERB::Util.url_encode(raw_string.gsub(" ", "_"))
-  end
+  # def wiki_name(raw_string)
+  #   raw_string == "::Home" ? raw_string : ERB::Util.url_encode(raw_string.gsub(" ", "_"))
+  # end
   
   def ask_wikipedia(search)
-    path = "/wiki/#{wiki_name(search)}"
+    # what is passed in when following a link will be encoded
+    search = CGI::unescape(search)
+    
+    path = "/wiki/#{search}"
+    puts "path = #{path}"
  
     # temporarily we hardcode these headers which are required by m.wikipedia.org
     headers = {
@@ -160,14 +164,12 @@ class Wikipedia < SourceAdapter
     #stylesheets
     # html = html.gsub('<link href=\'/stylesheets/application.css\'', '<link href=\'http://m.wikipedia.org/stylesheets/application.css\'')
     
-    # links to other articles
-    # html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i) do |s|
-    #   %Q(href="/app/WikipediaPage/{#{s}}/fetch" target="_top")
-    # end
-    # 
-    # <a href="/app/WikipediaPage/{href="/wiki/Wikipedia:Featured_articles"}/fetch" target="_top" title="Wikipedia:Featured articles">
-    
-    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i, 'href="/app/WikipediaPage/{\1}/fetch" target="_top"')
+    #links to other articles
+    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,\/._]*)\"/i) do |s|
+      # parameter must be double encoded, rhodes will unencode once automatically
+      # if not double encoded will fail
+      %Q(href="/app/WikipediaPage/{#{CGI::escape(CGI::escape($1))}}/fetch" target="_top")
+    end
     
     # redlinks
     html.gsub(%Q(href="/w/index.php?), %Q(target="_top" href="http://en.wikipedia.org/w/index.php?))
