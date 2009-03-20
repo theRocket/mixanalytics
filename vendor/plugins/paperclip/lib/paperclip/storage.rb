@@ -36,7 +36,7 @@ module Paperclip
       alias_method :to_io, :to_file
 
       def flush_writes #:nodoc:
-        logger.info("[paperclip] Writing files for #{name}")
+        #logger.info("[paperclip] Writing files for #{name}")
         @queued_for_write.each do |style, file|
           file.close
           FileUtils.mkdir_p(File.dirname(path(style)))
@@ -48,7 +48,7 @@ module Paperclip
       end
 
       def flush_deletes #:nodoc:
-        logger.info("[paperclip] Deleting files for #{name}")
+        #logger.info("[paperclip] Deleting files for #{name}")
         @queued_for_delete.each do |path|
           begin
             logger.info("[paperclip] -> #{path}")
@@ -193,7 +193,7 @@ module Paperclip
       alias_method :to_io, :to_file
 
       def flush_writes #:nodoc:
-        logger.info("[paperclip] Writing files for #{name}")
+        #logger.info("[paperclip] Writing files for #{name}")
         @queued_for_write.each do |style, file|
           begin
             logger.info("[paperclip] -> #{path(style)}")
@@ -208,7 +208,7 @@ module Paperclip
       end
 
       def flush_deletes #:nodoc:
-        logger.info("[paperclip] Writing files for #{name}")
+        #logger.info("[paperclip] Writing files for #{name}")
         @queued_for_delete.each do |path|
           begin
             logger.info("[paperclip] -> #{path}")
