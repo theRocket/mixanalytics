@@ -49,12 +49,12 @@ class SourcesController < ApplicationController
       if params[:client_id]
         @client = setup_client(params[:client_id])
         @ack_token = @token = params[:ack_token]
+        # return num microseconds since Jan 1 2009
+        @token=get_new_token
         if @ack_token
           @ack_token = @ack_token.to_s
-          @object_values=process_objects_for_client(@source,@client,nil,@ack_token,params[:p_size],true)
+          @object_values=process_objects_for_client(@source,@client,@token,@ack_token,params[:p_size],true)
         else
-          # return num microseconds since Jan 1 2009
-          @token=get_new_token
           @object_values=process_objects_for_client(@source,@client,@token,nil,params[:p_size])
         end
         # set token depending on records returned
