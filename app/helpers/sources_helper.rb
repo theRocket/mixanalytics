@@ -206,7 +206,7 @@ module SourcesHelper
     if !ack_token and repeat
       objs_to_return = ClientMap.get_delete_objs_by_token_status(client.id)
       client.update_attributes({:updated_at => last_sync_time})
-      objs_to_return.concat( ClientMap.get_insert_objs_by_token_status(object_value_join_conditions,client.id) )
+      objs_to_return.concat( ClientMap.get_insert_objs_by_token_status(object_value_join_conditions,client.id,source.id) )
     else
       # mark acknowledged token so we don't send it again
       ClientMap.mark_objs_by_ack_token(ack_token)
