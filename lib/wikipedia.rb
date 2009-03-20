@@ -161,9 +161,13 @@ class Wikipedia < SourceAdapter
     # html = html.gsub('<link href=\'/stylesheets/application.css\'', '<link href=\'http://m.wikipedia.org/stylesheets/application.css\'')
     
     # links to other articles
-    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i) do |s|
-      %Q(href="/app/WikipediaPage/{#{s}}/fetch" target="_top")
-    end
+    # html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i) do |s|
+    #   %Q(href="/app/WikipediaPage/{#{s}}/fetch" target="_top")
+    # end
+    # 
+    # <a href="/app/WikipediaPage/{href="/wiki/Wikipedia:Featured_articles"}/fetch" target="_top" title="Wikipedia:Featured articles">
+    
+    html = html.gsub(/href=\"\/wiki\/([\w\(\)%:\-\,._]*)\"/i, 'href="/app/WikipediaPage/{\1}/fetch" target="_top"')
     
     # redlinks
     html.gsub(%Q(href="/w/index.php?), %Q(target="_top" href="http://en.wikipedia.org/w/index.php?))
