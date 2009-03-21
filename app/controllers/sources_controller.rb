@@ -68,7 +68,7 @@ class SourcesController < ApplicationController
         end 
         
         # generate new token for the next set of data
-        @token=get_new_token
+        @token=@resend_token ? @resend_token : get_new_token
         # get the list of objects
         @object_values=process_objects_for_client(@source,@client,@token,@ack_token,@resend_token,params[:p_size],@first_request)
         
