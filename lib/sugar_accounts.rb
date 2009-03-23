@@ -8,10 +8,6 @@ class SugarAccounts < SugarAdapter
       name
       date_entered
       date_modified
-      modified_user_id
-      modified_by_name
-      created_by
-      created_by_name
       description
       assigned_user_id
       assigned_user_name
@@ -42,7 +38,6 @@ class SugarAccounts < SugarAdapter
       parent_id
       sic_code
       parent_name
-      campaign_id      
     )
   end
 end
