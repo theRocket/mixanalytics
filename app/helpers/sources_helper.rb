@@ -142,6 +142,7 @@ module SourcesHelper
         objvals=ObjectValue.find_all_by_object_and_update_type(x.object,utype)  # this has all the attribute value pairs now
         attrvalues={}
         attrvalues["id"]=x.object if utype!='create' # setting the ID allows it be an update or delete
+        blob=x.blob
         objvals.each do |y|
           attrvalues[y.attrib]=y.value
           y.destroy
@@ -150,7 +151,7 @@ module SourcesHelper
         nvlist=make_name_value_list(attrvalues)
         if source_adapter
           name_value_list=eval(nvlist)
-          eval("source_adapter." +utype +"(name_value_list)")
+          eval("source_adapter." +utype +"(name_value_list"+(x.blob.nil? ? ")" : ",x.blob)"))
         end
       else
         msg="Missing an object property on the objectvalue: " + x.id.to_s
