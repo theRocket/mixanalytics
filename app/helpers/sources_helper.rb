@@ -136,13 +136,13 @@ module SourcesHelper
     
   def process_update_type(utype)
     start=Time.new  # start timing the operation
-    objs=ObjectValue.find_by_sql("select distinct(object) from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
+    objs=ObjectValue.find_by_sql("select distinct(object),blob_file_name from object_values where update_type='"+ utype +"'and source_id="+id.to_s)
     objs.each do |x|
       if x.object  
         objvals=ObjectValue.find_all_by_object_and_update_type(x.object,utype)  # this has all the attribute value pairs now
         attrvalues={}
         attrvalues["id"]=x.object if utype!='create' # setting the ID allows it be an update or delete
-        blob=x.blob
+        blob_file=x.blob_file_name
         objvals.each do |y|
           attrvalues[y.attrib]=y.value
           y.destroy
@@ -151,7 +151,8 @@ module SourcesHelper
         nvlist=make_name_value_list(attrvalues)
         if source_adapter
           name_value_list=eval(nvlist)
-          eval("source_adapter." +utype +"(name_value_list"+(x.blob.nil? ? ")" : ",x.blob)"))
+          params="(name_value_list"+ (x.blob_file_name ? ",x.blob)" : ")")
+          eval("source_adapter." +utype +params)
         end
       else
         msg="Missing an object property on the objectvalue: " + x.id.to_s
