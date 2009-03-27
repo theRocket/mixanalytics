@@ -15,8 +15,8 @@ test:
 
 production:
   adapter: mysql
-  database: rhosync_production
+  database: rhosync_prod
   timeout: 15000
-  username: #{username}
-  password: #{password}
-  host: localhost
+  username: ryanr
+  password: rickerts
+  host: mysql.mixanalytics.com
