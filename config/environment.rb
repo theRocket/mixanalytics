@@ -29,7 +29,7 @@ Rails::Initializer.run do |config|
   config.gem "httpclient", :version => "2.1.2"
   config.gem "soap4r", :lib => "soap/mapping"
   config.gem "uuidtools"
-  config.gem "actionmailer",:lib => "actionmailer"
+  config.gem "actionmailer", :lib => "actionmailer"
   config.gem "rspec", :lib => "spec"
   config.gem "rspec-rails", :lib => "spec/rake/spectask"
   config.gem "rcov"
