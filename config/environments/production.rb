@@ -1,5 +1,5 @@
 # Settings specified here will take precedence over those in config/environment.rb
-ENV['GEM_PATH'] = File.expand_path('~/.gems') + ':/usr/lib/ruby/gems/1.8'
+
 # The production environment is meant for finished, "live" apps.
 # Code is not reloaded between requests
 config.cache_classes = true
